@@ -122,6 +122,18 @@ tr:hover td { background:#f9fafb; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .error-banner { background:#fef2f2; border:1px solid #fecaca; color:#dc2626; padding:12px 16px; border-radius:8px; margin-bottom:14px; font-size:13px; display:none; }
 .error-banner.show { display:block; }
+.agent-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; }
+.agent-card { background:var(--carvago-50); border:1px solid var(--carvago-100); border-radius:12px; padding:14px 16px; position:relative; }
+.agent-card.agent-na { background:#F3F4F6; border-color:#E5E7EB; }
+.agent-card .a-icon { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--carvago); color:#fff; font-size:14px; font-weight:600; margin-bottom:8px; }
+.agent-card.agent-na .a-icon { background:#9CA3AF; }
+.agent-card .a-name { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.3px; font-weight:600; }
+.agent-card .a-val { font-size:28px; font-weight:700; color:var(--navy); margin-top:2px; letter-spacing:-0.01em; }
+.agent-card .a-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+.agent-card .a-bar { height:4px; background:rgba(45,31,227,0.1); border-radius:2px; margin-top:10px; overflow:hidden; }
+.agent-card .a-bar-fill { height:100%; background:var(--carvago); opacity:0.6; transition:width 0.5s ease; }
+.agent-card.agent-na .a-bar { background:rgba(0,0,0,0.05); }
+.agent-card.agent-na .a-bar-fill { background:#9CA3AF; }
 .hm-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
 .hm-card { background:#f8f9fb; border-radius:6px; padding:10px 12px; }
 .hm-card .l { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.3px; }
@@ -167,6 +179,8 @@ tr:hover td { background:#f9fafb; }
   <div id="tier2"></div>
   <div id="tier3"></div>
 
+  <div class="card"><div class="card-title">&#128100; Call Center &mdash; Car Check per Agent</div><div id="tblAgent"></div></div>
+
   <div class="card"><div class="card-title">&#128222; Car Check &mdash; nedovolano detail</div><div id="tblNedov"></div></div>
   <div class="card"><div class="card-title">&#10006; Closed reasons (Phase 1)</div><div id="tblClosed"></div></div>
   <div class="card"><div class="card-title">&#127760; Vendor Country &mdash; prehled</div><div id="tblCountry"></div></div>
@@ -209,6 +223,7 @@ function render() {
   renderTier1(t.total, t.closed, t.phase2, t.ip_total, d.month_label);
   renderTier2(t.closed, t.phase2, t.ip_total, t.total);
   renderTier3(d.status_breakdown, d.nedov_count);
+  renderAgentTable(d.agent_breakdown);
   renderNedovTable(d.nedovolano, d.sf_base_url);
   renderClosedTable(d.closed_reasons);
   renderCountryTable(d.country_breakdown);
@@ -318,6 +333,33 @@ function renderTier3(sm, nedovCount) {
       '<div class="ip-sub">ceka na vyber &middot; '+pct(aw)+'% IP</div>'+
       '<div class="ip-bar"><div class="ip-bar-fill" style="width:'+pct(aw)+'%"></div></div>'+
     '</div></div>';
+}
+
+function renderAgentTable(agents) {
+  const el = document.getElementById('tblAgent');
+  if (!agents || !Object.keys(agents).length) { el.innerHTML='<span style="color:var(--muted)">Zadny Car Check case</span>'; return; }
+  const entries = Object.entries(agents).sort((a,b) => b[1] - a[1]);
+  const total = entries.reduce((s,[,v]) => s+v, 0);
+  const max = entries[0][1];
+  let h = '<div style="font-size:12px;color:var(--muted);margin-bottom:12px">Celkem Car Check cases: <strong style="color:var(--text)">'+total+'</strong></div>';
+  h += '<div class="agent-grid">';
+  entries.forEach(([name, cnt]) => {
+    const isNA = (name === 'Neprideleno' || name === 'null' || !name);
+    const cls = isNA ? 'agent-card agent-na' : 'agent-card';
+    const pct = total ? Math.round(cnt/total*100) : 0;
+    const barW = max ? Math.round(cnt/max*100) : 0;
+    const initials = isNA ? '?' : name.replace(/[^A-Z0-9]/gi, '').slice(0,2).toUpperCase();
+    const displayName = isNA ? 'Nepriděleno' : name;
+    h += '<div class="'+cls+'">'+
+      '<div class="a-icon">'+initials+'</div>'+
+      '<div class="a-name">'+displayName+'</div>'+
+      '<div class="a-val">'+cnt+'</div>'+
+      '<div class="a-sub">'+pct+'% z Car Check</div>'+
+      '<div class="a-bar"><div class="a-bar-fill" style="width:'+barW+'%"></div></div>'+
+    '</div>';
+  });
+  h += '</div>';
+  el.innerHTML = h;
 }
 
 function renderNedovTable(data, sfBase) {

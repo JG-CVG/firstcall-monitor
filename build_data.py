@@ -97,6 +97,14 @@ def main():
         closed_country = load("sf_closed_country.json")
     except FileNotFoundError:
         closed_country = {}
+    try:
+        agents_recs = load("sf_agents.json")["records"]
+        agents = {}
+        for r in agents_recs:
+            k = r.get("Call_Center_Agent__c") or "Neprideleno"
+            agents[k] = int(r.get("cnt", r.get("expr0", 0)))
+    except FileNotFoundError:
+        agents = {}
     feeds_data = load("sf_feeds.json")["records"]
     incs_data = load("sf_incidents.json")["records"]
     heatmap_recs = load("sf_heatmap.json")["records"]
@@ -211,6 +219,7 @@ def main():
         "status_breakdown": sm,
         "closed_reasons": cl_reasons,
         "country_breakdown": country,
+        "agent_breakdown": agents,
         "nedovolano": nedov_data,
         "nedov_count": nedov_count,
         "heatmap": {
