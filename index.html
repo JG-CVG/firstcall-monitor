@@ -18,6 +18,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .header-right { display:flex; align-items:center; gap:14px; }
 .ts { font-size:11px; color:rgba(255,255,255,0.7); }
 .ts.stale { color:#ffb547; font-weight:600; }
+.countdown { font-size:11px; color:rgba(255,255,255,0.55); font-variant-numeric:tabular-nums; }
 .refresh-btn { background:var(--green); color:var(--navy); border:none; padding:7px 18px; border-radius:6px; font-weight:700; cursor:pointer; font-size:13px; }
 .refresh-btn:disabled { opacity:0.4; cursor:not-allowed; }
 .container { padding:14px; max-width:1100px; margin:0 auto; }
@@ -106,7 +107,7 @@ tr:hover td { background:#f9fafb; }
   </div>
   <div class="header-right">
     <span class="ts" id="ts">&mdash;</span>
-    <button class="refresh-btn" id="btn" onclick="loadData()">&#8635; Obnovit</button>
+    <span class="countdown" id="countdown">&mdash;</span>
   </div>
 </div>
 
@@ -140,19 +141,19 @@ function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&a
 function fmtEta(d) { if (!d) return null; const p = String(d).slice(0,10).split('-'); if (p.length !== 3) return d; return parseInt(p[2],10)+'.'+parseInt(p[1],10)+'.'; }
 
 async function loadData() {
-  const btn=document.getElementById('btn'), overlay=document.getElementById('ov');
-  btn.disabled=true; overlay.classList.remove('hidden');
+  const overlay=document.getElementById('ov');
+  overlay.classList.remove('hidden');
   document.getElementById('errorBanner').classList.remove('show');
   try {
-    const url = './data.json?t=' + Date.now(); // cache-bust
+    const url = './data.json?t=' + Date.now();
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('HTTP '+resp.status);
     DATA = await resp.json();
     render();
+    resetCountdown();
   } catch (e) {
     showError('Chyba pri nacitani data.json: ' + e.message);
   } finally {
-    btn.disabled=false;
     overlay.classList.add('hidden');
   }
 }
@@ -439,9 +440,24 @@ function renderHeatmapWork(hm) {
   wrap.innerHTML = h;
 }
 
+let nextRefreshAt = 0;
+const REFRESH_MS = 5 * 60 * 1000;
+
+function resetCountdown() { nextRefreshAt = Date.now() + REFRESH_MS; }
+function tickCountdown() {
+  const el = document.getElementById('countdown');
+  if (!el) return;
+  const ms = nextRefreshAt - Date.now();
+  if (ms <= 0) { el.textContent = 'obnovuji...'; return; }
+  const totalSec = Math.floor(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  el.textContent = 'Pristi refresh za ' + m + ':' + String(s).padStart(2, '0');
+}
+
 loadData();
-/* Auto-refresh JSON every 5 min */
-setInterval(loadData, 5 * 60 * 1000);
+setInterval(loadData, REFRESH_MS);
+setInterval(tickCountdown, 1000);
 </script>
 </body>
 </html>
