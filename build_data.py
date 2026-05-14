@@ -105,6 +105,11 @@ def main():
             agents[k] = int(r.get("cnt", r.get("expr0", 0)))
     except FileNotFoundError:
         agents = {}
+    try:
+        with open(os.path.join(TMP, "sf_agents_per_case.json"), "r", encoding="utf-8") as f:
+            agents_per_case = json.load(f)
+    except FileNotFoundError:
+        agents_per_case = {}
     feeds_data = load("sf_feeds.json")["records"]
     incs_data = load("sf_incidents.json")["records"]
     heatmap_recs = load("sf_heatmap.json")["records"]
@@ -177,6 +182,7 @@ def main():
             "id": cid,
             "cn": c["CaseNumber"],
             "country": vc(c),
+            "agent": agents_per_case.get(cid),
             "ageH": age_h,
             "ageW": age_w,
             "isN": is_n,

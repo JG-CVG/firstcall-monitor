@@ -371,7 +371,7 @@ function renderNedovTable(data, sfBase) {
   h+='<span>&#128222; Car Check: <strong>'+data.length+'</strong></span>';
   h+='<span style="color:#d97706">&#10006; Nedovolano: <strong>'+nCnt+'</strong></span>';
   h+='<span style="color:#dc2626">&#10071; Bez nedovolano: <strong>'+noN+'</strong></span></div>';
-  h+='<table><thead><tr><th>Case</th><th>Country</th><th class="r">Stari</th><th class="r" title="Po-Pa 8-17, So 8-13">Prac. hod.</th><th class="c">Nedovolano</th><th>Posledni pokus</th><th>Operator</th><th>Blokacni incident</th><th class="c">Na uzavreni</th></tr></thead><tbody>';
+  h+='<table><thead><tr><th>Case</th><th>Country</th><th class="r">Stari</th><th class="r" title="Po-Pa 8-17, So 8-13">Prac. hod.</th><th class="c">Nedovolano</th><th>Posledni pokus</th><th>Operator</th><th>Agent</th><th>Blokacni incident</th><th class="c">Na uzavreni</th></tr></thead><tbody>';
   data.forEach(d=>{
     const rc=d.isN?' class="row-warn"':'';
     const ab=d.ageH!=null?'<span class="badge '+(d.ageH>72?'b-red':d.ageH>24?'b-amber':'b-green')+'">'+d.ageH+'h</span>':'—';
@@ -391,7 +391,8 @@ function renderNedovTable(data, sfBase) {
     const skullTitle = d.potClose ? ('Potencial na uzavreni: '+d.nCnt+' nedovolano, span '+(d.potSpanH!=null?d.potSpanH.toFixed(1):'?')+'h, '+(d.ageW!=null?d.ageW.toFixed(1):'?')+' prac. hod.') : '';
     const skullCell = d.potClose ? '<span title="'+escapeHtml(skullTitle)+'" style="font-size:18px">&#128128;</span>' : '<span style="color:var(--muted)">—</span>';
     const caseLink = (sfBase && d.id) ? '<a href="'+sfBase+'/lightning/r/Case/'+d.id+'/view" target="_blank" rel="noopener" style="color:var(--carvago);text-decoration:none;font-weight:500"><strong>'+d.cn+'</strong></a>' : '<strong>'+d.cn+'</strong>';
-    h+='<tr'+rc+'><td>'+caseLink+'</td><td>'+d.country+'</td><td class="r">'+ab+'</td><td class="r">'+wb+'</td><td class="c">'+nb+'</td><td>'+lt+'</td><td>'+escapeHtml(d.lastBy||'—')+'</td><td>'+incCell+'</td><td class="c">'+skullCell+'</td></tr>';
+    const agentCell = d.agent ? '<span class="badge b-blue">'+escapeHtml(d.agent)+'</span>' : '<span style="color:var(--muted)">—</span>';
+    h+='<tr'+rc+'><td>'+caseLink+'</td><td>'+d.country+'</td><td class="r">'+ab+'</td><td class="r">'+wb+'</td><td class="c">'+nb+'</td><td>'+lt+'</td><td>'+escapeHtml(d.lastBy||'—')+'</td><td>'+agentCell+'</td><td>'+incCell+'</td><td class="c">'+skullCell+'</td></tr>';
   });
   h+='</tbody></table>';
   el.innerHTML=h;
