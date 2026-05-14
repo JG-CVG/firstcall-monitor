@@ -34,7 +34,7 @@ P1_REJECTS = {
     "REJECT VIN Check", "REJECT Awaiting Selection",
     "QUARANTINE New CA", "QUARANTINE Car Check", "QUARANTINE VIN Check",
 }
-TMP = "/tmp"
+TMP = "/tmp/myrun"
 
 
 def load(name):
