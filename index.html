@@ -122,15 +122,15 @@ tr:hover td { background:#f9fafb; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .error-banner { background:#fef2f2; border:1px solid #fecaca; color:#dc2626; padding:12px 16px; border-radius:8px; margin-bottom:14px; font-size:13px; display:none; }
 .error-banner.show { display:block; }
-.agent-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; }
-.agent-card { background:var(--carvago-50); border:1px solid var(--carvago-100); border-radius:12px; padding:14px 16px; position:relative; }
+.agent-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:8px; }
+.agent-card { background:var(--carvago-50); border:1px solid var(--carvago-100); border-radius:10px; padding:10px 12px; position:relative; }
 .agent-card.agent-na { background:#F3F4F6; border-color:#E5E7EB; }
-.agent-card .a-icon { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--carvago); color:#fff; font-size:14px; font-weight:600; margin-bottom:8px; }
+.agent-card .a-icon { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:6px; background:var(--carvago); color:#fff; font-size:13px; margin-bottom:4px; }
 .agent-card.agent-na .a-icon { background:#9CA3AF; }
-.agent-card .a-name { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.3px; font-weight:600; }
-.agent-card .a-val { font-size:28px; font-weight:700; color:var(--navy); margin-top:2px; letter-spacing:-0.01em; }
-.agent-card .a-sub { font-size:10px; color:var(--muted); margin-top:2px; }
-.agent-card .a-bar { height:4px; background:rgba(45,31,227,0.1); border-radius:2px; margin-top:10px; overflow:hidden; }
+.agent-card .a-name { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.3px; font-weight:600; }
+.agent-card .a-val { font-size:20px; font-weight:700; color:var(--navy); margin-top:1px; letter-spacing:-0.01em; line-height:1.1; }
+.agent-card .a-sub { font-size:9.5px; color:var(--muted); margin-top:1px; }
+.agent-card .a-bar { height:3px; background:rgba(45,31,227,0.1); border-radius:2px; margin-top:6px; overflow:hidden; }
 .agent-card .a-bar-fill { height:100%; background:var(--carvago); opacity:0.6; transition:width 0.5s ease; }
 .agent-card.agent-na .a-bar { background:rgba(0,0,0,0.05); }
 .agent-card.agent-na .a-bar-fill { background:#9CA3AF; }
@@ -348,10 +348,10 @@ function renderAgentTable(agents) {
     const cls = isNA ? 'agent-card agent-na' : 'agent-card';
     const pct = total ? Math.round(cnt/total*100) : 0;
     const barW = max ? Math.round(cnt/max*100) : 0;
-    const initials = isNA ? '?' : name.replace(/[^A-Z0-9]/gi, '').slice(0,2).toUpperCase();
+    const iconChar = isNA ? '&#10067;' : '&#127911;';
     const displayName = isNA ? 'Nepriděleno' : name;
     h += '<div class="'+cls+'">'+
-      '<div class="a-icon">'+initials+'</div>'+
+      '<div class="a-icon">'+iconChar+'</div>'+
       '<div class="a-name">'+displayName+'</div>'+
       '<div class="a-val">'+cnt+'</div>'+
       '<div class="a-sub">'+pct+'% z Car Check</div>'+
