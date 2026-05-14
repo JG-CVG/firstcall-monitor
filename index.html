@@ -48,7 +48,15 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .refresh-btn { background:var(--green); color:var(--navy); border:none; padding:7px 18px; border-radius:6px; font-weight:700; cursor:pointer; font-size:13px; }
 .refresh-btn:disabled { opacity:0.4; cursor:not-allowed; }
 .container { padding:18px 20px; max-width:1140px; margin:0 auto; }
-.tier1 { background:var(--card); border-radius:14px; padding:20px 24px; margin-bottom:12px; display:flex; align-items:center; gap:24px; box-shadow:var(--shadow-md); border:1px solid var(--border); }
+.tier1 { background:var(--card); border-radius:14px; padding:24px 28px; margin-bottom:14px; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:32px; box-shadow:var(--shadow-md); border:1px solid var(--border); position:relative; overflow:hidden; }
+.tier1::before { content:""; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--carvago); }
+.tier1 .hero { padding-left:8px; }
+.tier1 .hero-kpis { display:flex; gap:24px; padding-left:16px; border-left:1px solid var(--border); }
+.tier1 .hero-kpi { text-align:center; }
+.tier1 .hero-kpi .v { font-size:22px; font-weight:700; color:var(--navy); letter-spacing:-0.01em; }
+.tier1 .hero-kpi .l { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
+.tier1 .hero-kpi.kpi-good .v { color:var(--green-text); }
+.tier1 .hero-kpi.kpi-bad .v { color:var(--red-text); }
 .tier1 .big-num { font-size:40px; font-weight:700; min-width:80px; letter-spacing:-0.02em; color:var(--navy); }
 .tier1 .big-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; }
 .tier1 .big-sub { font-size:11px; color:var(--muted); }
@@ -56,8 +64,12 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .progress-legend { display:flex; gap:14px; font-size:11px; color:var(--muted); margin-top:6px; }
 .progress-legend .dot { width:8px; height:8px; border-radius:50%; display:inline-block; vertical-align:middle; margin-right:4px; }
 .tier-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin:14px 0 6px; }
-.tier2 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
-.outcome { padding:16px 18px; border-left:4px solid var(--border); border-radius:0 12px 12px 0; }
+.tier2 { display:grid; grid-template-columns:1fr 28px 1fr 28px 1fr; gap:8px; margin-bottom:10px; align-items:stretch; }
+.tier2-chevron { display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:24px; font-weight:300; user-select:none; }
+.outcome { padding:18px 20px; border-left:4px solid var(--border); border-radius:0 12px 12px 0; position:relative; display:flex; flex-direction:column; gap:6px; }
+.outcome .o-icon { position:absolute; top:14px; right:14px; font-size:18px; opacity:0.35; }
+.outcome .o-bar { height:4px; background:rgba(0,0,0,0.06); border-radius:2px; margin-top:8px; overflow:hidden; }
+.outcome .o-bar-fill { height:100%; border-radius:2px; transition:width 0.5s ease; }
 .outcome .o-label { font-size:10px; text-transform:uppercase; letter-spacing:0.3px; }
 .outcome .o-val { font-size:32px; font-weight:700; margin:4px 0; letter-spacing:-0.02em; }
 .outcome .o-detail { font-size:11px; }
@@ -70,8 +82,15 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .outcome.o-blue { background:var(--blue-bg); border-color:var(--blue); }
 .outcome.o-blue .o-label,.outcome.o-blue .o-detail { color:var(--blue-text); }
 .outcome.o-blue .o-val { color:#1A3A95; }
-.tier3 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
-.ip-card { background:var(--card); border-radius:12px; padding:14px 16px; box-shadow:var(--shadow-sm); border:1px solid var(--border); }
+.tier3 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+.ip-card { background:var(--card); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow-sm); border:1px solid var(--border); position:relative; overflow:hidden; }
+.ip-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--carvago); opacity:0.4; }
+.ip-card.ip-amber::before { background:var(--amber); opacity:0.8; }
+.ip-card .ip-icon { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--carvago-50); color:var(--carvago); font-size:16px; margin-bottom:8px; }
+.ip-card.ip-amber .ip-icon { background:rgba(244,162,97,0.15); color:var(--amber-text); }
+.ip-card .ip-bar { height:4px; background:rgba(0,0,0,0.05); border-radius:2px; margin-top:10px; overflow:hidden; }
+.ip-card .ip-bar-fill { height:100%; background:var(--carvago); opacity:0.5; transition:width 0.5s ease; }
+.ip-card.ip-amber .ip-bar-fill { background:var(--amber); }
 .ip-card .ip-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.3px; }
 .ip-card .ip-val { font-size:26px; font-weight:700; margin:4px 0; color:var(--navy); letter-spacing:-0.01em; }
 .ip-card .ip-sub { font-size:10px; color:var(--muted); }
@@ -208,9 +227,12 @@ function updateTimestamp(d) {
 }
 
 function renderTier1(total, closed, phase2, ip, lbl) {
+  const phRate = total ? Math.round(phase2/total*100) : 0;
+  const clRate = total ? Math.round(closed/total*100) : 0;
   document.getElementById('tier1').innerHTML =
-    '<div class="tier1"><div><div class="big-label">Celkem 1st Call</div><div class="big-num">'+total+'</div><div class="big-sub">'+lbl+'</div></div>'+
-    '<div style="flex:1"><div class="progress-bar">'+
+    '<div class="tier1">'+
+    '<div class="hero"><div class="big-label">Celkem 1st Call</div><div class="big-num">'+total.toLocaleString('cs-CZ')+'</div><div class="big-sub">'+lbl+'</div></div>'+
+    '<div><div class="progress-bar">'+
       '<div style="flex:'+closed+';background:#E63946"></div>'+
       '<div style="flex:'+phase2+';background:#00B388"></div>'+
       '<div style="flex:'+ip+';background:#5E81F4"></div></div>'+
@@ -218,7 +240,12 @@ function renderTier1(total, closed, phase2, ip, lbl) {
         '<span><span class="dot" style="background:#E63946"></span>Closed '+closed+'</span>'+
         '<span><span class="dot" style="background:#00B388"></span>Phase 2+ '+phase2+'</span>'+
         '<span><span class="dot" style="background:#5E81F4"></span>In Progress '+ip+'</span>'+
-      '</div></div></div>';
+      '</div></div>'+
+    '<div class="hero-kpis">'+
+      '<div class="hero-kpi kpi-good"><div class="v">'+phRate+'%</div><div class="l">Prošlo dál</div></div>'+
+      '<div class="hero-kpi kpi-bad"><div class="v">'+clRate+'%</div><div class="l">Closed rate</div></div>'+
+    '</div>'+
+    '</div>';
 }
 
 function renderTier2(closed, phase2, ip, total) {
@@ -227,9 +254,30 @@ function renderTier2(closed, phase2, ip, total) {
   const pIp = total?Math.round(ip/total*100):0;
   document.getElementById('tier2').innerHTML =
     '<div class="tier-label">&#8618; Kam dosly</div><div class="tier2">'+
-    '<div class="outcome o-red"><div class="o-label">&#10006; Closed</div><div class="o-val">'+closed+'</div><div class="o-detail">'+pCl+'% z celku</div></div>'+
-    '<div class="outcome o-green"><div class="o-label">&#10004; Phase 2+</div><div class="o-val">'+phase2+'</div><div class="o-detail">'+pPh+'% — proslo dal</div></div>'+
-    '<div class="outcome o-blue"><div class="o-label">&#9654; In Progress</div><div class="o-val">'+ip+'</div><div class="o-detail">'+pIp+'% — v 1st Call</div></div></div>';
+    '<div class="outcome o-red">'+
+      '<div class="o-icon">&#10006;</div>'+
+      '<div class="o-label">Closed</div>'+
+      '<div class="o-val">'+closed.toLocaleString('cs-CZ')+'</div>'+
+      '<div class="o-detail">'+pCl+'% z celku</div>'+
+      '<div class="o-bar"><div class="o-bar-fill" style="width:'+pCl+'%;background:#E63946"></div></div>'+
+    '</div>'+
+    '<div class="tier2-chevron">&rsaquo;</div>'+
+    '<div class="outcome o-green">'+
+      '<div class="o-icon">&#10004;</div>'+
+      '<div class="o-label">Phase 2+</div>'+
+      '<div class="o-val">'+phase2.toLocaleString('cs-CZ')+'</div>'+
+      '<div class="o-detail">'+pPh+'% — proslo dal</div>'+
+      '<div class="o-bar"><div class="o-bar-fill" style="width:'+pPh+'%;background:#00B388"></div></div>'+
+    '</div>'+
+    '<div class="tier2-chevron">&rsaquo;</div>'+
+    '<div class="outcome o-blue">'+
+      '<div class="o-icon">&#9654;</div>'+
+      '<div class="o-label">In Progress</div>'+
+      '<div class="o-val">'+ip.toLocaleString('cs-CZ')+'</div>'+
+      '<div class="o-detail">'+pIp+'% &mdash; v 1st Call</div>'+
+      '<div class="o-bar"><div class="o-bar-fill" style="width:'+pIp+'%;background:#5E81F4"></div></div>'+
+    '</div>'+
+    '</div>';
 }
 
 function renderTier3(sm, nedovCount) {
@@ -237,13 +285,39 @@ function renderTier3(sm, nedovCount) {
   const cc = sm['Car check']||0;
   const vin = sm['VIN Check']||0;
   const aw = sm['Awaiting Selection']||0;
-  const nedovSub = nedovCount>0 ? '<span style="color:#d97706">z toho '+nedovCount+' nedovolano</span>' : 'bez nedovolano';
+  const ipTotal = newDv + cc + vin + aw;
+  const pct = v => ipTotal ? Math.round(v/ipTotal*100) : 0;
+  const nedovSub = nedovCount>0 ? '<span style="color:var(--amber-text);font-weight:600">z toho '+nedovCount+' nedovolano</span>' : 'bez nedovolano';
   document.getElementById('tier3').innerHTML =
     '<div class="tier-label">&#9776; In Progress — kde presne</div><div class="tier3">'+
-    '<div class="ip-card"><div class="ip-label">&#128196; New CA + DV</div><div class="ip-val">'+newDv+'</div><div class="ip-sub">zatim nezpracovano</div></div>'+
-    '<div class="ip-card ip-amber"><div class="ip-label">&#128222; Car Check</div><div class="ip-val">'+cc+'</div><div class="ip-sub">'+nedovSub+'</div></div>'+
-    '<div class="ip-card"><div class="ip-label">&#128269; VIN Check</div><div class="ip-val">'+vin+'</div><div class="ip-sub">ceka na overeni</div></div>'+
-    '<div class="ip-card"><div class="ip-label">&#9200; Awaiting Sel.</div><div class="ip-val">'+aw+'</div><div class="ip-sub">ceka na vyber</div></div></div>';
+    '<div class="ip-card">'+
+      '<div class="ip-icon">&#128196;</div>'+
+      '<div class="ip-label">New CA + DV</div>'+
+      '<div class="ip-val">'+newDv+'</div>'+
+      '<div class="ip-sub">zatim nezpracovano &middot; '+pct(newDv)+'% IP</div>'+
+      '<div class="ip-bar"><div class="ip-bar-fill" style="width:'+pct(newDv)+'%"></div></div>'+
+    '</div>'+
+    '<div class="ip-card ip-amber">'+
+      '<div class="ip-icon">&#128222;</div>'+
+      '<div class="ip-label">Car Check</div>'+
+      '<div class="ip-val">'+cc+'</div>'+
+      '<div class="ip-sub">'+nedovSub+' &middot; '+pct(cc)+'% IP</div>'+
+      '<div class="ip-bar"><div class="ip-bar-fill" style="width:'+pct(cc)+'%"></div></div>'+
+    '</div>'+
+    '<div class="ip-card">'+
+      '<div class="ip-icon">&#128269;</div>'+
+      '<div class="ip-label">VIN Check</div>'+
+      '<div class="ip-val">'+vin+'</div>'+
+      '<div class="ip-sub">ceka na overeni &middot; '+pct(vin)+'% IP</div>'+
+      '<div class="ip-bar"><div class="ip-bar-fill" style="width:'+pct(vin)+'%"></div></div>'+
+    '</div>'+
+    '<div class="ip-card">'+
+      '<div class="ip-icon">&#9200;</div>'+
+      '<div class="ip-label">Awaiting Sel.</div>'+
+      '<div class="ip-val">'+aw+'</div>'+
+      '<div class="ip-sub">ceka na vyber &middot; '+pct(aw)+'% IP</div>'+
+      '<div class="ip-bar"><div class="ip-bar-fill" style="width:'+pct(aw)+'%"></div></div>'+
+    '</div></div>';
 }
 
 function renderNedovTable(data, sfBase) {
