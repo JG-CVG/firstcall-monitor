@@ -103,6 +103,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .card-title { font-size:12px; font-weight:600; color:var(--navy); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
 table { width:100%; border-collapse:collapse; font-size:12px; }
 th { text-align:left; padding:7px 10px; border-bottom:2px solid var(--border); font-weight:700; color:var(--muted); text-transform:uppercase; font-size:10px; letter-spacing:0.4px; }
+th.sortable { cursor:pointer; user-select:none; }
+th.sortable:hover { color:var(--text); background:#F9FAFB; }
+th.sortable .sort-arr { display:inline-block; margin-left:3px; opacity:0.4; font-size:9px; }
+th.sortable.active .sort-arr { opacity:1; color:var(--carvago); }
 th.r,td.r { text-align:right; }
 th.c,td.c { text-align:center; }
 td { padding:6px 10px; border-bottom:1px solid var(--border); }
@@ -362,17 +366,81 @@ function renderAgentTable(agents) {
   el.innerHTML = h;
 }
 
+let nedovSortState = { col: 'isN', dir: 'desc' };
+let nedovCache = null;
+let sfBaseCache = null;
+
+function sortNedov(col) {
+  if (nedovSortState.col === col) {
+    nedovSortState.dir = nedovSortState.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    nedovSortState.col = col;
+    // numeric/boolean cols default desc; string cols default asc
+    const descByDefault = ['ageH','ageW','nCnt','isN','potClose','incs','lastD'];
+    nedovSortState.dir = descByDefault.includes(col) ? 'desc' : 'asc';
+  }
+  if (nedovCache) renderNedovTable(nedovCache, sfBaseCache);
+}
+
+function nedovSortValue(d, col) {
+  switch (col) {
+    case 'cn': return d.cn || '';
+    case 'country': return d.country || '';
+    case 'agent': return d.agent || 'zzz'; // nulls last when asc
+    case 'ageH': return d.ageH ?? -1;
+    case 'ageW': return d.ageW ?? -1;
+    case 'isN': return (d.isN ? 1 : 0) * 1000 + (d.nCnt || 0); // composite
+    case 'lastD': return d.lastD || '';
+    case 'lastBy': return d.lastBy || 'zzz';
+    case 'incs': return (d.incs || []).length;
+    case 'potClose': return d.potClose ? 1 : 0;
+    default: return 0;
+  }
+}
+
 function renderNedovTable(data, sfBase) {
   const el = document.getElementById('tblNedov');
   if (!data || !data.length) { el.innerHTML='<span style="color:var(--muted)">Zadne pripady v Car Check</span>'; return; }
-  data.sort((a,b)=>{ if(a.isN!==b.isN) return b.isN-a.isN; return (b.ageH||0)-(a.ageH||0); });
-  const nCnt=data.filter(d=>d.isN).length, noN=data.filter(d=>!d.isN).length;
+  nedovCache = data;
+  sfBaseCache = sfBase;
+  const sortCol = nedovSortState.col;
+  const sortDir = nedovSortState.dir;
+  const sorted = data.slice().sort((a,b) => {
+    const av = nedovSortValue(a, sortCol);
+    const bv = nedovSortValue(b, sortCol);
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    // tiebreaker: ageH desc
+    return (b.ageH||0)-(a.ageH||0);
+  });
+  const nCnt = data.filter(d=>d.isN).length, noN = data.filter(d=>!d.isN).length;
   let h='<div style="margin-bottom:8px;display:flex;gap:16px;font-size:12px">';
   h+='<span>&#128222; Car Check: <strong>'+data.length+'</strong></span>';
   h+='<span style="color:#d97706">&#10006; Nedovolano: <strong>'+nCnt+'</strong></span>';
   h+='<span style="color:#dc2626">&#10071; Bez nedovolano: <strong>'+noN+'</strong></span></div>';
-  h+='<table><thead><tr><th>Case</th><th>Country</th><th>Agent</th><th class="r">Stari</th><th class="r" title="Po-Pa 8-17, So 8-13">Prac. hod.</th><th class="c">Nedovolano</th><th>Posledni pokus</th><th>Operator</th><th>Blokacni incident</th><th class="c">Na uzavreni</th></tr></thead><tbody>';
-  data.forEach(d=>{
+  
+  const arr = dir => dir === 'asc' ? '&#9650;' : '&#9660;';
+  const th = (col, label, extra) => {
+    const active = sortCol === col;
+    const cls = 'sortable' + (active ? ' active' : '') + (extra && extra.includes('r') ? ' r' : '') + (extra && extra.includes('c') ? ' c' : '');
+    const titleAttr = extra && extra.includes('title') ? ' title="' + extra.split('title:')[1] + '"' : '';
+    const arrSpan = '<span class="sort-arr">' + (active ? arr(sortDir) : '&#8693;') + '</span>';
+    return '<th class="' + cls + '" onclick="sortNedov(\''+col+'\')"'+titleAttr+'>'+label+arrSpan+'</th>';
+  };
+  
+  h+='<table><thead><tr>'+
+    th('cn','Case','')+
+    th('country','Country','')+
+    th('agent','Agent','')+
+    th('ageH','Stari','r')+
+    th('ageW','Prac. hod.','r,title:Po-Pa 8-17, So 8-13')+
+    th('isN','Nedovolano','c')+
+    th('lastD','Posledni pokus','')+
+    th('lastBy','Operator','')+
+    th('incs','Blokacni incident','')+
+    th('potClose','Na uzavreni','c')+
+    '</tr></thead><tbody>';
+  sorted.forEach(d=>{
     const rc=d.isN?' class="row-warn"':'';
     const ab=d.ageH!=null?'<span class="badge '+(d.ageH>72?'b-red':d.ageH>24?'b-amber':'b-green')+'">'+d.ageH+'h</span>':'—';
     const wTxt = d.ageW!=null ? (d.ageW<10 ? d.ageW.toFixed(1)+'h' : Math.round(d.ageW)+'h') : '—';
