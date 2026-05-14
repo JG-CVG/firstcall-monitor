@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1st Call Monitor — Carvago</title>
+<style>
+:root {
+  color-scheme: light;
+  --navy:#1B2130; --green:#00D4A1; --red:#FF5C5C; --amber:#FFB547; --blue:#4BA3FF;
+  --bg:#f5f6fa; --card:#ffffff; --text:#1B2130; --muted:#6b7280; --border:#e5e7eb;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); font-size:14px; }
+.header { background:var(--navy); color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; }
+.header h1 { font-size:17px; font-weight:700; }
+.header .sub { font-size:10px; opacity:0.55; margin-top:2px; }
+.header-right { display:flex; align-items:center; gap:14px; }
+.ts { font-size:11px; color:rgba(255,255,255,0.7); }
+.ts.stale { color:#ffb547; font-weight:600; }
+.refresh-btn { background:var(--green); color:var(--navy); border:none; padding:7px 18px; border-radius:6px; font-weight:700; cursor:pointer; font-size:13px; }
+.refresh-btn:disabled { opacity:0.4; cursor:not-allowed; }
+.container { padding:14px; max-width:1100px; margin:0 auto; }
+.tier1 { background:var(--card); border-radius:10px; padding:16px 20px; margin-bottom:10px; display:flex; align-items:center; gap:20px; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+.tier1 .big-num { font-size:36px; font-weight:800; min-width:80px; }
+.tier1 .big-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; }
+.tier1 .big-sub { font-size:11px; color:var(--muted); }
+.progress-bar { flex:1; display:flex; height:12px; border-radius:6px; overflow:hidden; gap:2px; }
+.progress-legend { display:flex; gap:14px; font-size:11px; color:var(--muted); margin-top:6px; }
+.progress-legend .dot { width:8px; height:8px; border-radius:50%; display:inline-block; vertical-align:middle; margin-right:4px; }
+.tier-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin:14px 0 6px; }
+.tier2 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
+.outcome { padding:14px 16px; border-left:4px solid var(--border); }
+.outcome .o-label { font-size:10px; text-transform:uppercase; letter-spacing:0.3px; }
+.outcome .o-val { font-size:30px; font-weight:800; margin:2px 0; }
+.outcome .o-detail { font-size:11px; }
+.outcome.o-red { background:#fef2f2; border-color:var(--red); }
+.outcome.o-red .o-label,.outcome.o-red .o-detail { color:#a32d2d; }
+.outcome.o-red .o-val { color:#791f1f; }
+.outcome.o-green { background:#ecfdf5; border-color:var(--green); }
+.outcome.o-green .o-label,.outcome.o-green .o-detail { color:#0f6e56; }
+.outcome.o-green .o-val { color:#085041; }
+.outcome.o-blue { background:#eff6ff; border-color:var(--blue); }
+.outcome.o-blue .o-label,.outcome.o-blue .o-detail { color:#185fa5; }
+.outcome.o-blue .o-val { color:#0c447c; }
+.tier3 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
+.ip-card { background:var(--card); border-radius:8px; padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+.ip-card .ip-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.3px; }
+.ip-card .ip-val { font-size:24px; font-weight:800; margin:2px 0; }
+.ip-card .ip-sub { font-size:10px; color:var(--muted); }
+.ip-card.ip-amber { background:#fffbeb; }
+.ip-card.ip-amber .ip-label { color:#854f0b; }
+.ip-card.ip-amber .ip-val { color:#633806; }
+.ip-card.ip-amber .ip-sub { color:#854f0b; }
+.card { background:var(--card); border-radius:10px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin-bottom:14px; }
+.card-hm { background:#FFFBEB; }
+.card-title { font-size:12px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:0.3px; margin-bottom:10px; }
+table { width:100%; border-collapse:collapse; font-size:12px; }
+th { text-align:left; padding:7px 10px; border-bottom:2px solid var(--border); font-weight:700; color:var(--muted); text-transform:uppercase; font-size:10px; letter-spacing:0.4px; }
+th.r,td.r { text-align:right; }
+th.c,td.c { text-align:center; }
+td { padding:6px 10px; border-bottom:1px solid var(--border); }
+tr:hover td { background:#f9fafb; }
+.total-row td { font-weight:800; border-top:2px solid var(--navy); background:#f8f9fb; }
+.badge { display:inline-block; padding:2px 8px; border-radius:8px; font-size:10px; font-weight:700; white-space:nowrap; }
+.b-red { background:#fef2f2; color:#dc2626; }
+.b-amber { background:#fffbeb; color:#d97706; }
+.b-green { background:#f0fdf4; color:#16a34a; }
+.b-blue { background:#eff6ff; color:#2563eb; }
+.b-gray { background:#f3f4f6; color:#6b7280; }
+.row-warn { background:#fffbeb; }
+.pbar { height:6px; border-radius:3px; display:inline-block; min-width:2px; vertical-align:middle; }
+.overlay { position:fixed; inset:0; background:rgba(245,246,250,0.92); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:200; }
+.overlay.hidden { opacity:0; pointer-events:none; transition:opacity 0.2s; }
+.big-spin { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--green); border-radius:50%; animation:spin 0.7s linear infinite; margin-bottom:10px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.error-banner { background:#fef2f2; border:1px solid #fecaca; color:#dc2626; padding:12px 16px; border-radius:8px; margin-bottom:14px; font-size:13px; display:none; }
+.error-banner.show { display:block; }
+.hm-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+.hm-card { background:#f8f9fb; border-radius:6px; padding:10px 12px; }
+.hm-card .l { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.3px; }
+.hm-card .v { font-size:19px; font-weight:800; margin-top:2px; }
+.hm-card .s { font-size:10px; color:var(--muted); margin-top:1px; }
+.hm-sub { font-size:11px; color:var(--muted); margin-bottom:6px; }
+.hm-grid { display:grid; grid-template-columns:32px repeat(24,1fr) 52px; gap:2px; font-size:10.5px; }
+.hm-work-grid { display:grid; grid-template-columns:32px repeat(9,1fr) 56px; gap:3px; font-size:12px; }
+.hm-cell { height:24px; display:flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums; border-radius:3px; }
+.hm-na { background:#f3f4f6; color:#9ca3af; font-style:italic; }
+.hm-rowlbl { display:flex; align-items:center; justify-content:flex-end; padding-right:5px; color:var(--muted); font-weight:700; }
+.hm-hour { text-align:center; color:var(--muted); font-size:9.5px; padding-bottom:2px; font-variant-numeric:tabular-nums; }
+.hm-totlbl { text-align:right; padding-right:4px; color:var(--muted); font-size:9.5px; padding-bottom:2px; }
+.hm-rowtot { display:flex; align-items:center; justify-content:flex-end; padding-left:4px; padding-right:2px; color:var(--text); font-weight:700; font-variant-numeric:tabular-nums; }
+.hm-coltot { text-align:center; padding-top:5px; color:var(--muted); font-size:9.5px; font-variant-numeric:tabular-nums; }
+.hm-legend { display:flex; align-items:center; gap:10px; font-size:10.5px; color:var(--muted); flex-wrap:wrap; margin-top:10px; }
+.hm-leg-sq { width:12px; height:12px; border-radius:2px; display:inline-block; vertical-align:middle; margin-right:3px; }
+.hm-note { font-size:10.5px; color:var(--muted); margin-top:10px; line-height:1.5; }
+@media (max-width:700px) { .tier2 { grid-template-columns:1fr; } .tier3 { grid-template-columns:repeat(2,1fr); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>1st Call Monitor</h1>
+    <div class="sub">Carvago &middot; aktualni mesic &middot; bez XK/AL &middot; bez Instamotion</div>
+  </div>
+  <div class="header-right">
+    <span class="ts" id="ts">&mdash;</span>
+    <button class="refresh-btn" id="btn" onclick="loadData()">&#8635; Obnovit</button>
+  </div>
+</div>
+
+<div class="overlay" id="ov">
+  <div class="big-spin"></div>
+  <div style="color:var(--muted)">Nacitam data&hellip;</div>
+</div>
+
+<div class="container">
+  <div id="errorBanner" class="error-banner"></div>
+  <div id="tier1"></div>
+  <div id="tier2"></div>
+  <div id="tier3"></div>
+
+  <div class="card"><div class="card-title">&#128222; Car Check &mdash; nedovolano detail</div><div id="tblNedov"></div></div>
+  <div class="card"><div class="card-title">&#10006; Closed reasons (Phase 1)</div><div id="tblClosed"></div></div>
+  <div class="card"><div class="card-title">&#127760; Vendor Country &mdash; prehled</div><div id="tblCountry"></div></div>
+
+  <div class="card card-hm"><div class="card-title">&#128293; CarAudit New &mdash; Heatmap (prumer / den x hodina, plovouci mesic)</div><div id="heatmapWrap"></div></div>
+  <div class="card card-hm"><div class="card-title">&#9201; CarAudit New &mdash; Heatmap (pracovni okno, Po-Pa 8-17, So 8-13)</div><div id="heatmapWorkWrap"></div></div>
+</div>
+
+<script>
+let DATA = null;
+const HM_DOWS = ['Po','Út','St','Čt','Pá','So','Ne'];
+const NEDOV_RE = /nedovol[aá]n[oý]/i; // already pre-detected by Python; here just for safety
+const P1_REJECTS = new Set(['REJECT New CA','REJECT Data Validation','REJECT Car Check','REJECT VIN Check','REJECT Awaiting Selection','QUARANTINE New CA','QUARANTINE Car Check','QUARANTINE VIN Check']);
+
+function showError(m) { const el=document.getElementById('errorBanner'); el.textContent=m; el.classList.add('show'); }
+function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtEta(d) { if (!d) return null; const p = String(d).slice(0,10).split('-'); if (p.length !== 3) return d; return parseInt(p[2],10)+'.'+parseInt(p[1],10)+'.'; }
+
+async function loadData() {
+  const btn=document.getElementById('btn'), overlay=document.getElementById('ov');
+  btn.disabled=true; overlay.classList.remove('hidden');
+  document.getElementById('errorBanner').classList.remove('show');
+  try {
+    const url = './data.json?t=' + Date.now(); // cache-bust
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    DATA = await resp.json();
+    render();
+  } catch (e) {
+    showError('Chyba pri nacitani data.json: ' + e.message);
+  } finally {
+    btn.disabled=false;
+    overlay.classList.add('hidden');
+  }
+}
+
+function render() {
+  const d = DATA;
+  const t = d.tier1;
+  renderTier1(t.total, t.closed, t.phase2, t.ip_total, d.month_label);
+  renderTier2(t.closed, t.phase2, t.ip_total, t.total);
+  renderTier3(d.status_breakdown, d.nedov_count);
+  renderNedovTable(d.nedovolano, d.sf_base_url);
+  renderClosedTable(d.closed_reasons);
+  renderCountryTable(d.country_breakdown);
+  renderHeatmap(d.heatmap);
+  renderHeatmapWork(d.heatmap);
+  updateTimestamp(d);
+}
+
+function updateTimestamp(d) {
+  const gen = new Date(d.generated_at_utc);
+  const ageMin = Math.round((Date.now() - gen.getTime()) / 60000);
+  const el = document.getElementById('ts');
+  const ageLbl = ageMin < 1 ? 'pred chvili' : ageMin + ' min zpet';
+  el.textContent = 'Data: ' + gen.toLocaleString('cs-CZ') + ' (' + ageLbl + ')';
+  el.classList.toggle('stale', ageMin > 20);
+}
+
+function renderTier1(total, closed, phase2, ip, lbl) {
+  document.getElementById('tier1').innerHTML =
+    '<div class="tier1"><div><div class="big-label">Celkem 1st Call</div><div class="big-num">'+total+'</div><div class="big-sub">'+lbl+'</div></div>'+
+    '<div style="flex:1"><div class="progress-bar">'+
+      '<div style="flex:'+closed+';background:#F09595"></div>'+
+      '<div style="flex:'+phase2+';background:#5DCAA5"></div>'+
+      '<div style="flex:'+ip+';background:#85B7EB"></div></div>'+
+      '<div class="progress-legend">'+
+        '<span><span class="dot" style="background:#F09595"></span>Closed '+closed+'</span>'+
+        '<span><span class="dot" style="background:#5DCAA5"></span>Phase 2+ '+phase2+'</span>'+
+        '<span><span class="dot" style="background:#85B7EB"></span>In Progress '+ip+'</span>'+
+      '</div></div></div>';
+}
+
+function renderTier2(closed, phase2, ip, total) {
+  const pCl = total?Math.round(closed/total*100):0;
+  const pPh = total?Math.round(phase2/total*100):0;
+  const pIp = total?Math.round(ip/total*100):0;
+  document.getElementById('tier2').innerHTML =
+    '<div class="tier-label">&#8618; Kam dosly</div><div class="tier2">'+
+    '<div class="outcome o-red"><div class="o-label">&#10006; Closed</div><div class="o-val">'+closed+'</div><div class="o-detail">'+pCl+'% z celku</div></div>'+
+    '<div class="outcome o-green"><div class="o-label">&#10004; Phase 2+</div><div class="o-val">'+phase2+'</div><div class="o-detail">'+pPh+'% — proslo dal</div></div>'+
+    '<div class="outcome o-blue"><div class="o-label">&#9654; In Progress</div><div class="o-val">'+ip+'</div><div class="o-detail">'+pIp+'% — v 1st Call</div></div></div>';
+}
+
+function renderTier3(sm, nedovCount) {
+  const newDv = (sm['New CA']||0)+(sm['Data validation and completion']||0);
+  const cc = sm['Car check']||0;
+  const vin = sm['VIN Check']||0;
+  const aw = sm['Awaiting Selection']||0;
+  const nedovSub = nedovCount>0 ? '<span style="color:#d97706">z toho '+nedovCount+' nedovolano</span>' : 'bez nedovolano';
+  document.getElementById('tier3').innerHTML =
+    '<div class="tier-label">&#9776; In Progress — kde presne</div><div class="tier3">'+
+    '<div class="ip-card"><div class="ip-label">&#128196; New CA + DV</div><div class="ip-val">'+newDv+'</div><div class="ip-sub">zatim nezpracovano</div></div>'+
+    '<div class="ip-card ip-amber"><div class="ip-label">&#128222; Car Check</div><div class="ip-val">'+cc+'</div><div class="ip-sub">'+nedovSub+'</div></div>'+
+    '<div class="ip-card"><div class="ip-label">&#128269; VIN Check</div><div class="ip-val">'+vin+'</div><div class="ip-sub">ceka na overeni</div></div>'+
+    '<div class="ip-card"><div class="ip-label">&#9200; Awaiting Sel.</div><div class="ip-val">'+aw+'</div><div class="ip-sub">ceka na vyber</div></div></div>';
+}
+
+function renderNedovTable(data, sfBase) {
+  const el = document.getElementById('tblNedov');
+  if (!data || !data.length) { el.innerHTML='<span style="color:var(--muted)">Zadne pripady v Car Check</span>'; return; }
+  data.sort((a,b)=>{ if(a.isN!==b.isN) return b.isN-a.isN; return (b.ageH||0)-(a.ageH||0); });
+  const nCnt=data.filter(d=>d.isN).length, noN=data.filter(d=>!d.isN).length;
+  let h='<div style="margin-bottom:8px;display:flex;gap:16px;font-size:12px">';
+  h+='<span>&#128222; Car Check: <strong>'+data.length+'</strong></span>';
+  h+='<span style="color:#d97706">&#10006; Nedovolano: <strong>'+nCnt+'</strong></span>';
+  h+='<span style="color:#dc2626">&#10071; Bez nedovolano: <strong>'+noN+'</strong></span></div>';
+  h+='<table><thead><tr><th>Case</th><th>Country</th><th class="r">Stari</th><th class="r" title="Po-Pa 8-17, So 8-13">Prac. hod.</th><th class="c">Nedovolano</th><th>Posledni pokus</th><th>Operator</th><th>Blokacni incident</th><th class="c">Na uzavreni</th></tr></thead><tbody>';
+  data.forEach(d=>{
+    const rc=d.isN?' class="row-warn"':'';
+    const ab=d.ageH!=null?'<span class="badge '+(d.ageH>72?'b-red':d.ageH>24?'b-amber':'b-green')+'">'+d.ageH+'h</span>':'—';
+    const wTxt = d.ageW!=null ? (d.ageW<10 ? d.ageW.toFixed(1)+'h' : Math.round(d.ageW)+'h') : '—';
+    const wCls = d.ageW==null ? '' : (d.ageW>27 ? 'b-red' : d.ageW>9 ? 'b-amber' : 'b-green');
+    const wb = d.ageW!=null ? '<span class="badge '+wCls+'">'+wTxt+'</span>' : '—';
+    const nb=d.isN?'<span class="badge b-amber">&#10006; '+d.nCnt+'&times;</span>':'<span class="badge b-red">&#10071;</span>';
+    const lt=d.lastD?new Date(d.lastD).toLocaleString('cs-CZ',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+    let incCell='<span style="color:var(--muted)">—</span>';
+    if (d.incs && d.incs.length>0) {
+      incCell = d.incs.map(i=>{
+        const eta = fmtEta(i.eta);
+        const etaBadge = eta ? '<span class="badge b-amber" style="margin-left:6px">ETA '+escapeHtml(eta)+'</span>' : '<span class="badge b-gray" style="margin-left:6px">ETA —</span>';
+        return '<div style="margin:2px 0"><span style="color:#dc2626;font-weight:700">&#9888;</span> '+escapeHtml(i.subject)+etaBadge+'</div>';
+      }).join('');
+    }
+    const skullTitle = d.potClose ? ('Potencial na uzavreni: '+d.nCnt+' nedovolano, span '+(d.potSpanH!=null?d.potSpanH.toFixed(1):'?')+'h, '+(d.ageW!=null?d.ageW.toFixed(1):'?')+' prac. hod.') : '';
+    const skullCell = d.potClose ? '<span title="'+escapeHtml(skullTitle)+'" style="font-size:18px">&#128128;</span>' : '<span style="color:var(--muted)">—</span>';
+    const caseLink = (sfBase && d.id) ? '<a href="'+sfBase+'/lightning/r/Case/'+d.id+'/view" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none"><strong>'+d.cn+'</strong></a>' : '<strong>'+d.cn+'</strong>';
+    h+='<tr'+rc+'><td>'+caseLink+'</td><td>'+d.country+'</td><td class="r">'+ab+'</td><td class="r">'+wb+'</td><td class="c">'+nb+'</td><td>'+lt+'</td><td>'+escapeHtml(d.lastBy||'—')+'</td><td>'+incCell+'</td><td class="c">'+skullCell+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  el.innerHTML=h;
+}
+
+function renderClosedTable(clR) {
+  const el=document.getElementById('tblClosed');
+  const PHASE_ORDER={'New CA':1,'Data Validation':2,'Car Check':3,'VIN Check':4,'Awaiting Selection':5};
+  const getPhaseOrder=(k)=>{ const l=k.replace('REJECT ','').replace('QUARANTINE ',''); return PHASE_ORDER[l]||99; };
+  const sorted=Object.entries(clR||{}).sort((a,b)=>{
+    const oa=getPhaseOrder(a[0]), ob=getPhaseOrder(b[0]);
+    if(oa!==ob) return oa-ob;
+    return (a[0].startsWith('QUARANTINE')?1:0)-(b[0].startsWith('QUARANTINE')?1:0);
+  });
+  if (!sorted.length) { el.innerHTML='<span style="color:var(--muted)">Zadne Phase 1 rejecty</span>'; return; }
+  const total=sorted.reduce((s,[,v])=>s+v,0);
+  let h='<div style="margin-bottom:8px;font-size:12px">Celkem Phase 1 rejectu: <strong>'+total+'</strong></div>';
+  h+='<table><thead><tr><th>Reason</th><th class="r">Pocet</th><th class="r">%</th><th style="width:35%"></th></tr></thead><tbody>';
+  const mx=Math.max(...sorted.map(([,v])=>v));
+  sorted.forEach(([reason,cnt])=>{
+    const pct=Math.round(cnt/total*100), barW=Math.max(4,Math.round(cnt/mx*100));
+    const isQ=reason.startsWith('QUARANTINE'), lbl=reason.replace('REJECT ','').replace('QUARANTINE ','');
+    const badge=isQ?'<span class="badge b-amber">Q</span> ':'<span class="badge b-red">R</span> ';
+    h+='<tr><td>'+badge+lbl+'</td><td class="r"><strong>'+cnt+'</strong></td><td class="r" style="color:var(--muted)">'+pct+'%</td>';
+    h+='<td><span class="pbar" style="width:'+barW+'%;background:'+(isQ?'var(--amber)':'var(--red)')+'"></span></td></tr>';
+  });
+  h+='<tr class="total-row"><td>Celkem</td><td class="r">'+total+'</td><td class="r">100%</td><td></td></tr></tbody></table>';
+  el.innerHTML=h;
+}
+
+function renderCountryTable(cd) {
+  const el=document.getElementById('tblCountry');
+  const sorted=Object.entries(cd||{}).sort((a,b)=>(b[1].ip+b[1].cl)-(a[1].ip+a[1].cl));
+  if (!sorted.length) { el.innerHTML='<span style="color:var(--muted)">Zadna data</span>'; return; }
+  const mx=Math.max(1,...sorted.map(([,v])=>v.ip+v.cl));
+  const gIP=sorted.reduce((s,[,v])=>s+v.ip,0), gCl=sorted.reduce((s,[,v])=>s+v.cl,0);
+  let h='<table><thead><tr><th>Country</th><th class="r">In Prog.</th><th class="r">Car Ch.</th><th class="r">VIN Ch.</th><th class="r">New+DV</th><th class="r">Closed</th><th class="r">Total</th><th style="width:18%"></th></tr></thead><tbody>';
+  sorted.forEach(([c,v])=>{
+    const tot=v.ip+v.cl, barW=Math.max(3,Math.round(tot/mx*100));
+    h+='<tr><td><strong>'+c+'</strong></td>';
+    h+='<td class="r"><span class="badge b-blue">'+v.ip+'</span></td>';
+    h+='<td class="r">'+(v.cc?'<span class="badge b-amber">'+v.cc+'</span>':'<span style="color:var(--muted)">—</span>')+'</td>';
+    h+='<td class="r">'+(v.vin?'<span class="badge b-blue">'+v.vin+'</span>':'<span style="color:var(--muted)">—</span>')+'</td>';
+    h+='<td class="r">'+(v.newca||'<span style="color:var(--muted)">—</span>')+'</td>';
+    h+='<td class="r"><span class="badge b-red">'+v.cl+'</span></td>';
+    h+='<td class="r"><strong>'+tot+'</strong></td>';
+    h+='<td><span class="pbar" style="width:'+barW+'%;background:var(--green)"></span></td></tr>';
+  });
+  h+='<tr class="total-row"><td>Celkem</td><td class="r">'+gIP+'</td><td class="r"></td><td class="r"></td><td class="r"></td><td class="r">'+gCl+'</td><td class="r"><strong>'+(gIP+gCl)+'</strong></td><td></td></tr></tbody></table>';
+  el.innerHTML=h;
+}
+
+/* ========== HEATMAPS ========== */
+function hmBucket(v) {
+  if (v === 0) return { bg:'#F1EFE8', fg:'#888780', border:'0.5px solid var(--border)' };
+  if (v <= 1)  return { bg:'#E6F1FB', fg:'#0C447C', border:'none' };
+  if (v <= 3)  return { bg:'#B5D4F4', fg:'#0C447C', border:'none' };
+  if (v <= 6)  return { bg:'#85B7EB', fg:'#0C447C', border:'none' };
+  if (v <= 10) return { bg:'#378ADD', fg:'#ffffff', border:'none' };
+  if (v <= 15) return { bg:'#185FA5', fg:'#ffffff', border:'none' };
+  return { bg:'#0C447C', fg:'#ffffff', border:'none' };
+}
+function pushToWorking(d, h) {
+  if (d === 6) return { d:0, h:8 };
+  if (d === 5) { if (h<8) return {d:5,h:8}; if (h<=12) return {d:5,h:h}; return {d:0,h:8}; }
+  if (h<8) return {d:d,h:8};
+  if (h<=16) return {d:d,h:h};
+  if (d===4) return {d:5,h:8};
+  return {d:d+1,h:8};
+}
+function padH(h){return h<10?'0'+h:''+h;}
+
+function renderHeatmap(hm) {
+  const wrap = document.getElementById('heatmapWrap');
+  if (!hm || !hm.matrix) { wrap.innerHTML='<span style="color:var(--muted)">No data</span>'; return; }
+  const matrix = hm.matrix, daysPerDow = hm.days_per_dow;
+  const totalsPerDow = matrix.map(row => row.reduce((s,x)=>s+x,0));
+  const totalsPerHour = Array(24).fill(0);
+  matrix.forEach(row => row.forEach((v,h) => totalsPerHour[h] += v));
+  const total = hm.total_cases;
+  const totalDays = daysPerDow.reduce((s,x)=>s+x,0);
+
+  let peakD=0, peakH=0, peakAvg=0;
+  for (let d=0; d<7; d++) { if(!daysPerDow[d]) continue; for (let h=0; h<24; h++) { const a=Math.ceil(matrix[d][h]/daysPerDow[d]); if (a>peakAvg){peakAvg=a;peakD=d;peakH=h;} } }
+  let pdIdx=0, pdAvg=0;
+  for (let d=0; d<7; d++) { if(!daysPerDow[d]) continue; const a=Math.ceil(totalsPerDow[d]/daysPerDow[d]); if(a>pdAvg){pdAvg=a;pdIdx=d;} }
+  let phIdx=0, phAvg=0;
+  for (let h=0; h<24; h++) { const a=Math.ceil(totalsPerHour[h]/totalDays); if(a>phAvg){phAvg=a;phIdx=h;} }
+  const dayAvg = Math.ceil(total/totalDays);
+
+  let h = '<div class="hm-cards">';
+  h += '<div class="hm-card"><div class="l">Celkem ('+totalDays+' dni)</div><div class="v">'+total.toLocaleString('cs-CZ')+'</div><div class="s">&#8776; '+dayAvg+' / den</div></div>';
+  h += '<div class="hm-card"><div class="l">Spicka dne (avg)</div><div class="v">'+HM_DOWS[pdIdx]+'</div><div class="s">'+pdAvg+' / den</div></div>';
+  h += '<div class="hm-card"><div class="l">Spicka hodiny (avg)</div><div class="v">'+padH(phIdx)+':00</div><div class="s">'+phAvg+' / den-hod</div></div>';
+  h += '<div class="hm-card"><div class="l">Top bunka</div><div class="v">'+HM_DOWS[peakD]+' &middot; '+padH(peakH)+'h</div><div class="s">'+peakAvg+' / '+HM_DOWS[peakD]+' '+padH(peakH)+'h</div></div></div>';
+
+  h += '<div class="hm-sub">Prumer cases na 1 den daneho tydne x hodinu (Europe/Prague), zaokrouhleno nahoru</div><div class="hm-grid">';
+  h += '<div></div>';
+  for (let hh=0; hh<24; hh++) h += '<div class="hm-hour">'+padH(hh)+'</div>';
+  h += '<div class="hm-totlbl">avg/den</div>';
+
+  for (let d=0; d<7; d++) {
+    h += '<div class="hm-rowlbl">'+HM_DOWS[d]+'</div>';
+    for (let hh=0; hh<24; hh++) {
+      const t=matrix[d][hh], avg=daysPerDow[d]?t/daysPerDow[d]:0, cAvg=Math.ceil(avg);
+      const b=hmBucket(cAvg), txt=t===0?'&middot;':cAvg;
+      const tip=HM_DOWS[d]+' '+padH(hh)+':00 - avg '+cAvg+' / '+HM_DOWS[d]+' (presne '+(Math.round(avg*100)/100)+' = '+t+'/'+daysPerDow[d]+')';
+      h += '<div class="hm-cell" title="'+escapeHtml(tip)+'" style="background:'+b.bg+';color:'+b.fg+';border:'+b.border+'">'+txt+'</div>';
+    }
+    const da = daysPerDow[d] ? Math.ceil(totalsPerDow[d]/daysPerDow[d]) : 0;
+    h += '<div class="hm-rowtot">'+da+'</div>';
+  }
+  h += '<div class="hm-totlbl" style="padding-top:5px">avg/h</div>';
+  for (let hh=0; hh<24; hh++) { const a=totalDays?Math.ceil(totalsPerHour[hh]/totalDays):0; h += '<div class="hm-coltot">'+a+'</div>'; }
+  h += '<div class="hm-rowtot" style="padding-top:5px">'+dayAvg+'</div></div>';
+
+  h += '<div class="hm-legend"><span>Sytost = prumer / den</span>';
+  ['F1EFE8','E6F1FB','B5D4F4','85B7EB','378ADD','185FA5','0C447C'].forEach((c,i)=>{
+    const lbl=['0','1','2-3','4-6','7-10','11-15','16+'][i];
+    h += '<span><span class="hm-leg-sq" style="background:#'+c+(i===0?';border:0.5px solid var(--border)':'')+'"></span>'+lbl+'</span>';
+  });
+  h += '</div>';
+  h += '<div class="hm-note">Obdobi: '+hm.start_date+' &ndash; '+hm.end_date+' ('+daysPerDow.map((c,i)=>c+' '+HM_DOWS[i]).join(', ')+'). Filtr: RecordType=CarAudit, bez Instamotion, bez Is TEST Case, Country_Origin &ne; XK, AL.</div>';
+
+  wrap.innerHTML = h;
+}
+
+function renderHeatmapWork(hm) {
+  const wrap = document.getElementById('heatmapWorkWrap');
+  if (!hm || !hm.matrix) { wrap.innerHTML='<span style="color:var(--muted)">No data</span>'; return; }
+  const matrix = hm.matrix, daysPerDow = hm.days_per_dow;
+  const work = Array.from({length:6}, () => Array(9).fill(0));
+  let totalWork = 0;
+  for (let d=0; d<7; d++) {
+    for (let hh=0; hh<24; hh++) {
+      const v = matrix[d][hh]; if (!v) continue;
+      const t = pushToWorking(d, hh);
+      const col = t.h - 8;
+      if (t.d < 6 && col >= 0 && col < 9) { work[t.d][col] += v; totalWork += v; }
+    }
+  }
+  const rowTotals = work.map(r => r.reduce((s,x)=>s+x,0));
+  const colTotals = Array(9).fill(0);
+  work.forEach(r => r.forEach((v,c) => colTotals[c] += v));
+  const totalWorkDays = daysPerDow.slice(0,6).reduce((s,x)=>s+x,0);
+
+  let peakD=0, peakC=0, peakAvg=0;
+  for (let d=0; d<6; d++) { if(!daysPerDow[d]) continue; for (let c=0; c<9; c++) { if (d===5 && c>4) continue; const a=Math.ceil(work[d][c]/daysPerDow[d]); if(a>peakAvg){peakAvg=a;peakD=d;peakC=c;} } }
+  let pdIdx=0, pdAvg=0;
+  for (let d=0; d<6; d++) { if(!daysPerDow[d]) continue; const a=Math.ceil(rowTotals[d]/daysPerDow[d]); if(a>pdAvg){pdAvg=a;pdIdx=d;} }
+  let phIdx=8, phAvg=0;
+  for (let c=0; c<9; c++) { const a=totalWorkDays?Math.ceil(colTotals[c]/totalWorkDays):0; if(a>phAvg){phAvg=a;phIdx=c+8;} }
+  const dayAvg = totalWorkDays ? Math.ceil(totalWork/totalWorkDays) : 0;
+
+  let h = '<div class="hm-cards">';
+  h += '<div class="hm-card"><div class="l">Prerozdeleno ('+totalWorkDays+' prac. dni)</div><div class="v">'+totalWork.toLocaleString('cs-CZ')+'</div><div class="s">&#8776; '+dayAvg+' / prac. den</div></div>';
+  h += '<div class="hm-card"><div class="l">Spicka dne (avg)</div><div class="v">'+HM_DOWS[pdIdx]+'</div><div class="s">'+pdAvg+' / den</div></div>';
+  h += '<div class="hm-card"><div class="l">Spicka hodiny (avg)</div><div class="v">'+padH(phIdx)+':00</div><div class="s">'+phAvg+' / prac. den-hod</div></div>';
+  h += '<div class="hm-card"><div class="l">Top bunka</div><div class="v">'+HM_DOWS[peakD]+' &middot; '+padH(peakC+8)+'h</div><div class="s">'+peakAvg+'</div></div></div>';
+
+  h += '<div class="hm-sub">Cases mimo prac. okno presunuty na nejbližší prac. hodinu &mdash; pondelni rano absorbuje vikendovy backlog</div><div class="hm-work-grid">';
+  h += '<div></div>';
+  for (let c=0; c<9; c++) h += '<div class="hm-hour">'+padH(c+8)+'</div>';
+  h += '<div class="hm-totlbl">avg/den</div>';
+  for (let d=0; d<6; d++) {
+    h += '<div class="hm-rowlbl">'+HM_DOWS[d]+'</div>';
+    for (let c=0; c<9; c++) {
+      if (d===5 && c>4) { h += '<div class="hm-cell hm-na" title="Mimo prac. dobu">&times;</div>'; continue; }
+      const v = work[d][c], avg = daysPerDow[d]?v/daysPerDow[d]:0, cAvg = Math.ceil(avg);
+      const b = hmBucket(cAvg), txt = v===0?'&middot;':cAvg;
+      const tip = HM_DOWS[d]+' '+padH(c+8)+':00 - avg '+cAvg+' (presne '+(Math.round(avg*100)/100)+')';
+      h += '<div class="hm-cell" title="'+escapeHtml(tip)+'" style="background:'+b.bg+';color:'+b.fg+';border:'+b.border+'">'+txt+'</div>';
+    }
+    h += '<div class="hm-rowtot">'+(daysPerDow[d]?Math.ceil(rowTotals[d]/daysPerDow[d]):0)+'</div>';
+  }
+  h += '<div class="hm-totlbl" style="padding-top:5px">avg/h</div>';
+  for (let c=0; c<9; c++) { const a = totalWorkDays?Math.ceil(colTotals[c]/totalWorkDays):0; h += '<div class="hm-coltot">'+a+'</div>'; }
+  h += '<div class="hm-rowtot" style="padding-top:5px">'+dayAvg+'</div></div>';
+
+  h += '<div class="hm-legend"><span>Sytost = prumer / den</span>';
+  ['F1EFE8','E6F1FB','B5D4F4','85B7EB','378ADD','185FA5','0C447C'].forEach((c,i)=>{
+    const lbl=['0','1','2-3','4-6','7-10','11-15','16+'][i];
+    h += '<span><span class="hm-leg-sq" style="background:#'+c+(i===0?';border:0.5px solid var(--border)':'')+'"></span>'+lbl+'</span>';
+  });
+  h += '<span><span class="hm-leg-sq" style="background:#f3f4f6;border:0.5px solid var(--border)"></span>Mimo prac. dobu</span></div>';
+  h += '<div class="hm-note">Pravidla presunu: Po-Ct po 17h &rarr; dalsi den 8h. Pa po 17h &rarr; So 8h. So po 13h &rarr; Po 8h. Ne &rarr; Po 8h. Pred 8h &rarr; ten samy den 8h.</div>';
+
+  wrap.innerHTML = h;
+}
+
+loadData();
+/* Auto-refresh JSON every 5 min */
+setInterval(loadData, 5 * 60 * 1000);
+</script>
+</body>
+</html>
