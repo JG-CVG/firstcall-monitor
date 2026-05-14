@@ -93,7 +93,10 @@ def main():
     status_recs = load("sf_status.json")["records"]
     ip_recs = load("sf_ip.json")["records"]
     closed_status = load("sf_closed_status.json")
-    closed_country = load("sf_closed_country.json")
+    try:
+        closed_country = load("sf_closed_country.json")
+    except FileNotFoundError:
+        closed_country = {}
     feeds_data = load("sf_feeds.json")["records"]
     incs_data = load("sf_incidents.json")["records"]
     heatmap_recs = load("sf_heatmap.json")["records"]
