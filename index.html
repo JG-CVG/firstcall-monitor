@@ -185,6 +185,8 @@ tr:hover td { background:#f9fafb; }
 
   <div class="card"><div class="card-title">&#128100; Call Center &mdash; Car Check per Agent</div><div id="tblAgent"></div></div>
 
+  <div class="card"><div class="card-title">&#9888; Urgent &mdash; opakuj volání</div><div id="tblUrgent"></div></div>
+
   <div class="card"><div class="card-title">&#128222; Car Check &mdash; nedovolano detail</div><div id="tblNedov"></div></div>
   <div class="card"><div class="card-title">&#10006; Closed reasons (Phase 1)</div><div id="tblClosed"></div></div>
   <div class="card"><div class="card-title">&#127760; Vendor Country &mdash; prehled</div><div id="tblCountry"></div></div>
@@ -228,6 +230,7 @@ function render() {
   renderTier2(t.closed, t.phase2, t.ip_total, t.total);
   renderTier3(d.status_breakdown, d.nedov_count);
   renderAgentTable(d.agent_breakdown);
+  renderUrgentCount(d.nedovolano);
   renderNedovTable(d.nedovolano, d.sf_base_url);
   renderClosedTable(d.closed_reasons);
   renderCountryTable(d.country_breakdown);
@@ -363,6 +366,29 @@ function renderAgentTable(agents) {
     '</div>';
   });
   h += '</div>';
+  el.innerHTML = h;
+}
+
+function renderUrgentCount(nedov) {
+  const el = document.getElementById('tblUrgent');
+  if (!nedov || !nedov.length) { el.innerHTML='<span style="color:var(--muted)">Žádné case</span>'; return; }
+  const now = Date.now();
+  const urgentCases = nedov.filter(d => d.nCnt === 1 && d.lastD && (now - new Date(d.lastD).getTime()) > 2*3600*1000);
+  const count = urgentCases.length;
+  const totalNedov = nedov.filter(d => d.isN).length;
+  const pct = totalNedov ? Math.round(count/totalNedov*100) : 0;
+  const urgentColor = count > 0 ? '#DC2626' : '#16A34A';
+  let h = '<div style="display:flex;align-items:center;gap:20px;padding:6px 4px">';
+  h += '<div style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;background:#FFFBEB;border-radius:12px;border:1px solid #FDE68A">';
+  h += '<svg viewBox="0 0 24 24" width="48" height="44"><path d="M12 2 L22 21 L2 21 Z" fill="#FCD34D" stroke="#D97706" stroke-width="1.5" stroke-linejoin="round"/><g transform="translate(8.2 10) scale(0.38)" fill="#DC2626"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></g></svg>';
+  h += '</div>';
+  h += '<div style="flex:1">';
+  h += '<div style="display:flex;align-items:baseline;gap:12px">';
+  h += '<div style="font-size:44px;font-weight:700;color:'+urgentColor+';line-height:1;letter-spacing:-0.02em">'+count+'</div>';
+  h += '<div style="font-size:14px;color:var(--text);font-weight:500">cases vyžadují okamžité opakování</div>';
+  h += '</div>';
+  h += '<div style="font-size:11.5px;color:var(--muted);margin-top:8px;letter-spacing:0.02em">1× nedovoláno &middot; poslední pokus před více než 2h &middot; <strong>'+pct+'%</strong> ze všech nedovolaných ('+totalNedov+')</div>';
+  h += '</div></div>';
   el.innerHTML = h;
 }
 
