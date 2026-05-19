@@ -192,6 +192,7 @@ def main():
             "incs": case_incs,
             "potClose": pot_close,
             "potSpanH": pot_span_h,
+            "pref": bool((c.get("Order__r") or {}).get("Preferred__c")) if c.get("Order__r") else False,
         })
 
     # ---- Heatmap (rolling 30 days, Prague TZ) ----
