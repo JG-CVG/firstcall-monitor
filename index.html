@@ -623,7 +623,7 @@ function renderBufferTower(bh, sb) {
   const deltaArrow = netDelta > 5 ? '↑↑' : netDelta > 0 ? '↗' : netDelta < 0 ? '↘' : '→';
   const deltaTxt = netDelta > 0 ? '+'+netDelta : ''+netDelta;
   // KPI strip
-  let h = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">';
+  let h = '<div style="display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr 1.1fr;gap:8px;margin-bottom:14px">';
   h += '<div style="background:#1B2130;border-radius:8px;padding:10px 12px">'+
     '<div style="font-size:9.5px;letter-spacing:0.05em;color:#B8AFF9;text-transform:uppercase;font-weight:600">Buffer NOW</div>'+
     '<div style="font-size:26px;font-weight:700;letter-spacing:-0.02em;line-height:1.05;color:#fff">'+currentBuffer+'</div>'+
@@ -636,6 +636,17 @@ function renderBufferTower(bh, sb) {
     '<div style="font-size:9.5px;letter-spacing:0.05em;color:#2D4FBC;text-transform:uppercase;font-weight:600">↓ → VIN Check</div>'+
     '<div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;line-height:1.05">'+totalVin+'</div>'+
     '<div style="font-size:10px;color:var(--muted);margin-top:3px">posunuto dál</div></div>';
+  // Projection card (added)
+  const proj = bh.projection_18 || null;
+  if (proj) {
+    const projColor = proj.delta_vs_now < -5 ? '#00805F' : proj.delta_vs_now <= 5 ? '#B66B2A' : '#C2293A';
+    const projArrow = proj.delta_vs_now < 0 ? '↘' : proj.delta_vs_now > 0 ? '↗' : '→';
+    const projDeltaTxt = proj.delta_vs_now > 0 ? '+'+proj.delta_vs_now : ''+proj.delta_vs_now;
+    h += '<div style="background:rgba(126,52,255,0.07);border-radius:8px;padding:10px 12px;border-left:3px solid #7F77DD">'+
+      '<div style="font-size:9.5px;letter-spacing:0.05em;color:#534AB7;text-transform:uppercase;font-weight:600">⏱ Očekávaný 18:00</div>'+
+      '<div style="font-size:22px;font-weight:700;color:'+projColor+';letter-spacing:-0.02em;line-height:1.05">'+projArrow+' '+proj.buffer+'</div>'+
+      '<div style="font-size:10px;color:var(--muted);margin-top:3px" title="Linear projection: current + rate × hours_remaining">'+projDeltaTxt+' vs teď · '+proj.rate_per_h+'/h tempo</div></div>';
+  }
   h += '<div style="background:rgba(244,162,97,0.08);border-radius:8px;padding:10px 12px;border-left:3px solid #F4A261">'+
     '<div style="font-size:9.5px;letter-spacing:0.05em;color:#B66B2A;text-transform:uppercase;font-weight:600">Delta dnes</div>'+
     '<div style="font-size:22px;font-weight:700;color:'+deltaColor+';letter-spacing:-0.02em;line-height:1.05">'+deltaArrow+' '+deltaTxt+'</div>'+
