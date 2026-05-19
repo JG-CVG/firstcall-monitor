@@ -199,6 +199,8 @@ tr:hover td { background:#f9fafb; }
   <div class="card"><div class="card-title">&#10006; Closed reasons (Phase 1)</div><div id="tblClosed"></div></div>
   <div class="card"><div class="card-title">&#127760; Vendor Country &mdash; prehled</div><div id="tblCountry"></div></div>
 
+  <div class="card"><div class="card-title">&#128202; 1st Call Buffer &mdash; kolik práce před sebou (po hodinách dnes)</div><div id="bufferTower"></div></div>
+
   <div class="card card-hm"><div class="card-title">&#128293; CarAudit New &mdash; Heatmap (prumer / den x hodina, plovouci mesic)</div><div id="heatmapWrap"></div></div>
   <div class="card card-hm"><div class="card-title">&#9201; CarAudit New &mdash; Heatmap (pracovni okno, Po-Pa 8-17, So 8-13)</div><div id="heatmapWorkWrap"></div></div>
 </div>
@@ -243,6 +245,7 @@ function render() {
   renderNedovTable(d.nedovolano, d.sf_base_url);
   renderClosedTable(d.closed_reasons);
   renderCountryTable(d.country_breakdown);
+  renderBufferTower(d.buffer_hourly, d.status_breakdown);
   renderHeatmap(d.heatmap);
   renderHeatmapWork(d.heatmap);
   updateTimestamp(d);
@@ -595,6 +598,109 @@ function pushToWorking(d, h) {
   return {d:d+1,h:8};
 }
 function padH(h){return h<10?'0'+h:''+h;}
+
+function renderBufferTower(bh, sb) {
+  const el = document.getElementById('bufferTower');
+  // bh = { start_buffer, current_buffer, current_new_ca, current_car_check, hours: [{h: 8, in: 2, vin: 0, rej: 0, buffer_end: 32}, ...] }
+  // If no data, render preview placeholder with computed current values
+  const newCA = (sb && sb['New CA']) || 0;
+  const cc = (sb && sb['Car check']) || 0;
+  const currentBuffer = newCA + cc;
+  if (!bh || !bh.hours || !bh.hours.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6">'+
+      '<div style="font-size:14px;color:var(--text);margin-bottom:8px">&#128202; Buffer NOW: <strong style="color:var(--carvago);font-size:18px">'+currentBuffer+'</strong> ('+newCA+' New CA + '+cc+' Car Check)</div>'+
+      '<div style="color:#9CA3AF">Per-hour tracking se aktivuje s další refreshí — počítá <strong>vzniklo</strong> (CA New today), <strong>→VIN</strong> (CA VIN Check today) a <strong>→REJ</strong> (P1 reject today) po hodinách 8:00–18:00.</div>'+
+    '</div>';
+    return;
+  }
+  const hours = bh.hours;
+  const startBuf = bh.start_buffer;
+  const maxBuf = Math.max(startBuf, currentBuffer, ...hours.map(h => h.buffer_end || 0)) * 1.1;
+  let totalIn = 0, totalVin = 0, totalRej = 0;
+  hours.forEach(h => { if (h.in !== null) { totalIn += h.in; totalVin += h.vin; totalRej += h.rej; } });
+  const netDelta = currentBuffer - startBuf;
+  const deltaColor = netDelta > 5 ? '#C2293A' : netDelta > 0 ? '#B66B2A' : '#00805F';
+  const deltaArrow = netDelta > 5 ? '↑↑' : netDelta > 0 ? '↗' : netDelta < 0 ? '↘' : '→';
+  const deltaTxt = netDelta > 0 ? '+'+netDelta : ''+netDelta;
+  // KPI strip
+  let h = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px">';
+  h += '<div style="background:#1B2130;border-radius:8px;padding:10px 12px">'+
+    '<div style="font-size:9.5px;letter-spacing:0.05em;color:#B8AFF9;text-transform:uppercase;font-weight:600">Buffer NOW</div>'+
+    '<div style="font-size:26px;font-weight:700;letter-spacing:-0.02em;line-height:1.05;color:#fff">'+currentBuffer+'</div>'+
+    '<div style="font-size:10px;color:#B8AFF9;margin-top:3px">'+newCA+' New CA · '+cc+' Car Check</div></div>';
+  h += '<div style="background:rgba(0,179,136,0.07);border-radius:8px;padding:10px 12px;border-left:3px solid #00B388">'+
+    '<div style="font-size:9.5px;letter-spacing:0.05em;color:#00805F;text-transform:uppercase;font-weight:600">↗ Přibylo dnes</div>'+
+    '<div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;line-height:1.05">'+totalIn+'</div>'+
+    '<div style="font-size:10px;color:var(--muted);margin-top:3px">vstoupilo do bufferu</div></div>';
+  h += '<div style="background:rgba(94,129,244,0.07);border-radius:8px;padding:10px 12px;border-left:3px solid #5E81F4">'+
+    '<div style="font-size:9.5px;letter-spacing:0.05em;color:#2D4FBC;text-transform:uppercase;font-weight:600">↓ → VIN Check</div>'+
+    '<div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;line-height:1.05">'+totalVin+'</div>'+
+    '<div style="font-size:10px;color:var(--muted);margin-top:3px">posunuto dál</div></div>';
+  h += '<div style="background:rgba(244,162,97,0.08);border-radius:8px;padding:10px 12px;border-left:3px solid #F4A261">'+
+    '<div style="font-size:9.5px;letter-spacing:0.05em;color:#B66B2A;text-transform:uppercase;font-weight:600">Delta dnes</div>'+
+    '<div style="font-size:22px;font-weight:700;color:'+deltaColor+';letter-spacing:-0.02em;line-height:1.05">'+deltaArrow+' '+deltaTxt+'</div>'+
+    '<div style="font-size:10px;color:var(--muted);margin-top:3px">vs '+startBuf+' v 8:00</div></div>';
+  h += '</div>';
+  // Tower
+  h += '<div style="background:#F9FAFB;border-radius:10px;padding:14px 16px;margin-bottom:12px">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
+    '<div style="font-size:11px;color:var(--muted);letter-spacing:0.04em;text-transform:uppercase;font-weight:600">Po hodinách 8:00 → 18:00</div>'+
+    '<div style="display:flex;gap:12px;font-size:10.5px;color:var(--muted)"><span><span style="display:inline-block;width:10px;height:10px;background:#7F77DD;border-radius:2px;vertical-align:middle;margin-right:4px"></span>New CA</span>'+
+    '<span><span style="display:inline-block;width:10px;height:10px;background:#2D1FE3;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Car Check</span></div></div>';
+  h += '<div style="display:flex;flex-direction:column;gap:6px">';
+  // Start row
+  const startNew = bh.start_new_ca || 0;
+  const startCC = bh.start_car_check || 0;
+  const startNewPct = (startNew / maxBuf * 100).toFixed(1);
+  const startCCPct = (startCC / maxBuf * 100).toFixed(1);
+  h += '<div style="display:grid;grid-template-columns:56px 1fr 38px 24px 170px;align-items:center;gap:10px;font-size:13px">'+
+    '<div style="color:var(--muted)">8:00</div>'+
+    '<div style="background:#F3F4F6;border-radius:4px;height:22px;display:flex;overflow:hidden"><div style="background:#7F77DD;width:'+startNewPct+'%"></div><div style="background:#2D1FE3;width:'+startCCPct+'%"></div></div>'+
+    '<div style="text-align:right;font-weight:600;color:var(--text)">'+startBuf+'</div>'+
+    '<div style="text-align:center" title="Start dne (baseline)">▪</div>'+
+    '<div style="font-size:10.5px;color:#9CA3AF">start ('+startNew+' New + '+startCC+' CC)</div></div>';
+  // Hourly rows
+  const nowHour = new Date().getHours();
+  for (let i = 0; i < hours.length; i++) {
+    const r = hours[i];
+    const isFuture = r.in === null;
+    const isCurrent = r.h === nowHour;
+    if (isFuture) {
+      h += '<div style="display:grid;grid-template-columns:56px 1fr 38px 24px 170px;align-items:center;gap:10px;font-size:13px;opacity:0.5">'+
+        '<div style="color:#9CA3AF">'+r.h+':00</div>'+
+        '<div style="background:repeating-linear-gradient(45deg,#F3F4F6,#F3F4F6 5px,#FAFBFC 5px,#FAFBFC 10px);border-radius:4px;height:22px"></div>'+
+        '<div style="text-align:right;color:#9CA3AF">—</div><div></div>'+
+        '<div style="font-size:10.5px;color:#9CA3AF;font-style:italic">budoucí</div></div>';
+      continue;
+    }
+    const net = r.in - r.vin - r.rej;
+    const light = net <= 0 ? '🟢' : net <= 3 ? '🟡' : '🔴';
+    const bufNum = r.buffer_end;
+    const bufNumColor = net <= 0 ? '#00805F' : net <= 3 ? '#B66B2A' : '#C2293A';
+    // assume new_ca/cc split from r if available, else proportional
+    const rNew = r.buffer_new_ca != null ? r.buffer_new_ca : Math.round(bufNum * (startNew / Math.max(1, startBuf)));
+    const rCC = bufNum - rNew;
+    const newPct = (rNew / maxBuf * 100).toFixed(1);
+    const ccPct = (rCC / maxBuf * 100).toFixed(1);
+    const rowStyle = isCurrent ? 'background:rgba(45,31,227,0.06);padding:6px 8px;border-radius:6px;border-left:3px solid var(--carvago)' : '';
+    const barShadow = isCurrent ? 'box-shadow:0 0 0 2px rgba(45,31,227,0.2);' : '';
+    const timeLabel = isCurrent ? '<div style="color:var(--carvago);font-weight:700">NOW</div>' : '<div style="color:var(--muted)">'+r.h+':00</div>';
+    h += '<div style="display:grid;grid-template-columns:56px 1fr 38px 24px 170px;align-items:center;gap:10px;font-size:13px;'+rowStyle+'">'+
+      timeLabel+
+      '<div style="background:#F3F4F6;border-radius:4px;height:22px;display:flex;overflow:hidden;'+barShadow+'"><div style="background:#7F77DD;width:'+newPct+'%"></div><div style="background:#2D1FE3;width:'+ccPct+'%"></div></div>'+
+      '<div style="text-align:right;font-weight:'+(isCurrent?700:600)+';color:'+bufNumColor+';font-size:'+(isCurrent?14:13)+'px">'+bufNum+'</div>'+
+      '<div style="text-align:center;font-size:13px" title="Net '+(net>=0?'+':'')+net+'">'+light+'</div>'+
+      '<div style="font-size:10.5px;color:var(--muted)"><span style="color:#00805F">+'+r.in+'</span> · <span style="color:#2D4FBC">−'+r.vin+' VIN</span> · <span style="color:#C2293A">−'+r.rej+' REJ</span></div></div>';
+  }
+  h += '</div></div>';
+  // Legend
+  h += '<div style="display:flex;flex-wrap:wrap;gap:18px;font-size:11.5px;color:#4B5563;padding:0 4px 8px">'+
+    '<span>🟢 <strong>Klesá</strong> (≤0)</span>'+
+    '<span>🟡 <strong>Mírně roste</strong> (+1–3)</span>'+
+    '<span>🔴 <strong>Rychle roste</strong> (+4+)</span>'+
+    '<span style="margin-left:auto;color:#9CA3AF">Net = Přibylo − (→VIN + →REJ)</span></div>';
+  el.innerHTML = h;
+}
 
 function renderHeatmap(hm) {
   const wrap = document.getElementById('heatmapWrap');
