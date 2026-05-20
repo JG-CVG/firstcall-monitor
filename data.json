@@ -1100,92 +1100,88 @@
     "end_date": "2026-05-20"
   },
   "buffer_hourly": {
-    "current": 52,
-    "newCa": 8,
-    "carCheck": 44,
-    "hourly": [
+    "start_buffer": 57,
+    "start_new_ca": 9,
+    "start_car_check": 48,
+    "current_buffer": 52,
+    "current_new_ca": 8,
+    "current_car_check": 44,
+    "hours": [
       {
-        "hr": 8,
+        "h": 8,
         "in": 5,
-        "outVin": 1,
-        "outRej": 2,
-        "future": false
+        "vin": 1,
+        "rej": 2,
+        "buffer_end": 59
       },
       {
-        "hr": 9,
+        "h": 9,
         "in": 8,
-        "outVin": 9,
-        "outRej": 1,
-        "future": false
+        "vin": 9,
+        "rej": 1,
+        "buffer_end": 57
       },
       {
-        "hr": 10,
+        "h": 10,
         "in": 1,
-        "outVin": 5,
-        "outRej": 1,
-        "future": false
+        "vin": 5,
+        "rej": 1,
+        "buffer_end": 52
       },
       {
-        "hr": 11,
+        "h": 11,
         "in": null,
-        "outVin": null,
-        "outRej": null,
-        "future": true
+        "vin": null,
+        "rej": null,
+        "buffer_end": null
       },
       {
-        "hr": 12,
+        "h": 12,
         "in": null,
-        "outVin": null,
-        "outRej": null,
-        "future": true
+        "vin": null,
+        "rej": null,
+        "buffer_end": null
       },
       {
-        "hr": 13,
+        "h": 13,
         "in": null,
-        "outVin": null,
-        "outRej": null,
-        "future": true
+        "vin": null,
+        "rej": null,
+        "buffer_end": null
       },
       {
-        "hr": 14,
+        "h": 14,
         "in": null,
-        "outVin": null,
-        "outRej": null,
-        "future": true
+        "vin": null,
+        "rej": null,
+        "buffer_end": null
       },
       {
-        "hr": 15,
+        "h": 15,
         "in": null,
-        "outVin": null,
-        "outRej": null,
-        "future": true
+        "vin": null,
+        "rej": null,
+        "buffer_end": null
       },
       {
-        "hr": 16,
+        "h": 16,
         "in": null,
-        "outVin": null,
-        "outRej": null,
-        "future": true
+        "vin": null,
+        "rej": null,
+        "buffer_end": null
       },
       {
-        "hr": 17,
+        "h": 17,
         "in": null,
-        "outVin": null,
-        "outRej": null,
-        "future": true
-      },
-      {
-        "hr": 18,
-        "in": null,
-        "outVin": null,
-        "outRej": null,
-        "future": true
+        "vin": null,
+        "rej": null,
+        "buffer_end": null
       }
     ],
-    "projection_18": 40,
-    "totalInToday": 14,
-    "totalOutToday": 19,
-    "netPerHr": -1.67,
-    "currentHr": 10
+    "projection_18": {
+      "buffer": 40,
+      "rate_per_h": -1.67,
+      "delta_vs_now": -12
+    }
   }
 }
