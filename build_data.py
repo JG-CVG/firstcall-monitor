@@ -342,6 +342,21 @@ def main():
             },
         }
 
+    # ---- SANITY CHECK — fail-fast pokud filtry chybí v Q1 ----
+    # Carvago květen 2026 by mělo mít ~1 300-1 700 cases. 5000+ = filtr chybí (Q1 bez THIS_MONTH/Instamotion/Vendor)
+    if total > 5000:
+        raise SystemExit(
+            f"\n\n🛑 SANITY CHECK FAILED: total={total} (max 5000 expected for Carvago monthly).\n"
+            f"Probable cause: Q1 ran without filters (CA_New_CarAudit_Date__c=THIS_MONTH AND "
+            f"Order__r.Instamotion_Customer__c=false AND CarAudit__r.Vendor_Country__c NOT IN ('XK','AL')).\n"
+            f"Fix: Re-run Q1 with correct filters per SKILL.md §6.\n"
+            f"Build aborted to prevent bad data deployment.\n"
+        )
+    if ip_total > 300:
+        raise SystemExit(f"\n\n🛑 SANITY CHECK FAILED: ip_total={ip_total} (max 300 expected). Filtr chybí v Q1.\n")
+    if closed > 3000:
+        raise SystemExit(f"\n\n🛑 SANITY CHECK FAILED: closed={closed} (max 3000 expected/month). Filtr chybí v Q1.\n")
+
     # ---- Output ----
     output = {
         "schema_version": 1,
