@@ -26,9 +26,29 @@ from zoneinfo import ZoneInfo
 PRAGUE = ZoneInfo("Europe/Prague")
 NEDOV_RE = re.compile(
     r"nedovol[aá]n[oý]|nebere|nicht\s+er[r]?eicht|"
-    r"konnte\s+.*?nicht\s+er[r]?e[ia]cht|immer\s+noch\s+nicht",
+    r"konnte\s+.*?nicht\s+er[r]?e[ia]cht|immer\s+noch\s+nicht|"
+    r"obsazen[oýáéí]*|besetzt|\bbusy\b|mailbox|"
+    r"Verk[aä]ufer\s+ist\s+im\s+Kundengespr[aä]ch|Kundengespr[aä]ch|"
+    r"sp[aä]+t?er\s+(noch\s*(ein)?\s*)?mal\s*anrufen|spaerter",
     re.IGNORECASE,
 )
+# Categorization of latest feed
+RE_MESSAGING = re.compile(
+    r"\b(e-?mail|mail|whatsapp|sms|chat|messenger)\b|"
+    r"posl[au]?(m|n[ae])?\s*(mu|jej|mail|email|sms|whatsapp)|"
+    r"zasl[aá]m|gesendet|geschickt|"
+    r"sent\s*(an\s+)?(email|mail|sms|whatsapp)",
+    re.IGNORECASE,
+)
+RE_CALLBACK = re.compile(
+    r"zavol[aá]\s*zp[eě]t|ozv[eou]+\s*se|vr[aá]t[ií]\s+se|"
+    r"meldet\s+sich|wird\s+sich\s+melden|ruft\s+zur[uü]ck|r[uü]ckruf|"
+    r"kolega\s+(p[rř]i?jde|zavol[aá]|p[rř]eb[ií]r[aá])|"
+    r"call(s|ed)?\s*back|callback|gets?\s+back|"
+    r"\bAP\s*[:=]",
+    re.IGNORECASE,
+)
+
 P1_REJECTS = {
     "REJECT New CA", "REJECT Data Validation", "REJECT Car Check",
     "REJECT VIN Check", "REJECT Awaiting Selection",
@@ -150,14 +170,32 @@ def main():
     for i in incs_data:
         incs_by_case.setdefault(i["Case__c"], []).append(i)
 
+    def categorize(body):
+        """Return 'messaging' | 'callback' | 'nedov' | None for a feed body."""
+        if not body:
+            return None
+        if RE_MESSAGING.search(body):
+            return "messaging"
+        if RE_CALLBACK.search(body):
+            return "callback"
+        if NEDOV_RE.search(body):
+            return "nedov"
+        return None
+
     now_utc = datetime.now(timezone.utc)
     nedov_data = []
     nedov_count = 0
     cc_recs = [r for r in ip_recs if r["Status"] == "Car check"]
     for c in cc_recs:
         cid = c["Id"]
-        cf = feeds_by_case.get(cid, [])
+        cf = sorted(feeds_by_case.get(cid, []), key=lambda x: x.get("CreatedDate") or "", reverse=True)
         nf = [f for f in cf if f.get("Body") and NEDOV_RE.search(f["Body"])]
+        # All categorized feeds (any of 3 categories) — used for potClose and lastType
+        cat_feeds = []
+        for f in cf:
+            cat = categorize(f.get("Body"))
+            if cat:
+                cat_feeds.append((cat, f))
         is_n = len(nf) > 0
         if is_n:
             nedov_count += 1
@@ -171,13 +209,19 @@ def main():
             }
             for i in incs_by_case.get(cid, [])
         ]
+        # potClose: 2+ contacts of ANY type, span >= 1.5h, age_w >= 4h
         pot_close = False
         pot_span_h = None
-        if age_w is not None and age_w >= 4 and len(nf) >= 2:
-            ts = sorted(parse_dt(f["CreatedDate"]).timestamp() for f in nf)
+        if age_w is not None and age_w >= 4 and len(cat_feeds) >= 2:
+            ts = sorted(parse_dt(f["CreatedDate"]).timestamp() for _, f in cat_feeds)
             pot_span_h = round((ts[-1] - ts[0]) / 3600, 2)
-            if pot_span_h >= 2:
+            if pot_span_h >= 1.5:
                 pot_close = True
+        # Last contact info (from latest categorized feed)
+        last_type = cat_feeds[0][0] if cat_feeds else None
+        last_feed = cat_feeds[0][1] if cat_feeds else (cf[0] if cf else None)
+        last_d = last_feed["CreatedDate"] if last_feed else None
+        last_by = (last_feed.get("CreatedBy") or {}).get("Name") if last_feed else None
         nedov_data.append({
             "id": cid,
             "cn": c["CaseNumber"],
@@ -187,8 +231,10 @@ def main():
             "ageW": age_w,
             "isN": is_n,
             "nCnt": len(nf),
-            "lastD": nf[0]["CreatedDate"] if nf else None,
-            "lastBy": (nf[0].get("CreatedBy") or {}).get("Name") if nf else None,
+            "ctCnt": len(cat_feeds),
+            "lastType": last_type,
+            "lastD": last_d,
+            "lastBy": last_by,
             "incs": case_incs,
             "potClose": pot_close,
             "potSpanH": pot_span_h,
