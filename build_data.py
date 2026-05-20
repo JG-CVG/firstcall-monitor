@@ -259,6 +259,77 @@ def main():
         matrix[idx][hr] = cnt
         hm_total += cnt
 
+    # ---- Buffer hourly (Q9/Q10/Q11) — optional ----
+    def _load_hourly(name):
+        try:
+            with open(os.path.join(TMP, name), "r", encoding="utf-8") as fh:
+                return json.load(fh).get("records", [])
+        except FileNotFoundError:
+            return None
+
+    bh_added = _load_hourly("sf_hourly_added.json")
+    bh_vin = _load_hourly("sf_hourly_vin.json")
+    bh_rej = _load_hourly("sf_hourly_rej.json")
+
+    buffer_hourly = None
+    if bh_added is not None and bh_vin is not None and bh_rej is not None:
+        now_local = now_utc.astimezone(PRAGUE)
+        cur_hr = now_local.hour
+        # Determine Prague offset to convert UTC hours from SF
+        prague_offset = int(now_local.utcoffset().total_seconds() // 3600)
+        def _by_local(records):
+            m = {}
+            for r in records:
+                hp = (int(r["hr"]) + prague_offset) % 24
+                m[hp] = m.get(hp, 0) + int(r["cnt"])
+            return m
+        in_h = _by_local(bh_added)
+        vin_h = _by_local(bh_vin)
+        rej_h = _by_local(bh_rej)
+        new_ca_count = sm.get("New CA", 0)
+        cc_count = sm.get("Car check", 0)
+        current_buffer = new_ca_count + cc_count
+        sum_in = sum(in_h.get(h, 0) for h in range(8, cur_hr + 1))
+        sum_vin = sum(vin_h.get(h, 0) for h in range(8, cur_hr + 1))
+        sum_rej = sum(rej_h.get(h, 0) for h in range(8, cur_hr + 1))
+        start_buffer = current_buffer - sum_in + sum_vin + sum_rej
+        if current_buffer > 0:
+            start_new_ca = max(0, round(start_buffer * new_ca_count / current_buffer))
+        else:
+            start_new_ca = 0
+        start_car_check = max(0, start_buffer - start_new_ca)
+        hours_arr = []
+        running = start_buffer
+        for h in range(8, 18):
+            if h > cur_hr:
+                hours_arr.append({"h": h, "in": None, "vin": None, "rej": None, "buffer_end": None})
+                continue
+            ih = in_h.get(h, 0)
+            vh = vin_h.get(h, 0)
+            rh = rej_h.get(h, 0)
+            running = running + ih - vh - rh
+            hours_arr.append({"h": h, "in": ih, "vin": vh, "rej": rh, "buffer_end": running})
+        hours_elapsed = max(1, cur_hr - 8 + 1)
+        net_today = sum_in - sum_vin - sum_rej
+        rate_per_h = round(net_today / hours_elapsed, 2)
+        hours_remaining = max(0, 17 - cur_hr)
+        proj_buffer = max(0, round(current_buffer + rate_per_h * hours_remaining))
+        delta_vs_now = proj_buffer - current_buffer
+        buffer_hourly = {
+            "start_buffer": start_buffer,
+            "start_new_ca": start_new_ca,
+            "start_car_check": start_car_check,
+            "current_buffer": current_buffer,
+            "current_new_ca": new_ca_count,
+            "current_car_check": cc_count,
+            "hours": hours_arr,
+            "projection_18": {
+                "buffer": proj_buffer,
+                "rate_per_h": rate_per_h,
+                "delta_vs_now": delta_vs_now,
+            },
+        }
+
     # ---- Output ----
     output = {
         "schema_version": 1,
@@ -283,6 +354,8 @@ def main():
             "end_date": today_pg.strftime("%Y-%m-%d"),
         },
     }
+    if buffer_hourly is not None:
+        output["buffer_hourly"] = buffer_hourly
     with open("/tmp/data.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2, default=str)
     print(
