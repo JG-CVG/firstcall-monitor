@@ -202,12 +202,15 @@ def main():
         ccd = parse_dt(c.get("CA_Car_Check_Date__c"))
         age_h = round((now_utc - ccd).total_seconds() / 3600) if ccd else None
         age_w = working_hours_between(ccd, now_utc) if ccd else None
+        case_incs_raw = sorted(incs_by_case.get(cid, []), key=lambda x: x.get("CreatedDate") or "", reverse=True)
         case_incs = [
             {
                 "subject": strip_html(i.get("Subject__c", "")) or "(bez subjectu)",
                 "eta": i.get("Estimated_Resolution_Date__c"),
+                "createdDate": i.get("CreatedDate"),
+                "createdBy": (i.get("CreatedBy") or {}).get("Name"),
             }
-            for i in incs_by_case.get(cid, [])
+            for i in case_incs_raw
         ]
         # potClose: 2+ contacts of ANY type, span >= 1.5h, age_w >= 4h
         pot_close = False
@@ -217,11 +220,20 @@ def main():
             pot_span_h = round((ts[-1] - ts[0]) / 3600, 2)
             if pot_span_h >= 1.5:
                 pot_close = True
-        # Last contact info (from latest categorized feed)
+        # Last contact info — STRICT: only operators who logged a categorized feed
+        # (Nedovoláno/Zavolá zpět/Email-SMS) OR created an incident. Uncategorized feed
+        # noise (vendor info dumps, etc.) is ignored.
         last_type = cat_feeds[0][0] if cat_feeds else None
-        last_feed = cat_feeds[0][1] if cat_feeds else (cf[0] if cf else None)
-        last_d = last_feed["CreatedDate"] if last_feed else None
-        last_by = (last_feed.get("CreatedBy") or {}).get("Name") if last_feed else None
+        last_d = None
+        last_by = None
+        if cat_feeds:
+            last_feed = cat_feeds[0][1]
+            last_d = last_feed["CreatedDate"]
+            last_by = (last_feed.get("CreatedBy") or {}).get("Name")
+        elif case_incs:
+            # No categorized feed — fall back to incident creator
+            last_d = case_incs[0].get("createdDate")
+            last_by = case_incs[0].get("createdBy")
         nedov_data.append({
             "id": cid,
             "cn": c["CaseNumber"],
