@@ -436,7 +436,7 @@ function sortNedov(col) {
   } else {
     nedovSortState.col = col;
     // numeric/boolean cols default desc; string cols default asc
-    const descByDefault = ['ageH','ageW','nCnt','isN','potClose','incs','lastD','lastType'];
+    const descByDefault = ['ageH','ageW','nCnt','ctCnt','isN','potClose','incs','lastD','lastType'];
     nedovSortState.dir = descByDefault.includes(col) ? 'desc' : 'asc';
   }
   if (nedovCache) renderNedovTable(nedovCache, sfBaseCache);
@@ -452,6 +452,7 @@ function nedovSortValue(d, col) {
     case 'ageH': return d.ageH ?? -1;
     case 'ageW': return d.ageW ?? -1;
     case 'isN': return (d.isN ? 1 : 0) * 1000 + (d.nCnt || 0); // composite (kept for backwards compat)
+    case 'ctCnt': return d.ctCnt || 0;
     case 'lastType': return typeRank[d.lastType] || 0;
     case 'lastD': return d.lastD || '';
     case 'lastBy': return d.lastBy || 'zzz';
@@ -502,6 +503,7 @@ function renderNedovTable(data, sfBase) {
     th('agent','Agent','')+
     th('ageH','Stari','r')+
     th('ageW','Prac. hod.','r,title:Po-Pa 8-17, So 8-13')+
+    th('ctCnt','# Kontaktů','c')+
     th('lastD','Posledni pokus','')+
     th('lastType','Typ kontaktu','c')+
     th('lastBy','Operator','')+
@@ -516,6 +518,9 @@ function renderNedovTable(data, sfBase) {
     const wCls = d.ageW==null ? '' : (d.ageW>27 ? 'b-red' : d.ageW>9 ? 'b-amber' : 'b-green');
     const wb = d.ageW!=null ? '<span class="badge '+wCls+'">'+wTxt+'</span>' : '—';
     const lt=d.lastD?new Date(d.lastD).toLocaleString('cs-CZ',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+    const cc = (d.ctCnt || 0);
+    const ctBadgeCls = cc === 0 ? 'b-gray' : cc === 1 ? 'b-amber' : 'b-green';
+    const ctCell = cc > 0 ? '<span class="badge '+ctBadgeCls+'">'+cc+'×</span>' : '<span style="color:var(--muted)">—</span>';
     let typeCell = '<span style="color:var(--muted)">—</span>';
     if (d.lastType === 'nedov') typeCell = '<span class="badge b-amber" title="Posledni pokus byl nedovolano nebo obsazeno">&#10006; Nedovoláno</span>';
     else if (d.lastType === 'callback') typeCell = '<span class="badge b-blue" title="Prodejce zavola zpet / preda kolegovi">&#8634; Zavolá zpět</span>';
@@ -537,7 +542,7 @@ function renderNedovTable(data, sfBase) {
     const prefBadge = d.pref ? '<span title="Preferovaný vůz" style="display:inline-block;background:var(--carvago);color:#fff;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:0.06em;margin-right:8px;vertical-align:middle">&#9733; PREFERRED</span>' : '';
     const caseLink = prefBadge + urgentIcon + urgentNoCallIcon + ((sfBase && d.id) ? '<a href="'+sfBase+'/lightning/r/Case/'+d.id+'/view" target="_blank" rel="noopener" style="color:var(--carvago);text-decoration:none;font-weight:500"><strong>'+d.cn+'</strong></a>' : '<strong>'+d.cn+'</strong>');
     const agentCell = d.agent ? '<span class="badge b-blue">'+escapeHtml(d.agent)+'</span>' : '<span style="color:var(--muted)">—</span>';
-    h+='<tr'+rc+'><td>'+caseLink+'</td><td>'+d.country+'</td><td>'+agentCell+'</td><td class="r">'+ab+'</td><td class="r">'+wb+'</td><td>'+lt+'</td><td class="c">'+typeCell+'</td><td>'+escapeHtml(d.lastBy||'—')+'</td><td>'+incCell+'</td><td class="c">'+skullCell+'</td></tr>';
+    h+='<tr'+rc+'><td>'+caseLink+'</td><td>'+d.country+'</td><td>'+agentCell+'</td><td class="r">'+ab+'</td><td class="r">'+wb+'</td><td class="c">'+ctCell+'</td><td>'+lt+'</td><td class="c">'+typeCell+'</td><td>'+escapeHtml(d.lastBy||'—')+'</td><td>'+incCell+'</td><td class="c">'+skullCell+'</td></tr>';
   });
   h+='</tbody></table>';
   el.innerHTML=h;
