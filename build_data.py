@@ -342,6 +342,38 @@ def main():
             },
         }
 
+    # ---- AwS customer split (Q12) ----
+    def _load_aws():
+        try:
+            with open(os.path.join(TMP, "sf_aws_open.json"), "r", encoding="utf-8") as fh:
+                return json.load(fh).get("records", [])
+        except FileNotFoundError:
+            return None
+
+    aws_open_recs = _load_aws()
+    aws_split = None
+    if aws_open_recs is not None:
+        from collections import defaultdict as _dd
+        by_acc = _dd(set)
+        aws_cases_cnt = 0
+        for r in aws_open_recs:
+            acc = r.get("AccountId")
+            st = r.get("Status")
+            if not acc:
+                continue
+            by_acc[acc].add(st)
+            if st == "Awaiting Selection":
+                aws_cases_cnt += 1
+        aws_accs = set(a for a, s in by_acc.items() if "Awaiting Selection" in s)
+        with_other = set(a for a in aws_accs if (by_acc[a] - {"Awaiting Selection"}))
+        solo = aws_accs - with_other
+        aws_split = {
+            "cases": aws_cases_cnt,
+            "customers": len(aws_accs),
+            "solo": len(solo),
+            "with_other": len(with_other),
+        }
+
     # ---- SANITY CHECK — fail-fast pokud filtry chybí v Q1 ----
     # Carvago květen 2026 by mělo mít ~1 300-1 700 cases. 5000+ = filtr chybí (Q1 bez THIS_MONTH/Instamotion/Vendor)
     if total > 5000:
@@ -383,6 +415,8 @@ def main():
     }
     if buffer_hourly is not None:
         output["buffer_hourly"] = buffer_hourly
+    if aws_split is not None:
+        output["aws_split"] = aws_split
     with open("/tmp/data.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2, default=str)
     print(

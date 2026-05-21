@@ -352,6 +352,23 @@ function renderTier3(sm, nedovCount) {
       '<div class="ip-sub">ceka na vyber &middot; '+pct(aw)+'% IP</div>'+
       '<div class="ip-bar"><div class="ip-bar-fill" style="width:'+pct(aw)+'%"></div></div>'+
     '</div></div>';
+  // ---- AwS customer split (minimal) ----
+  const aws = d.aws_split;
+  if (aws && aws.customers > 0) {
+    const pSolo = Math.round(aws.solo / aws.customers * 100);
+    const pWith = 100 - pSolo;
+    document.getElementById('tier3').innerHTML +=
+      '<div style="margin:0 0 14px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:16px;font-size:11.5px;color:var(--text)">' +
+        '<div style="flex-shrink:0;color:var(--muted);font-size:10px;letter-spacing:0.4px;text-transform:uppercase;font-weight:600">&#9200; AwS detail</div>' +
+        '<div style="flex-shrink:0;color:var(--navy);font-weight:600">'+aws.customers+' z\u00e1kazn\u00edk\u016f</div>' +
+        '<div style="flex:1;display:flex;height:8px;border-radius:4px;overflow:hidden;background:#F3F4F6">' +
+          '<div title="Pouze AwS, \u017e\u00e1dn\u00fd dal\u0161\u00ed otev\u0159en\u00fd CA" style="width:'+pSolo+'%;background:var(--green)"></div>' +
+          '<div title="AwS + dal\u0161\u00ed otev\u0159en\u00fd CA v jin\u00e9 f\u00e1zi" style="width:'+pWith+'%;background:var(--amber)"></div>' +
+        '</div>' +
+        '<div style="flex-shrink:0;color:var(--green);font-weight:600">'+aws.solo+' jen AwS <span style="color:var(--muted);font-weight:400">('+pSolo+'%)</span></div>' +
+        '<div style="flex-shrink:0;color:var(--amber-text);font-weight:600">'+aws.with_other+' + dal\u0161\u00ed CA <span style="color:var(--muted);font-weight:400">('+pWith+'%)</span></div>' +
+      '</div>';
+  }
 }
 
 function renderAgentTable(agents) {
