@@ -374,6 +374,60 @@ def main():
             "with_other": len(with_other),
         }
 
+    # ---- Phase 2 tables (Q13) ----
+    def _load_phase2():
+        try:
+            with open(os.path.join(TMP, "sf_phase2.json"), "r", encoding="utf-8") as fh:
+                return json.load(fh).get("records", [])
+        except FileNotFoundError:
+            return None
+
+    phase2_recs = _load_phase2()
+    phase2_tables = None
+    if phase2_recs is not None:
+        P2_STATUSES = ["Auditor selection", "Audit order", "Audit result", "CarAudit preparation"]
+        # Table 1: Status × Preferred / NO preferred
+        pref_table = {s: {"pref": 0, "nopref": 0} for s in P2_STATUSES}
+        # Table 2: Status × age bucket (working days since CA_Auditor_Selection_Date__c)
+        # Buckets: <2, 2-3, 3-5, 5-7, >7 (semi-open intervals on the right)
+        BUCKETS = ["lt2", "b23", "b35", "b57", "gt7"]
+        age_table = {s: {b: 0 for b in BUCKETS} for s in P2_STATUSES}
+        for r in phase2_recs:
+            st = r.get("Status")
+            if st not in P2_STATUSES:
+                continue
+            is_pref = bool(((r.get("Order__r") or {}).get("Preferred__c")))
+            pref_table[st]["pref" if is_pref else "nopref"] += 1
+            aws_dt = parse_dt(r.get("CA_Auditor_Selection_Date__c"))
+            if aws_dt is None:
+                continue
+            wh = working_hours_between(aws_dt, now_utc)
+            wd = wh / 8.0  # working hours -> working days (8 h/day)
+            if wd < 2:
+                b = "lt2"
+            elif wd < 3:
+                b = "b23"
+            elif wd < 5:
+                b = "b35"
+            elif wd < 7:
+                b = "b57"
+            else:
+                b = "gt7"
+            age_table[st][b] += 1
+        phase2_tables = {
+            "statuses": P2_STATUSES,
+            "preferred": pref_table,
+            "age": age_table,
+            "buckets": BUCKETS,
+            "bucket_labels": {
+                "lt2": "< 2 prac. dnů",
+                "b23": "2-3 prac. dnů",
+                "b35": "3-5 prac. dnů",
+                "b57": "5-7 prac. dnů",
+                "gt7": "> 7 prac. dnů",
+            },
+        }
+
     # ---- SANITY CHECK — fail-fast pokud filtry chybí v Q1 ----
     # Carvago květen 2026 by mělo mít ~1 300-1 700 cases. 5000+ = filtr chybí (Q1 bez THIS_MONTH/Instamotion/Vendor)
     if total > 5000:
@@ -417,6 +471,8 @@ def main():
         output["buffer_hourly"] = buffer_hourly
     if aws_split is not None:
         output["aws_split"] = aws_split
+    if phase2_tables is not None:
+        output["phase2_tables"] = phase2_tables
     with open("/tmp/data.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2, default=str)
     print(

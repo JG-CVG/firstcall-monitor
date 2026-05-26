@@ -101,6 +101,14 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .card { background:var(--card); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow-sm); margin-bottom:14px; border:1px solid var(--border); }
 .card-hm { background:var(--carvago-50); border-color:var(--carvago-100); }
 .card-title { font-size:12px; font-weight:600; color:var(--navy); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.p2-table { width:100%; border-collapse:collapse; font-size:12px; }
+.p2-table th, .p2-table td { padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+.p2-table th { font-size:10.5px; text-transform:uppercase; letter-spacing:0.4px; color:var(--muted); font-weight:600; background:#FAFBFD; }
+.p2-table td.num, .p2-table th.num { text-align:right; font-variant-numeric:tabular-nums; }
+.p2-table td.num.strong { font-weight:700; color:var(--navy); }
+.p2-table td.num.risk { color:var(--amber-text); font-weight:600; background:rgba(245,158,11,0.06); }
+.p2-table td .zero { color:#D1D5DB; }
+.p2-table tr.total-row td { background:#F3F4F6; font-weight:700; color:var(--navy); border-top:2px solid var(--border); }
 table { width:100%; border-collapse:collapse; font-size:12px; }
 th { text-align:left; padding:7px 10px; border-bottom:2px solid var(--border); font-weight:700; color:var(--muted); text-transform:uppercase; font-size:10px; letter-spacing:0.4px; }
 th.sortable { cursor:pointer; user-select:none; }
@@ -203,6 +211,7 @@ tr:hover td { background:#f9fafb; }
 
   <div class="card card-hm"><div class="card-title">&#128293; CarAudit New &mdash; Heatmap (prumer / den x hodina, plovouci mesic)</div><div id="heatmapWrap"></div></div>
   <div class="card card-hm"><div class="card-title">&#9201; CarAudit New &mdash; Heatmap (pracovni okno, Po-Pa 8-17, So 8-13)</div><div id="heatmapWorkWrap"></div></div>
+  <div id="phase2Tables"></div>
 </div>
 
 <script>
@@ -249,6 +258,7 @@ function render() {
   renderBufferTower(d.buffer_hourly, d.status_breakdown);
   renderHeatmap(d.heatmap);
   renderHeatmapWork(d.heatmap);
+  renderPhase2Tables(d.phase2_tables);
   updateTimestamp(d);
 }
 
@@ -312,6 +322,87 @@ function renderTier2(closed, phase2, ip, total) {
       '<div class="o-detail">'+pIp+'% &mdash; v 1st Call</div>'+
       '<div class="o-bar"><div class="o-bar-fill" style="width:'+pIp+'%;background:#5E81F4"></div></div>'+
     '</div>'+
+    '</div>';
+}
+
+function renderPhase2Tables(p2) {
+  const el = document.getElementById('phase2Tables');
+  if (!el) return;
+  if (!p2 || !p2.statuses) { el.innerHTML = ''; return; }
+  const STATUSES = p2.statuses;
+  const BUCKETS = p2.buckets;
+  const labels = p2.bucket_labels || {};
+  // Compute totals
+  const totalsPref = { pref: 0, nopref: 0, total: 0 };
+  STATUSES.forEach(s => {
+    const row = (p2.preferred && p2.preferred[s]) || { pref:0, nopref:0 };
+    totalsPref.pref += row.pref;
+    totalsPref.nopref += row.nopref;
+  });
+  totalsPref.total = totalsPref.pref + totalsPref.nopref;
+  const totalsAge = { total: 0 };
+  BUCKETS.forEach(b => totalsAge[b] = 0);
+  STATUSES.forEach(s => {
+    const row = (p2.age && p2.age[s]) || {};
+    BUCKETS.forEach(b => { totalsAge[b] += row[b] || 0; });
+  });
+  BUCKETS.forEach(b => totalsAge.total += totalsAge[b]);
+
+  // ===== Table 1: Status × Preferred / NO preferred =====
+  let h1 = '<table class="p2-table"><thead><tr>'+
+    '<th>Status</th>'+
+    '<th class="num">Preferred</th>'+
+    '<th class="num">NO preferred</th>'+
+    '<th class="num">Celkem</th>'+
+    '</tr></thead><tbody>';
+  STATUSES.forEach(s => {
+    const row = (p2.preferred && p2.preferred[s]) || { pref:0, nopref:0 };
+    const tot = row.pref + row.nopref;
+    h1 += '<tr>'+
+      '<td>'+escapeHtml(s)+'</td>'+
+      '<td class="num">'+row.pref+'</td>'+
+      '<td class="num">'+row.nopref+'</td>'+
+      '<td class="num strong">'+tot+'</td>'+
+      '</tr>';
+  });
+  h1 += '<tr class="total-row">'+
+    '<td>Celkem</td>'+
+    '<td class="num">'+totalsPref.pref+'</td>'+
+    '<td class="num">'+totalsPref.nopref+'</td>'+
+    '<td class="num strong">'+totalsPref.total+'</td>'+
+    '</tr></tbody></table>';
+
+  // ===== Table 2: Status × Age bucket =====
+  let h2 = '<table class="p2-table"><thead><tr>'+
+    '<th>Status</th>';
+  BUCKETS.forEach(b => { h2 += '<th class="num">'+escapeHtml(labels[b]||b)+'</th>'; });
+  h2 += '<th class="num">Celkem</th></tr></thead><tbody>';
+  STATUSES.forEach(s => {
+    const row = (p2.age && p2.age[s]) || {};
+    let tot = 0;
+    let cells = '';
+    BUCKETS.forEach(b => {
+      const v = row[b] || 0;
+      tot += v;
+      // Risk coloring for buckets >5 days
+      let cls = 'num';
+      if ((b === 'b57' || b === 'gt7') && v > 0) cls += ' risk';
+      cells += '<td class="'+cls+'">'+(v||'<span class="zero">0</span>')+'</td>';
+    });
+    h2 += '<tr><td>'+escapeHtml(s)+'</td>'+cells+'<td class="num strong">'+tot+'</td></tr>';
+  });
+  // Totals row
+  let totalsCells = '';
+  BUCKETS.forEach(b => { totalsCells += '<td class="num">'+totalsAge[b]+'</td>'; });
+  h2 += '<tr class="total-row"><td>Celkem</td>'+totalsCells+'<td class="num strong">'+totalsAge.total+'</td></tr>';
+  h2 += '</tbody></table>';
+
+  el.innerHTML =
+    '<div class="card"><div class="card-title">&#128203; Počet CA ve statusech &mdash; Preferred / NO preferred (aktuální rozpracovanost)</div>'+
+      h1+
+    '</div>'+
+    '<div class="card"><div class="card-title">&#9201; Aktuální rozpracovanost (od stavu Awaiting Selection approved &mdash; pracovní dny)</div>'+
+      h2+
     '</div>';
 }
 
