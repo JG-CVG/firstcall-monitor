@@ -429,6 +429,108 @@ def main():
             },
         }
 
+    # ---- Audit Order — Expected delivery timeline (Q14) ----
+    def _load_audit_order():
+        try:
+            with open(os.path.join(TMP, "sf_audit_order_expected.json"), "r", encoding="utf-8") as fh:
+                return json.load(fh).get("records", [])
+        except FileNotFoundError:
+            return None
+
+    ao_recs = _load_audit_order()
+    audit_order_expected = None
+    if ao_recs is not None:
+        from datetime import date as _date
+        DOW_CS = ["po", "út", "st", "čt", "pá", "so", "ne"]
+        today_pg = datetime.now(PRAGUE).date()
+        DAYS_BACK = 5
+        DAYS_FWD = 7
+        # Build empty bucket for each day in range
+        bucket_map = {}
+        for offset in range(-DAYS_BACK, DAYS_FWD + 1):
+            d = today_pg + timedelta(days=offset)
+            bucket_map[d.isoformat()] = {"pref": 0, "nopref": 0, "countries": {}}
+        # Overflow: keep totals for "earlier than range" and "later than range"
+        overflow_back = {"pref": 0, "nopref": 0}
+        overflow_fwd = {"pref": 0, "nopref": 0}
+        for r in ao_recs:
+            ca = r.get("CarAudit__r") or {}
+            pdd = ca.get("Promised_Delivery_Date__c")
+            if not pdd:
+                continue
+            dt = parse_dt(pdd)
+            if dt is None:
+                continue
+            d = dt.astimezone(PRAGUE).date()
+            is_pref = bool(((r.get("Order__r") or {}).get("Preferred__c")))
+            cc = ca.get("Vendor_Country__c") or "N/A"
+            key = d.isoformat()
+            if key in bucket_map:
+                b = bucket_map[key]
+                b["pref" if is_pref else "nopref"] += 1
+                b["countries"][cc] = b["countries"].get(cc, 0) + 1
+            elif d < today_pg + timedelta(days=-DAYS_BACK):
+                overflow_back["pref" if is_pref else "nopref"] += 1
+            else:
+                overflow_fwd["pref" if is_pref else "nopref"] += 1
+        # Build sorted list
+        days = []
+        for offset in range(-DAYS_BACK, DAYS_FWD + 1):
+            d = today_pg + timedelta(days=offset)
+            b = bucket_map[d.isoformat()]
+            if offset < 0:
+                status = "overdue"
+            elif offset == 0:
+                status = "today"
+            else:
+                status = "future"
+            days.append({
+                "date": d.isoformat(),
+                "label": f"{d.day}.{d.month}.",
+                "dow": DOW_CS[d.weekday()],
+                "offset": offset,
+                "status": status,
+                "pref": b["pref"],
+                "nopref": b["nopref"],
+                "total": b["pref"] + b["nopref"],
+                "countries": b["countries"],
+            })
+        # Totals
+        overdue_total = sum(x["total"] for x in days if x["status"] == "overdue")
+        overdue_pref = sum(x["pref"] for x in days if x["status"] == "overdue")
+        today_day = next(x for x in days if x["status"] == "today")
+        tomorrow_day = next((x for x in days if x["offset"] == 1), None)
+        # Next 7 calendar days starting from today (inclusive)
+        week_total = sum(x["total"] for x in days if 0 <= x["offset"] <= 6)
+        # Max bar count for stem scaling
+        max_count = max([x["total"] for x in days] + [1])
+        # Max past-overdue working days (positive number)
+        max_overdue_offset = 0
+        for x in days:
+            if x["status"] == "overdue" and x["total"] > 0:
+                max_overdue_offset = max(max_overdue_offset, -x["offset"])
+        audit_order_expected = {
+            "today_iso": today_pg.isoformat(),
+            "days_back": DAYS_BACK,
+            "days_fwd": DAYS_FWD,
+            "max_count": max_count,
+            "days": days,
+            "overflow_back": overflow_back,
+            "overflow_fwd": overflow_fwd,
+            "totals": {
+                "overdue": overdue_total,
+                "overdue_pref": overdue_pref,
+                "overdue_days_count": sum(1 for x in days if x["status"] == "overdue" and x["total"] > 0),
+                "max_overdue_days_back": max_overdue_offset,
+                "today": today_day["total"],
+                "today_pref": today_day["pref"],
+                "tomorrow": tomorrow_day["total"] if tomorrow_day else 0,
+                "tomorrow_pref": tomorrow_day["pref"] if tomorrow_day else 0,
+                "week": week_total,
+                "total": sum(x["total"] for x in days) + overflow_back["pref"] + overflow_back["nopref"] + overflow_fwd["pref"] + overflow_fwd["nopref"],
+            },
+        }
+
     # ---- SANITY CHECK — fail-fast pokud filtry chybí v Q1 ----
     # Carvago květen 2026 by mělo mít ~1 300-1 700 cases. 5000+ = filtr chybí (Q1 bez THIS_MONTH/Instamotion/Vendor)
     if total > 5000:
@@ -474,6 +576,8 @@ def main():
         output["aws_split"] = aws_split
     if phase2_tables is not None:
         output["phase2_tables"] = phase2_tables
+    if audit_order_expected is not None:
+        output["audit_order_expected"] = audit_order_expected
     with open("/tmp/data.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2, default=str)
     print(
