@@ -159,3 +159,5 @@ firstcall-monitor/
 ├── refresh.py               # Python script, dotazuje SF
 └── requirements.txt         # simple-salesforce
 ```
+
+<!-- deploy nudge 1779793393 -->
