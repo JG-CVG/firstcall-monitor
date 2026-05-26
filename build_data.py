@@ -390,8 +390,9 @@ def main():
         pref_table = {s: {"pref": 0, "nopref": 0} for s in P2_STATUSES}
         # Table 2: Status × age bucket (working days since CA_Auditor_Selection_Date__c)
         # Buckets: <2, 2-3, 3-5, 5-7, >7 (semi-open intervals on the right)
+        # Each cell now stores {pref: X, nopref: Y} for the dual-count display.
         BUCKETS = ["lt2", "b23", "b35", "b57", "gt7"]
-        age_table = {s: {b: 0 for b in BUCKETS} for s in P2_STATUSES}
+        age_table = {s: {b: {"pref": 0, "nopref": 0} for b in BUCKETS} for s in P2_STATUSES}
         for r in phase2_recs:
             st = r.get("Status")
             if st not in P2_STATUSES:
@@ -413,7 +414,7 @@ def main():
                 b = "b57"
             else:
                 b = "gt7"
-            age_table[st][b] += 1
+            age_table[st][b]["pref" if is_pref else "nopref"] += 1
         phase2_tables = {
             "statuses": P2_STATUSES,
             "preferred": pref_table,
