@@ -429,28 +429,24 @@ def main():
             },
         }
 
-    # ---- Audit Order — Expected delivery timeline (Q14) ----
-    def _load_audit_order():
+    # ---- Audit Order timelines (Q14 = Carvago/CarAudit, Q15 = Cebia CarAudit) ----
+    def _load_ao(fname):
         try:
-            with open(os.path.join(TMP, "sf_audit_order_expected.json"), "r", encoding="utf-8") as fh:
+            with open(os.path.join(TMP, fname), "r", encoding="utf-8") as fh:
                 return json.load(fh).get("records", [])
         except FileNotFoundError:
             return None
 
-    ao_recs = _load_audit_order()
-    audit_order_expected = None
-    if ao_recs is not None:
+    def _compute_ao_timeline(ao_recs):
         from datetime import date as _date
         DOW_CS = ["po", "út", "st", "čt", "pá", "so", "ne"]
         today_pg = datetime.now(PRAGUE).date()
         DAYS_BACK = 5
         DAYS_FWD = 7
-        # Build empty bucket for each day in range
         bucket_map = {}
         for offset in range(-DAYS_BACK, DAYS_FWD + 1):
             d = today_pg + timedelta(days=offset)
             bucket_map[d.isoformat()] = {"pref": 0, "nopref": 0, "countries": {}, "cases": []}
-        # Overflow: keep totals for "earlier than range" and "later than range"
         overflow_back = {"pref": 0, "nopref": 0}
         overflow_fwd = {"pref": 0, "nopref": 0}
         for r in ao_recs:
@@ -471,12 +467,11 @@ def main():
                 b = bucket_map[key]
                 b["pref" if is_pref else "nopref"] += 1
                 b["countries"][cc] = b["countries"].get(cc, 0) + 1
-                b.setdefault("cases", []).append({"id": cid, "cn": cn, "country": cc, "pref": is_pref})
+                b["cases"].append({"id": cid, "cn": cn, "country": cc, "pref": is_pref})
             elif d < today_pg + timedelta(days=-DAYS_BACK):
                 overflow_back["pref" if is_pref else "nopref"] += 1
             else:
                 overflow_fwd["pref" if is_pref else "nopref"] += 1
-        # Build sorted list
         days = []
         for offset in range(-DAYS_BACK, DAYS_FWD + 1):
             d = today_pg + timedelta(days=offset)
@@ -497,23 +492,19 @@ def main():
                 "nopref": b["nopref"],
                 "total": b["pref"] + b["nopref"],
                 "countries": b["countries"],
-                "cases": b.get("cases", []),
+                "cases": b["cases"],
             })
-        # Totals
         overdue_total = sum(x["total"] for x in days if x["status"] == "overdue")
         overdue_pref = sum(x["pref"] for x in days if x["status"] == "overdue")
         today_day = next(x for x in days if x["status"] == "today")
         tomorrow_day = next((x for x in days if x["offset"] == 1), None)
-        # Next 7 calendar days starting from today (inclusive)
         week_total = sum(x["total"] for x in days if 0 <= x["offset"] <= 6)
-        # Max bar count for stem scaling
         max_count = max([x["total"] for x in days] + [1])
-        # Max past-overdue working days (positive number)
         max_overdue_offset = 0
         for x in days:
             if x["status"] == "overdue" and x["total"] > 0:
                 max_overdue_offset = max(max_overdue_offset, -x["offset"])
-        audit_order_expected = {
+        return {
             "today_iso": today_pg.isoformat(),
             "days_back": DAYS_BACK,
             "days_fwd": DAYS_FWD,
@@ -534,6 +525,11 @@ def main():
                 "total": sum(x["total"] for x in days) + overflow_back["pref"] + overflow_back["nopref"] + overflow_fwd["pref"] + overflow_fwd["nopref"],
             },
         }
+
+    ao_recs = _load_ao("sf_audit_order_expected.json")
+    audit_order_expected = _compute_ao_timeline(ao_recs) if ao_recs is not None else None
+    cebia_recs = _load_ao("sf_cebia_audit_order_expected.json")
+    cebia_audit_order_expected = _compute_ao_timeline(cebia_recs) if cebia_recs is not None else None
 
     # ---- SANITY CHECK — fail-fast pokud filtry chybí v Q1 ----
     # Carvago květen 2026 by mělo mít ~1 300-1 700 cases. 5000+ = filtr chybí (Q1 bez THIS_MONTH/Instamotion/Vendor)
@@ -582,6 +578,8 @@ def main():
         output["phase2_tables"] = phase2_tables
     if audit_order_expected is not None:
         output["audit_order_expected"] = audit_order_expected
+    if cebia_audit_order_expected is not None:
+        output["cebia_audit_order_expected"] = cebia_audit_order_expected
     with open("/tmp/data.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2, default=str)
     print(

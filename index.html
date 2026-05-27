@@ -271,6 +271,7 @@ tr:hover td { background:#f9fafb; }
   <div class="card card-hm"><div class="card-title">&#9201; CarAudit New &mdash; Heatmap (pracovni okno, Po-Pa 8-17, So 8-13)</div><div id="heatmapWorkWrap"></div></div>
   <div id="phase2Tables"></div>
   <div id="auditOrderTimeline"></div>
+  <div id="cebiaAuditOrderTimeline"></div>
 </div>
 
 <script>
@@ -319,6 +320,7 @@ function render() {
   renderHeatmapWork(d.heatmap);
   renderPhase2Tables(d.phase2_tables);
   renderAuditOrderTimeline(d.audit_order_expected);
+  renderAuditOrderTimeline(d.cebia_audit_order_expected, { containerId: "cebiaAuditOrderTimeline", title: "Cebia CarAudit — Audit Order očekávané dodání", subtitle: "Status = Audit Order · Record Type = Cebia CarAudit · bez XK/AL" });
   updateTimestamp(d);
 }
 
@@ -483,8 +485,12 @@ function renderPhase2Tables(p2) {
     '</div>';
 }
 
-function renderAuditOrderTimeline(ao) {
-  const el = document.getElementById('auditOrderTimeline');
+function renderAuditOrderTimeline(ao, opts) {
+  opts = opts || {};
+  const containerId = opts.containerId || 'auditOrderTimeline';
+  const titleText = opts.title || 'Audit Order — očekávané dodání (Promised Delivery Date)';
+  const subtitleText = opts.subtitle || 'Status = Audit Order · Carvago zákazníci · bez XK/AL';
+  const el = document.getElementById(containerId);
   if (!el) return;
   if (!ao || !ao.days) { el.innerHTML = ''; return; }
   const days = ao.days;
@@ -562,8 +568,8 @@ function renderAuditOrderTimeline(ao) {
 
   el.innerHTML =
     '<div class="card ao-card-wrap">'+
-      '<div class="card-title">&#128197; Audit Order &mdash; očekávané dodání (Promised Delivery Date)</div>'+
-      '<div class="ao-sub">Status = Audit Order · Carvago zákazníci · bez XK/AL</div>'+
+      '<div class="card-title">&#128197; '+escapeHtml(titleText)+'</div>'+
+      '<div class="ao-sub">'+escapeHtml(subtitleText)+'</div>'+
       kpiHtml +
       '<div class="ao-rail-wrap">'+
         '<div class="ao-baseline"></div>'+
@@ -582,22 +588,26 @@ function renderAuditOrderTimeline(ao) {
   // Position DNES vertical + pill on the today cell
   function position() {
     if (todayIdx < 0) return;
-    const rail = document.getElementById('aoRail');
+    const rail = document.getElementById(containerId + '_aoRail');
+    if (!rail) return;
     const cells = rail.children;
     if (!cells[todayIdx]) return;
     const railRect = rail.getBoundingClientRect();
     const cellRect = cells[todayIdx].getBoundingClientRect();
     const cx = cellRect.left + cellRect.width/2 - railRect.left;
-    const vert = document.getElementById('aoTodayVert');
-    const pill = document.getElementById('aoTodayPill');
+    const vert = document.getElementById(containerId + '_aoTodayVert');
+    const pill = document.getElementById(containerId + '_aoTodayPill');
     if (vert) vert.style.left = (cx - 1) + 'px';
     if (pill) { pill.style.left = cx + 'px'; pill.style.opacity = '1'; }
   }
-  // Need to wait for DOM layout
   setTimeout(position, 0);
-  if (!window._aoTimelineResize) {
-    window._aoTimelineResize = true;
-    window.addEventListener('resize', () => { setTimeout(position, 0); });
+  window._aoTimelineResizeHandlers = window._aoTimelineResizeHandlers || [];
+  window._aoTimelineResizeHandlers.push(position);
+  if (!window._aoTimelineResizeBound) {
+    window._aoTimelineResizeBound = true;
+    window.addEventListener('resize', () => {
+      (window._aoTimelineResizeHandlers || []).forEach(h => setTimeout(h, 0));
+    });
   }
 }
 
