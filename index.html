@@ -153,6 +153,19 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .ao-legend span { display: inline-flex; align-items: center; gap: 8px; }
 .ao-lg-dot { width: 14px; height: 14px; border-radius: 50%; }
 .ao-lg-pref { width: 16px; height: 16px; border-radius: 8px; background: var(--amber); color: #fff; font-size: 9px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+.ao-cell-has { cursor: help; }
+.ao-cell-has:hover { z-index: 50; }
+.ao-tooltip { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; box-shadow: 0 6px 24px rgba(15,23,42,0.16); min-width: 180px; max-width: 260px; font-size: 11px; opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 100; }
+.ao-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--card); }
+.ao-cell-has:hover .ao-tooltip { opacity: 1; pointer-events: auto; }
+.ao-tip-title { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted); font-weight: 600; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.ao-tip-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; text-decoration: none; color: var(--text); border-radius: 4px; }
+.ao-tip-row:hover { background: var(--carvago-50); color: var(--carvago-dark); }
+.ao-tip-cn { flex: 1; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 11px; }
+.ao-tip-cc { font-size: 10px; color: var(--muted); min-width: 22px; }
+.ao-tip-pref { background: var(--carvago); color: #fff; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 8px; line-height: 1.2; }
+.ao-tip-nopref { background: #E5E7EB; color: #6B7280; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 8px; line-height: 1.2; }
+
 
 table { width:100%; border-collapse:collapse; font-size:12px; }
 th { text-align:left; padding:7px 10px; border-bottom:2px solid var(--border); font-weight:700; color:var(--muted); text-transform:uppercase; font-size:10px; letter-spacing:0.4px; }
@@ -509,6 +522,7 @@ function renderAuditOrderTimeline(ao) {
   const nCols = days.length;
   let railCells = '';
   let todayIdx = -1;
+  const sfBase = (typeof sfBaseCache !== 'undefined' && sfBaseCache) ? sfBaseCache : ((DATA && DATA.sf_base_url) || 'https://carvago.lightning.force.com');
   days.forEach((d, i) => {
     if (d.status === 'today') todayIdx = i;
     const sp = stemPct(d.total);
@@ -520,11 +534,29 @@ function renderAuditOrderTimeline(ao) {
     let dayLblCls = 'ao-day-lbl';
     if (d.status === 'today') dayLblCls += ' ao-day-lbl-today';
     else if (d.status === 'overdue' && d.total > 0) dayLblCls += ' ao-day-lbl-overdue';
+    let tooltip = '';
+    const cases = d.cases || [];
+    if (cases.length > 0) {
+      let rows = '';
+      cases.forEach(c => {
+        const url = sfBase + '/lightning/r/Case/' + c.id + '/view';
+        const prefBadge = c.pref ? '<span class="ao-tip-pref">P</span>' : '<span class="ao-tip-nopref">N</span>';
+        rows += '<a class="ao-tip-row" href="'+url+'" target="_blank" rel="noopener">'+
+          '<span class="ao-tip-cn">'+escapeHtml(c.cn || '')+'</span>'+
+          '<span class="ao-tip-cc">'+escapeHtml(c.country || '')+'</span>'+
+          prefBadge+
+        '</a>';
+      });
+      const tipTitle = '<div class="ao-tip-title">'+d.label+' '+d.dow+' &middot; '+cases.length+' CA</div>';
+      tooltip = '<div class="ao-tooltip">'+tipTitle+rows+'</div>';
+    }
+    const cellCls = cases.length > 0 ? 'ao-cell ao-cell-has' : 'ao-cell';
     railCells +=
-      '<div class="ao-cell" data-idx="'+i+'">'+
+      '<div class="'+cellCls+'" data-idx="'+i+'">'+
         '<div class="ao-stem '+stemCls+'" style="height:'+sp+'%"></div>'+
         '<div class="'+dotCls+'">'+dotInner+prefPill+'</div>'+
         '<div class="'+dayLblCls+'">'+d.label+'<br><span class="ao-dow">'+d.dow+'</span></div>'+
+        tooltip+
       '</div>';
   });
 

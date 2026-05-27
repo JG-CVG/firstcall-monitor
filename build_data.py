@@ -449,7 +449,7 @@ def main():
         bucket_map = {}
         for offset in range(-DAYS_BACK, DAYS_FWD + 1):
             d = today_pg + timedelta(days=offset)
-            bucket_map[d.isoformat()] = {"pref": 0, "nopref": 0, "countries": {}}
+            bucket_map[d.isoformat()] = {"pref": 0, "nopref": 0, "countries": {}, "cases": []}
         # Overflow: keep totals for "earlier than range" and "later than range"
         overflow_back = {"pref": 0, "nopref": 0}
         overflow_fwd = {"pref": 0, "nopref": 0}
@@ -464,11 +464,14 @@ def main():
             d = dt.astimezone(PRAGUE).date()
             is_pref = bool(((r.get("Order__r") or {}).get("Preferred__c")))
             cc = ca.get("Vendor_Country__c") or "N/A"
+            cid = r.get("Id")
+            cn = r.get("CaseNumber") or ""
             key = d.isoformat()
             if key in bucket_map:
                 b = bucket_map[key]
                 b["pref" if is_pref else "nopref"] += 1
                 b["countries"][cc] = b["countries"].get(cc, 0) + 1
+                b.setdefault("cases", []).append({"id": cid, "cn": cn, "country": cc, "pref": is_pref})
             elif d < today_pg + timedelta(days=-DAYS_BACK):
                 overflow_back["pref" if is_pref else "nopref"] += 1
             else:
@@ -494,6 +497,7 @@ def main():
                 "nopref": b["nopref"],
                 "total": b["pref"] + b["nopref"],
                 "countries": b["countries"],
+                "cases": b.get("cases", []),
             })
         # Totals
         overdue_total = sum(x["total"] for x in days if x["status"] == "overdue")
