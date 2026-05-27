@@ -122,6 +122,40 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .ao-badge { display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
 .ao-badge-carvago { background: var(--carvago); color: #fff; }
 .ao-badge-teal { background: #0F766E; color: #fff; }
+.pdc-card { padding: 18px 22px; }
+.pdc-card-carvago { border-left: 5px solid var(--carvago); }
+.pdc-card-cebia { border-left: 5px solid #0F766E; }
+.ao-badge.pdc-badge-carvago { background: var(--carvago); color: #fff; }
+.ao-badge.pdc-badge-cebia { background: #0F766E; color: #fff; }
+.pdc-tbl-wrap { overflow-x: auto; margin-top: 4px; }
+.pdc-tbl { width: 100%; border-collapse: collapse; font-size: 11px; font-variant-numeric: tabular-nums; }
+.pdc-tbl thead tr { border-bottom: 1px solid var(--border); }
+.pdc-tbl th { padding: 6px 4px; text-align: center; font-size: 10px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.pdc-tbl th.pdc-name { text-align: left; padding-left: 10px; min-width: 140px; }
+.pdc-tbl th.pdc-day { min-width: 34px; }
+.pdc-tbl th.pdc-day-today { background: var(--carvago-50); color: var(--carvago); font-weight: 700; border-radius: 4px 4px 0 0; }
+.pdc-tbl th .pdc-dow { display: block; font-size: 9px; font-weight: 500; color: #9CA3AF; margin-top: 2px; text-transform: uppercase; }
+.pdc-tbl th.pdc-day-today .pdc-dow { color: var(--carvago); font-weight: 700; }
+.pdc-tbl td { padding: 6px 4px; text-align: center; border-bottom: 0.5px solid #F3F4F6; }
+.pdc-tbl td.pdc-name { text-align: left; padding-left: 10px; font-weight: 500; color: var(--text); font-size: 12px; }
+.pdc-tbl td.pdc-cell { font-variant-numeric: tabular-nums; border-radius: 3px; }
+.pdc-tbl tr.pdc-total-row td { background: #F3F4F6; border-top: 2px solid #D1D5DB; border-bottom: none; font-weight: 700; padding: 8px 4px; color: var(--navy); }
+.pdc-tbl tr.pdc-total-row td.pdc-name { padding-left: 10px; }
+.cv-0 { color: #D1D5DB; }
+.cv-1 { background: #F5F3FF; color: #6D28D9; }
+.cv-2 { background: #DDD6FE; color: #5B21B6; }
+.cv-3 { background: #A78BFA; color: #fff; font-weight: 600; }
+.cv-4 { background: #7C3AED; color: #fff; font-weight: 600; }
+.cv-5 { background: #5B21B6; color: #fff; font-weight: 700; }
+.tv-0 { color: #D1D5DB; }
+.tv-1 { background: #ECFDF5; color: #047857; }
+.tv-2 { background: #A7F3D0; color: #065F46; }
+.tv-3 { background: #34D399; color: #fff; font-weight: 600; }
+.tv-4 { background: #059669; color: #fff; font-weight: 600; }
+.tv-5 { background: #065F46; color: #fff; font-weight: 700; }
+.pdc-legend { display: flex; align-items: center; gap: 10px; font-size: 10.5px; color: var(--muted); margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--border); }
+.pdc-leg-scale { display: inline-flex; gap: 2px; }
+.pdc-leg-cell { width: 18px; height: 14px; border-radius: 2px; display: inline-block; }
 .ao-sub { font-size: 11px; color: var(--muted); margin: 0; }
 .ao-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
 .ao-kpi { border-radius: 10px; padding: 12px 14px; position: relative; overflow: hidden; }
@@ -280,6 +314,7 @@ tr:hover td { background:#f9fafb; }
   <div id="phase2Tables"></div>
   <div id="auditOrderTimeline"></div>
   <div id="cebiaAuditOrderTimeline"></div>
+  <div id="prepToDoneHeatmap"></div>
 </div>
 
 <script>
@@ -329,6 +364,7 @@ function render() {
   renderPhase2Tables(d.phase2_tables);
   renderAuditOrderTimeline(d.audit_order_expected, { badgeText: "CARVAGO CARAUDIT", badgeColor: "carvago", title: "Audit Order — Očekávané dodání", subtitle: "Status = Audit Order · Record Type = CarAudit · bez Instamotion · bez XK/AL" });
   renderAuditOrderTimeline(d.cebia_audit_order_expected, { containerId: "cebiaAuditOrderTimeline", badgeText: "CEBIA CARAUDIT", badgeColor: "teal", title: "Audit Order — Očekávané dodání", subtitle: "Status = Audit Order · Record Type = Cebia CarAudit · bez Instamotion · bez XK/AL" });
+  renderPrepToDoneHeatmap(d.prep_to_done_daily);
   updateTimestamp(d);
 }
 
@@ -493,6 +529,67 @@ function renderPhase2Tables(p2) {
       '<div class="ao-header"><span class="ao-badge ao-badge-carvago">CARVAGO CARAUDIT</span><div class="ao-header-text"><div class="card-title ao-card-title">&#9201; Aktuální rozpracovanost (od stavu Awaiting Selection approved &mdash; pracovní dny) &mdash; Preferred / NO preferred</div><div class="ao-sub">Record Type = CarAudit · bez Instamotion · bez XK/AL</div></div></div>'+
       h2+
     '</div>';
+}
+
+function renderPrepToDoneHeatmap(p) {
+  const el = document.getElementById('prepToDoneHeatmap');
+  if (!el) return;
+  if (!p || !p.days) { el.innerHTML = ''; return; }
+  const sections = [
+    { key: 'carvago', label: 'CARVAGO CARAUDIT', badgeCls: 'pdc-badge-carvago', cardCls: 'pdc-card-carvago', cellPrefix: 'cv', subtitle: 'Record Type = CarAudit · OldValue = CarAudit preparation · NewValue ∈ {Done, Closed} · pouze pracovní dny' },
+    { key: 'cebia',   label: 'CEBIA CARAUDIT',   badgeCls: 'pdc-badge-cebia',   cardCls: 'pdc-card-cebia',   cellPrefix: 'tv', subtitle: 'Record Type = Cebia CarAudit · OldValue = CarAudit preparation · NewValue ∈ {Done, Closed} · pouze pracovní dny' }
+  ];
+  function bucket(v, maxCell, isCarvago) {
+    if (!v || v <= 0) return 0;
+    const t1 = Math.max(1, Math.round(maxCell * 0.2));
+    const t2 = Math.max(2, Math.round(maxCell * 0.4));
+    const t3 = Math.max(3, Math.round(maxCell * 0.6));
+    const t4 = Math.max(4, Math.round(maxCell * 0.8));
+    if (v >= t4) return 5;
+    if (v >= t3) return 4;
+    if (v >= t2) return 3;
+    if (v >= t1) return 2;
+    return 1;
+  }
+  let html = '';
+  sections.forEach(sec => {
+    const data = p[sec.key];
+    if (!data || !data.users || data.users.length === 0) return;
+    let headThs = '<th class="pdc-name">Operátor</th>';
+    p.days.forEach((d, idx) => {
+      const isToday = idx === 0;
+      headThs += '<th class="pdc-day'+(isToday ? ' pdc-day-today' : '')+'">'+escapeHtml(d.label)+'<span class="pdc-dow">'+escapeHtml(isToday ? 'DNES' : d.dow)+'</span></th>';
+    });
+    let rows = '';
+    data.users.forEach(u => {
+      let cells = '';
+      p.days.forEach(d => {
+        const v = (u.by_date && u.by_date[d.date]) || 0;
+        const b = bucket(v, data.max_cell, sec.key === 'carvago');
+        const display = v > 0 ? v : '0';
+        cells += '<td class="pdc-cell '+sec.cellPrefix+'-'+b+'">'+display+'</td>';
+      });
+      rows += '<tr><td class="pdc-name">'+escapeHtml(u.name)+'</td>'+cells+'</tr>';
+    });
+    let totalCells = '';
+    data.day_totals.forEach(t => { totalCells += '<td class="pdc-cell">'+t+'</td>'; });
+    rows += '<tr class="pdc-total-row"><td class="pdc-name">Celkem</td>'+totalCells+'</tr>';
+    let scaleSpans = '';
+    for (let i = 1; i <= 5; i++) scaleSpans += '<span class="pdc-leg-cell '+sec.cellPrefix+'-'+i+'"></span>';
+    html +=
+      '<div class="card pdc-card '+sec.cardCls+'">'+
+        '<div class="ao-header">'+
+          '<span class="ao-badge '+sec.badgeCls+'">'+escapeHtml(sec.label)+'</span>'+
+          '<div class="ao-header-text">'+
+            '<div class="card-title ao-card-title">&#128203; Prep &rarr; Done/Closed denně · per operátor</div>'+
+            '<div class="ao-sub">'+escapeHtml(sec.subtitle)+'</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="pdc-tbl-wrap"><table class="pdc-tbl"><thead><tr>'+headThs+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+        '<div class="pdc-legend"><span>Intensity:</span><span>0</span><div class="pdc-leg-scale">'+scaleSpans+'</div><span>'+data.max_cell+'+</span><span style="margin-left:auto">Pracovní dny &middot; nejnovější vlevo &middot; řazeno dle součtu</span></div>'+
+      '</div>';
+  });
+  el.innerHTML = html;
 }
 
 function renderAuditOrderTimeline(ao, opts) {

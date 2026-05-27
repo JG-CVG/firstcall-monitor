@@ -531,6 +531,71 @@ def main():
     cebia_recs = _load_ao("sf_cebia_audit_order_expected.json")
     cebia_audit_order_expected = _compute_ao_timeline(cebia_recs) if cebia_recs is not None else None
 
+    # ---- Prep → Done/Closed daily heatmap (Q16) ----
+    def _load_ptd():
+        try:
+            with open(os.path.join(TMP, "sf_prep_to_done.json"), "r", encoding="utf-8") as fh:
+                return json.load(fh).get("records", [])
+        except FileNotFoundError:
+            return None
+
+    ptd_recs = _load_ptd()
+    prep_to_done_daily = None
+    if ptd_recs is not None:
+        from datetime import date as _date
+        DOW_CS = ["po", "út", "st", "čt", "pá", "so", "ne"]
+        today_pg = datetime.now(PRAGUE).date()
+        DAYS_BACK_WORKING = 14
+        days_list = []
+        cur = today_pg
+        while len(days_list) < DAYS_BACK_WORKING:
+            if cur.weekday() < 5:
+                days_list.append(cur)
+            cur = cur - timedelta(days=1)
+        date_keys = set(d.isoformat() for d in days_list)
+        agg = {"CarAudit": {}, "Cebia CarAudit": {}}
+        for r in ptd_recs:
+            rt = r.get("RecordType")
+            if rt not in agg:
+                continue
+            name = r.get("CreatedByName") or "Unknown"
+            cd_str = r.get("CreatedDate")
+            if not cd_str:
+                continue
+            cd = parse_dt(cd_str)
+            if cd is None:
+                continue
+            d = cd.astimezone(PRAGUE).date()
+            dk = d.isoformat()
+            if dk not in date_keys:
+                continue
+            user_map = agg[rt].setdefault(name, {})
+            user_map[dk] = user_map.get(dk, 0) + 1
+        def _section(rt):
+            users_data = agg[rt]
+            users = []
+            for name, dm in users_data.items():
+                row = {"name": name, "by_date": {}, "total": 0}
+                for d in days_list:
+                    dk = d.isoformat()
+                    cnt = dm.get(dk, 0)
+                    row["by_date"][dk] = cnt
+                    row["total"] += cnt
+                users.append(row)
+            users.sort(key=lambda r: r["total"], reverse=True)
+            day_totals = []
+            for d in days_list:
+                dk = d.isoformat()
+                day_totals.append(sum(u["by_date"][dk] for u in users))
+            max_cell = max([max(u["by_date"].values()) for u in users] + [0]) if users else 0
+            return {"users": users, "day_totals": day_totals, "max_cell": max_cell}
+        prep_to_done_daily = {
+            "today_iso": today_pg.isoformat(),
+            "days": [{"date": d.isoformat(), "label": f"{d.day}.{d.month}.", "dow": DOW_CS[d.weekday()]} for d in days_list],
+            "carvago": _section("CarAudit"),
+            "cebia": _section("Cebia CarAudit"),
+        }
+
     # ---- SANITY CHECK — fail-fast pokud filtry chybí v Q1 ----
     # Carvago květen 2026 by mělo mít ~1 300-1 700 cases. 5000+ = filtr chybí (Q1 bez THIS_MONTH/Instamotion/Vendor)
     if total > 5000:
@@ -580,6 +645,8 @@ def main():
         output["audit_order_expected"] = audit_order_expected
     if cebia_audit_order_expected is not None:
         output["cebia_audit_order_expected"] = cebia_audit_order_expected
+    if prep_to_done_daily is not None:
+        output["prep_to_done_daily"] = prep_to_done_daily
     with open("/tmp/data.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2, default=str)
     print(
