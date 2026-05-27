@@ -141,6 +141,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .pdc-tbl td.pdc-cell { font-variant-numeric: tabular-nums; border-radius: 3px; }
 .pdc-tbl tr.pdc-total-row td { background: #F3F4F6; border-top: 2px solid #D1D5DB; border-bottom: none; font-weight: 700; padding: 8px 4px; color: var(--navy); }
 .pdc-tbl tr.pdc-total-row td.pdc-name { padding-left: 10px; }
+.pdc-medal { display: inline-block; font-size: 14px; margin-right: 6px; line-height: 1; vertical-align: -1px; }
+.pdc-name-medal { font-weight: 700; }
 .cv-0 { color: #D1D5DB; }
 .cv-1 { background: #F5F3FF; color: #6D28D9; }
 .cv-2 { background: #DDD6FE; color: #5B21B6; }
@@ -561,7 +563,7 @@ function renderPrepToDoneHeatmap(p) {
       headThs += '<th class="pdc-day'+(isToday ? ' pdc-day-today' : '')+'">'+escapeHtml(d.label)+'<span class="pdc-dow">'+escapeHtml(isToday ? 'DNES' : d.dow)+'</span></th>';
     });
     let rows = '';
-    data.users.forEach(u => {
+    data.users.forEach((u, idx) => {
       let cells = '';
       p.days.forEach(d => {
         const v = (u.by_date && u.by_date[d.date]) || 0;
@@ -569,7 +571,14 @@ function renderPrepToDoneHeatmap(p) {
         const display = v > 0 ? v : '0';
         cells += '<td class="pdc-cell '+sec.cellPrefix+'-'+b+'">'+display+'</td>';
       });
-      rows += '<tr><td class="pdc-name">'+escapeHtml(u.name)+'</td>'+cells+'</tr>';
+      let medal = '';
+      if (sec.key === 'carvago' && u.total > 0) {
+        if (idx === 0) medal = '<span class="pdc-medal pdc-medal-gold" title="#1">&#x1F947;</span>';
+        else if (idx === 1) medal = '<span class="pdc-medal pdc-medal-silver" title="#2">&#x1F948;</span>';
+        else if (idx === 2) medal = '<span class="pdc-medal pdc-medal-bronze" title="#3">&#x1F949;</span>';
+      }
+      const nameCls = medal ? 'pdc-name pdc-name-medal' : 'pdc-name';
+      rows += '<tr><td class="'+nameCls+'">'+medal+escapeHtml(u.name)+'</td>'+cells+'</tr>';
     });
     let totalCells = '';
     data.day_totals.forEach(t => { totalCells += '<td class="pdc-cell">'+t+'</td>'; });
