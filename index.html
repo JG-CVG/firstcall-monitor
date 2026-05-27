@@ -485,10 +485,12 @@ function renderPhase2Tables(p2) {
   h2 += '<div style="margin-top:8px;font-size:11px;color:var(--muted);display:flex;gap:14px;align-items:center"><span><span class="pn-pref">●</span> Preferred</span><span><span class="pn-sep">/</span></span><span><span class="pn-nopref">●</span> NO preferred</span></div>';
 
   el.innerHTML =
-    '<div class="card"><div class="card-title">&#128203; Počet CA ve statusech &mdash; Preferred / NO preferred (aktuální rozpracovanost)</div>'+
+    '<div class="card ao-card-wrap ao-card-carvago">'+
+      '<div class="ao-header"><span class="ao-badge ao-badge-carvago">CARVAGO CARAUDIT</span><div class="ao-header-text"><div class="card-title ao-card-title">&#128203; Počet CA ve statusech &mdash; Preferred / NO preferred (aktuální rozpracovanost)</div><div class="ao-sub">Record Type = CarAudit · bez Instamotion · bez XK/AL</div></div></div>'+
       h1+
     '</div>'+
-    '<div class="card"><div class="card-title">&#9201; Aktuální rozpracovanost (od stavu Awaiting Selection approved &mdash; pracovní dny) &mdash; Preferred / NO preferred</div>'+
+    '<div class="card ao-card-wrap ao-card-carvago">'+
+      '<div class="ao-header"><span class="ao-badge ao-badge-carvago">CARVAGO CARAUDIT</span><div class="ao-header-text"><div class="card-title ao-card-title">&#9201; Aktuální rozpracovanost (od stavu Awaiting Selection approved &mdash; pracovní dny) &mdash; Preferred / NO preferred</div><div class="ao-sub">Record Type = CarAudit · bez Instamotion · bez XK/AL</div></div></div>'+
       h2+
     '</div>';
 }
