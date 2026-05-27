@@ -1,42 +1,49 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-05-27T11:02:22.677905+00:00",
-  "generated_at_local": "2026-05-27T13:02:22.677905+02:00",
+  "generated_at_utc": "2026-05-27T11:19:14.004392+00:00",
+  "generated_at_local": "2026-05-27T13:19:14.004392+02:00",
   "sf_base_url": "https://carvago.lightning.force.com",
   "month_label": "May 2026",
   "tier1": {
-    "total": 1914,
-    "closed": 1296,
-    "phase2": 569,
+    "total": 1915,
+    "closed": 1301,
+    "phase2": 565,
     "ip_total": 49
   },
   "status_breakdown": {
-    "Auditor selection": 27,
-    "Awaiting Selection": 72,
-    "Audit result": 11,
-    "New CA": 2,
-    "CarAudit preparation": 2,
+    "Auditor selection": 25,
+    "Awaiting Selection": 71,
+    "Audit result": 10,
+    "New CA": 3,
+    "CarAudit preparation": 3,
     "Data validation and completion": 3,
     "CarAudit Done": 417,
-    "Audit order": 40,
-    "Car check": 42,
-    "CarAudit Closed": 1296,
-    "VIN Check": 2
+    "Audit order": 39,
+    "Car check": 37,
+    "CarAudit Closed": 1301,
+    "VIN Check": 6
   },
   "closed_reasons": {
     "REJECT New CA": 163,
     "REJECT Data Validation": 244,
     "REJECT Car Check": 514,
     "REJECT VIN Check": 115,
-    "REJECT Awaiting Selection": 123
+    "REJECT Awaiting Selection": 124
   },
   "country_breakdown": {
     "DE": {
       "ip": 34,
       "cl": 0,
-      "cc": 29,
-      "vin": 2,
+      "cc": 26,
+      "vin": 5,
       "newca": 3
+    },
+    "PL": {
+      "ip": 3,
+      "cl": 0,
+      "cc": 2,
+      "vin": 0,
+      "newca": 1
     },
     "KR": {
       "ip": 2,
@@ -44,13 +51,6 @@
       "cc": 0,
       "vin": 0,
       "newca": 2
-    },
-    "PL": {
-      "ip": 2,
-      "cl": 0,
-      "cc": 2,
-      "vin": 0,
-      "newca": 0
     },
     "NL": {
       "ip": 2,
@@ -69,8 +69,8 @@
     "SE": {
       "ip": 2,
       "cl": 0,
-      "cc": 2,
-      "vin": 0,
+      "cc": 1,
+      "vin": 1,
       "newca": 0
     },
     "IT": {
@@ -100,55 +100,23 @@
       "cc": 1,
       "vin": 0,
       "newca": 0
-    },
-    "LU": {
-      "ip": 1,
-      "cl": 0,
-      "cc": 1,
-      "vin": 0,
-      "newca": 0
     }
   },
   "agent_breakdown": {
-    "Agent1": 15,
+    "Agent1": 11,
     "Agent2": 9,
-    "Neprideleno": 10,
+    "Neprideleno": 9,
     "Agent4": 1,
-    "Agent5": 7
+    "Agent5": 8
   },
   "nedovolano": [
-    {
-      "id": "500MI00000nkrF9YAI",
-      "cn": "00182731",
-      "country": "DE",
-      "agent": "Agent1",
-      "ageH": 120,
-      "ageW": 32.2,
-      "isN": true,
-      "nCnt": 2,
-      "ctCnt": 3,
-      "lastType": "messaging",
-      "lastD": "2026-05-27T09:47:13.000+0000",
-      "lastBy": "Call Center Conectart1",
-      "incs": [
-        {
-          "subject": "CA - reserved for another customer",
-          "eta": "2026-05-26",
-          "createdDate": "2026-05-22T12:11:58.000+0000",
-          "createdBy": "Martin Farkas"
-        }
-      ],
-      "potClose": true,
-      "potSpanH": 118.85,
-      "pref": true
-    },
     {
       "id": "500MI00000nnZtJYAU",
       "cn": "00182898",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 53,
-      "ageW": 23.04,
+      "ageH": 54,
+      "ageW": 23.32,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -172,8 +140,8 @@
       "cn": "00182927",
       "country": "DE",
       "agent": "Agent5",
-      "ageH": 53,
-      "ageW": 23.04,
+      "ageH": 54,
+      "ageW": 23.32,
       "isN": true,
       "nCnt": 2,
       "ctCnt": 2,
@@ -198,7 +166,7 @@
       "country": "DE",
       "agent": "Agent1",
       "ageH": 48,
-      "ageW": 17.68,
+      "ageW": 17.96,
       "isN": true,
       "nCnt": 1,
       "ctCnt": 1,
@@ -223,7 +191,7 @@
       "country": "PL",
       "agent": null,
       "ageH": 48,
-      "ageW": 17.7,
+      "ageW": 17.98,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -248,7 +216,7 @@
       "country": "DE",
       "agent": "Agent1",
       "ageH": 47,
-      "ageW": 16.6,
+      "ageW": 16.88,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -272,8 +240,8 @@
       "cn": "00183395",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 46,
-      "ageW": 16.36,
+      "ageH": 47,
+      "ageW": 16.64,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 1,
@@ -297,17 +265,17 @@
       "cn": "00183613",
       "country": "NL",
       "agent": null,
-      "ageH": 26,
-      "ageW": 11.24,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 1,
-      "lastType": "callback",
-      "lastD": "2026-05-27T08:57:34.000+0000",
+      "ageH": 27,
+      "ageW": 11.52,
+      "isN": true,
+      "nCnt": 1,
+      "ctCnt": 2,
+      "lastType": "messaging",
+      "lastD": "2026-05-27T11:02:56.000+0000",
       "lastBy": "Lenka Venerová",
       "incs": [],
-      "potClose": false,
-      "potSpanH": null,
+      "potClose": true,
+      "potSpanH": 2.09,
       "pref": false
     },
     {
@@ -316,7 +284,7 @@
       "country": "AT",
       "agent": "Agent2",
       "ageH": 23,
-      "ageW": 7.55,
+      "ageW": 7.83,
       "isN": true,
       "nCnt": 2,
       "ctCnt": 2,
@@ -334,7 +302,7 @@
       "country": "SE",
       "agent": null,
       "ageH": 23,
-      "ageW": 7.59,
+      "ageW": 7.87,
       "isN": true,
       "nCnt": 1,
       "ctCnt": 1,
@@ -351,8 +319,8 @@
       "cn": "00183733",
       "country": "DE",
       "agent": "Agent2",
-      "ageH": 22,
-      "ageW": 7.42,
+      "ageH": 23,
+      "ageW": 7.7,
       "isN": true,
       "nCnt": 2,
       "ctCnt": 2,
@@ -370,7 +338,7 @@
       "country": "DE",
       "agent": "Agent2",
       "ageH": 21,
-      "ageW": 5.51,
+      "ageW": 5.8,
       "isN": true,
       "nCnt": 2,
       "ctCnt": 2,
@@ -387,8 +355,8 @@
       "cn": "00183782",
       "country": "DE",
       "agent": "Agent5",
-      "ageH": 20,
-      "ageW": 5.5,
+      "ageH": 21,
+      "ageW": 5.78,
       "isN": true,
       "nCnt": 3,
       "ctCnt": 3,
@@ -406,7 +374,7 @@
       "country": "PL",
       "agent": null,
       "ageH": 5,
-      "ageW": 5.04,
+      "ageW": 5.32,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -424,16 +392,16 @@
       "country": "DE",
       "agent": "Agent5",
       "ageH": 5,
-      "ageW": 5.03,
+      "ageW": 5.31,
       "isN": true,
-      "nCnt": 1,
-      "ctCnt": 1,
+      "nCnt": 2,
+      "ctCnt": 2,
       "lastType": "nedov",
-      "lastD": "2026-05-27T07:41:45.000+0000",
+      "lastD": "2026-05-27T10:56:11.000+0000",
       "lastBy": "Anna Katharina Plath",
       "incs": [],
-      "potClose": false,
-      "potSpanH": null,
+      "potClose": true,
+      "potSpanH": 3.24,
       "pref": true
     },
     {
@@ -442,7 +410,7 @@
       "country": "DE",
       "agent": "Agent2",
       "ageH": 5,
-      "ageW": 5.04,
+      "ageW": 5.32,
       "isN": true,
       "nCnt": 2,
       "ctCnt": 2,
@@ -460,19 +428,19 @@
       "country": "DE",
       "agent": "Agent1",
       "ageH": 5,
-      "ageW": 4.98,
+      "ageW": 5.26,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
       "lastType": null,
       "lastD": "2026-05-27T08:19:32.000+0000",
-      "lastBy": "Vladimír Uher",
+      "lastBy": "Anna Katharina Plath",
       "incs": [
         {
           "subject": "CA - reserved for another customer",
           "eta": "2026-05-28",
           "createdDate": "2026-05-27T08:19:32.000+0000",
-          "createdBy": "Vladimír Uher"
+          "createdBy": "Anna Katharina Plath"
         }
       ],
       "potClose": false,
@@ -484,8 +452,8 @@
       "cn": "00183863",
       "country": "IT",
       "agent": null,
-      "ageH": 5,
-      "ageW": 5.04,
+      "ageH": 6,
+      "ageW": 5.32,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -503,7 +471,7 @@
       "country": "SK",
       "agent": "Agent2",
       "ageH": 5,
-      "ageW": 4.95,
+      "ageW": 5.23,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -521,7 +489,7 @@
       "country": "DE",
       "agent": "Agent4",
       "ageH": 5,
-      "ageW": 5.04,
+      "ageW": 5.32,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 1,
@@ -538,8 +506,8 @@
       "cn": "00183958",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 0,
-      "ageW": 0.47,
+      "ageH": 1,
+      "ageW": 0.75,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -555,9 +523,9 @@
       "id": "500MI00000nwxTSYAY",
       "cn": "00183959",
       "country": "DE",
-      "agent": "Agent1",
+      "agent": null,
       "ageH": 1,
-      "ageW": 0.51,
+      "ageW": 0.79,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -574,8 +542,8 @@
       "cn": "00183920",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 0,
-      "ageW": 0.46,
+      "ageH": 1,
+      "ageW": 0.74,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -593,7 +561,7 @@
       "country": "DE",
       "agent": "Agent5",
       "ageH": 1,
-      "ageW": 0.97,
+      "ageW": 1.25,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -611,7 +579,7 @@
       "country": "DE",
       "agent": "Agent5",
       "ageH": 2,
-      "ageW": 2.19,
+      "ageW": 2.47,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -636,7 +604,7 @@
       "country": "NL",
       "agent": null,
       "ageH": 2,
-      "ageW": 2.07,
+      "ageW": 2.35,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -653,14 +621,14 @@
       "cn": "00183949",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 0,
-      "ageW": 0.5,
+      "ageH": 1,
+      "ageW": 0.78,
       "isN": false,
       "nCnt": 0,
-      "ctCnt": 0,
-      "lastType": null,
-      "lastD": null,
-      "lastBy": null,
+      "ctCnt": 1,
+      "lastType": "messaging",
+      "lastD": "2026-05-27T11:05:54.000+0000",
+      "lastBy": "Call Center Conectart1",
       "incs": [],
       "potClose": false,
       "potSpanH": null,
@@ -671,14 +639,14 @@
       "cn": "00183950",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 0,
-      "ageW": 0.45,
+      "ageH": 1,
+      "ageW": 0.74,
       "isN": false,
       "nCnt": 0,
-      "ctCnt": 0,
-      "lastType": null,
-      "lastD": null,
-      "lastBy": null,
+      "ctCnt": 1,
+      "lastType": "messaging",
+      "lastD": "2026-05-27T10:59:00.000+0000",
+      "lastBy": "Call Center Conectart1",
       "incs": [],
       "potClose": false,
       "potSpanH": null,
@@ -689,8 +657,8 @@
       "cn": "00183988",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 0,
-      "ageW": 0.45,
+      "ageH": 1,
+      "ageW": 0.73,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -708,7 +676,7 @@
       "country": "DE",
       "agent": "Agent5",
       "ageH": 1,
-      "ageW": 0.67,
+      "ageW": 0.95,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -721,48 +689,12 @@
       "pref": true
     },
     {
-      "id": "500MI00000nxP3BYAU",
-      "cn": "00183969",
-      "country": "SE",
-      "agent": null,
-      "ageH": 0,
-      "ageW": 0.48,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 0,
-      "lastType": null,
-      "lastD": null,
-      "lastBy": null,
-      "incs": [],
-      "potClose": false,
-      "potSpanH": null,
-      "pref": false
-    },
-    {
-      "id": "500MI00000nxR00YAE",
-      "cn": "00183953",
-      "country": "DE",
-      "agent": "Agent1",
-      "ageH": 1,
-      "ageW": 0.53,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 0,
-      "lastType": null,
-      "lastD": null,
-      "lastBy": null,
-      "incs": [],
-      "potClose": false,
-      "potSpanH": null,
-      "pref": false
-    },
-    {
       "id": "500MI00000nxR01YAE",
       "cn": "00183954",
       "country": "DE",
       "agent": "Agent1",
       "ageH": 1,
-      "ageW": 0.54,
+      "ageW": 0.82,
       "isN": true,
       "nCnt": 1,
       "ctCnt": 1,
@@ -779,8 +711,8 @@
       "cn": "00183940",
       "country": "DE",
       "agent": "Agent2",
-      "ageH": 2,
-      "ageW": 2.25,
+      "ageH": 3,
+      "ageW": 2.53,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -798,7 +730,7 @@
       "country": "DE",
       "agent": "Agent2",
       "ageH": 2,
-      "ageW": 2.04,
+      "ageW": 2.33,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -816,7 +748,7 @@
       "country": "IT",
       "agent": null,
       "ageH": 1,
-      "ageW": 0.69,
+      "ageW": 0.97,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -833,26 +765,8 @@
       "cn": "00183997",
       "country": "CZ",
       "agent": "Agent2",
-      "ageH": 0,
-      "ageW": 0.43,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 0,
-      "lastType": null,
-      "lastD": null,
-      "lastBy": null,
-      "incs": [],
-      "potClose": false,
-      "potSpanH": null,
-      "pref": false
-    },
-    {
-      "id": "500MI00000nxXlVYAU",
-      "cn": "00183998",
-      "country": "DE",
-      "agent": "Agent1",
-      "ageH": 0,
-      "ageW": 0.47,
+      "ageH": 1,
+      "ageW": 0.71,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -870,7 +784,7 @@
       "country": "DE",
       "agent": "Agent5",
       "ageH": 1,
-      "ageW": 0.58,
+      "ageW": 0.86,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -888,7 +802,7 @@
       "country": "BE",
       "agent": null,
       "ageH": 1,
-      "ageW": 0.72,
+      "ageW": 1.01,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -905,8 +819,8 @@
       "cn": "00183977",
       "country": "DE",
       "agent": "Agent2",
-      "ageH": 0,
-      "ageW": 0.47,
+      "ageH": 1,
+      "ageW": 0.75,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -917,24 +831,6 @@
       "potClose": false,
       "potSpanH": null,
       "pref": true
-    },
-    {
-      "id": "500MI00000nxiqTYAQ",
-      "cn": "00183991",
-      "country": "LU",
-      "agent": null,
-      "ageH": 1,
-      "ageW": 0.53,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 0,
-      "lastType": null,
-      "lastD": null,
-      "lastBy": null,
-      "incs": [],
-      "potClose": false,
-      "potSpanH": null,
-      "pref": false
     }
   ],
   "nedov_count": 11,
@@ -1006,7 +902,7 @@
         25,
         39,
         34,
-        28,
+        29,
         59,
         27,
         26,
@@ -1132,59 +1028,59 @@
       4,
       4
     ],
-    "total_cases": 2171,
+    "total_cases": 2172,
     "start_date": "2026-04-27",
     "end_date": "2026-05-27"
   },
   "buffer_hourly": {
-    "start_buffer": 56,
-    "start_new_ca": 3,
+    "start_buffer": 57,
+    "start_new_ca": 4,
     "start_car_check": 53,
-    "current_buffer": 44,
-    "current_new_ca": 2,
-    "current_car_check": 42,
+    "current_buffer": 40,
+    "current_new_ca": 3,
+    "current_car_check": 37,
     "hours": [
       {
         "h": 8,
         "in": 4,
         "vin": 1,
         "rej": 8,
-        "buffer_end": 51
+        "buffer_end": 52
       },
       {
         "h": 9,
         "in": 6,
         "vin": 7,
         "rej": 4,
-        "buffer_end": 46
+        "buffer_end": 47
       },
       {
         "h": 10,
         "in": 3,
         "vin": 7,
         "rej": 1,
-        "buffer_end": 41
+        "buffer_end": 42
       },
       {
         "h": 11,
         "in": 16,
         "vin": 4,
         "rej": 3,
-        "buffer_end": 50
+        "buffer_end": 51
       },
       {
         "h": 12,
         "in": 6,
-        "vin": 9,
+        "vin": 13,
         "rej": 3,
-        "buffer_end": 44
+        "buffer_end": 41
       },
       {
         "h": 13,
-        "in": 0,
-        "vin": 0,
+        "in": 1,
+        "vin": 2,
         "rej": 0,
-        "buffer_end": 44
+        "buffer_end": 40
       },
       {
         "h": 14,
@@ -1216,16 +1112,16 @@
       }
     ],
     "projection_18": {
-      "buffer": 36,
-      "rate_per_h": -2.0,
-      "delta_vs_now": -8
+      "buffer": 29,
+      "rate_per_h": -2.83,
+      "delta_vs_now": -11
     }
   },
   "aws_split": {
-    "cases": 71,
-    "customers": 61,
+    "cases": 72,
+    "customers": 60,
     "solo": 44,
-    "with_other": 17
+    "with_other": 16
   },
   "phase2_tables": {
     "statuses": [
@@ -1236,26 +1132,26 @@
     ],
     "preferred": {
       "Auditor selection": {
-        "pref": 21,
-        "nopref": 6
+        "pref": 17,
+        "nopref": 5
       },
       "Audit order": {
-        "pref": 30,
+        "pref": 33,
         "nopref": 8
       },
       "Audit result": {
-        "pref": 9,
-        "nopref": 1
+        "pref": 10,
+        "nopref": 0
       },
       "CarAudit preparation": {
-        "pref": 3,
-        "nopref": 0
+        "pref": 2,
+        "nopref": 1
       }
     },
     "age": {
       "Auditor selection": {
         "lt2": {
-          "pref": 20,
+          "pref": 16,
           "nopref": 5
         },
         "b23": {
@@ -1264,7 +1160,7 @@
         },
         "b35": {
           "pref": 1,
-          "nopref": 1
+          "nopref": 0
         },
         "b57": {
           "pref": 0,
@@ -1277,7 +1173,7 @@
       },
       "Audit order": {
         "lt2": {
-          "pref": 21,
+          "pref": 24,
           "nopref": 7
         },
         "b23": {
@@ -1299,7 +1195,7 @@
       },
       "Audit result": {
         "lt2": {
-          "pref": 6,
+          "pref": 7,
           "nopref": 0
         },
         "b23": {
@@ -1308,7 +1204,7 @@
         },
         "b35": {
           "pref": 2,
-          "nopref": 1
+          "nopref": 0
         },
         "b57": {
           "pref": 0,
@@ -1329,8 +1225,8 @@
           "nopref": 0
         },
         "b35": {
-          "pref": 1,
-          "nopref": 0
+          "pref": 0,
+          "nopref": 1
         },
         "b57": {
           "pref": 0,
@@ -1426,12 +1322,6 @@
         },
         "cases": [
           {
-            "id": "500MI00000niJQyYAM",
-            "cn": "00182579",
-            "country": "DE",
-            "pref": true
-          },
-          {
             "id": "500MI00000ndx45YAA",
             "cn": "00182291",
             "country": "DE",
@@ -1460,6 +1350,12 @@
             "cn": "00182180",
             "country": "DE",
             "pref": true
+          },
+          {
+            "id": "500MI00000niJQyYAM",
+            "cn": "00182579",
+            "country": "DE",
+            "pref": true
           }
         ]
       },
@@ -1469,21 +1365,15 @@
         "dow": "st",
         "offset": 0,
         "status": "today",
-        "pref": 9,
+        "pref": 10,
         "nopref": 2,
-        "total": 11,
+        "total": 12,
         "countries": {
-          "DE": 7,
           "CZ": 1,
-          "NL": 3
+          "DE": 7,
+          "NL": 4
         },
         "cases": [
-          {
-            "id": "500MI00000nqp2OYAQ",
-            "cn": "00183292",
-            "country": "DE",
-            "pref": true
-          },
           {
             "id": "500MI00000nuDrJYAU",
             "cn": "00183671",
@@ -1491,10 +1381,10 @@
             "pref": true
           },
           {
-            "id": "500MI00000nuSzzYAE",
-            "cn": "00183707",
+            "id": "500MI00000nbbqnYAA",
+            "cn": "00182053",
             "country": "DE",
-            "pref": true
+            "pref": false
           },
           {
             "id": "500MI00000ngtdWYAQ",
@@ -1515,21 +1405,27 @@
             "pref": true
           },
           {
-            "id": "500MI00000ntrMFYAY",
-            "cn": "00183655",
+            "id": "500MI00000nnIkPYAU",
+            "cn": "00182885",
+            "country": "NL",
+            "pref": true
+          },
+          {
+            "id": "500MI00000nuSzzYAE",
+            "cn": "00183707",
             "country": "DE",
             "pref": true
           },
           {
-            "id": "500MI00000nbbqnYAA",
-            "cn": "00182053",
+            "id": "500MI00000nqp2OYAQ",
+            "cn": "00183292",
             "country": "DE",
-            "pref": false
+            "pref": true
           },
           {
-            "id": "500MI00000nnIkPYAU",
-            "cn": "00182885",
-            "country": "NL",
+            "id": "500MI00000ntrMFYAY",
+            "cn": "00183655",
+            "country": "DE",
             "pref": true
           },
           {
@@ -1541,6 +1437,12 @@
           {
             "id": "500MI00000ntcN1YAI",
             "cn": "00183600",
+            "country": "NL",
+            "pref": true
+          },
+          {
+            "id": "500MI00000nsR0bYAE",
+            "cn": "00183510",
             "country": "NL",
             "pref": true
           }
@@ -1561,8 +1463,8 @@
         },
         "cases": [
           {
-            "id": "500MI00000npFKFYA2",
-            "cn": "00183140",
+            "id": "500MI00000nrIMAYA2",
+            "cn": "00183475",
             "country": "DE",
             "pref": true
           },
@@ -1621,6 +1523,12 @@
             "pref": true
           },
           {
+            "id": "500MI00000npFKFYA2",
+            "cn": "00183140",
+            "country": "DE",
+            "pref": true
+          },
+          {
             "id": "500MI00000npugkYAA",
             "cn": "00183246",
             "country": "DE",
@@ -1629,12 +1537,6 @@
           {
             "id": "500MI00000nqQk0YAE",
             "cn": "00183307",
-            "country": "DE",
-            "pref": true
-          },
-          {
-            "id": "500MI00000nrIMAYA2",
-            "cn": "00183475",
             "country": "DE",
             "pref": true
           },
@@ -1658,18 +1560,30 @@
         "dow": "pá",
         "offset": 2,
         "status": "future",
-        "pref": 3,
-        "nopref": 3,
-        "total": 6,
+        "pref": 6,
+        "nopref": 2,
+        "total": 8,
         "countries": {
-          "DE": 4,
+          "DE": 6,
           "AT": 1,
           "IT": 1
         },
         "cases": [
           {
+            "id": "500MI00000ntkZ6YAI",
+            "cn": "00183620",
+            "country": "DE",
+            "pref": true
+          },
+          {
             "id": "500MI00000nrGPJYA2",
             "cn": "00183400",
+            "country": "DE",
+            "pref": false
+          },
+          {
+            "id": "500MI00000ntb1IYAQ",
+            "cn": "00183618",
             "country": "DE",
             "pref": false
           },
@@ -1686,22 +1600,22 @@
             "pref": true
           },
           {
+            "id": "500MI00000nw2GaYAI",
+            "cn": "00183858",
+            "country": "DE",
+            "pref": true
+          },
+          {
             "id": "500MI00000nw2JmYAI",
             "cn": "00183850",
             "country": "DE",
             "pref": true
           },
           {
-            "id": "500MI00000ntb1IYAQ",
-            "cn": "00183618",
-            "country": "DE",
-            "pref": false
-          },
-          {
             "id": "500MI00000nhEYEYA2",
             "cn": "00182495",
             "country": "IT",
-            "pref": false
+            "pref": true
           }
         ]
       },
@@ -1779,12 +1693,12 @@
       "overdue_pref": 6,
       "overdue_days_count": 1,
       "max_overdue_days_back": 1,
-      "today": 11,
-      "today_pref": 9,
+      "today": 12,
+      "today_pref": 10,
       "tomorrow": 15,
       "tomorrow_pref": 12,
-      "week": 32,
-      "total": 38
+      "week": 35,
+      "total": 41
     }
   },
   "cebia_audit_order_expected": {
