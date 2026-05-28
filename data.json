@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-05-28T06:19:19.010565+00:00",
-  "generated_at_local": "2026-05-28T08:19:19.010565+02:00",
+  "generated_at_utc": "2026-05-28T06:26:36.848863+00:00",
+  "generated_at_local": "2026-05-28T08:26:36.848863+02:00",
   "sf_base_url": "https://carvago.lightning.force.com",
   "month_label": "May 2026",
   "tier1": {
-    "total": 1974,
-    "closed": 1334,
-    "phase2": 572,
-    "ip_total": 68
+    "total": 1977,
+    "closed": 1337,
+    "phase2": 575,
+    "ip_total": 65
   },
   "status_breakdown": {
-    "Auditor selection": 12,
-    "Awaiting Selection": 68,
-    "Audit result": 15,
-    "New CA": 9,
-    "Data validation and completion": 5,
+    "Auditor selection": 14,
+    "Awaiting Selection": 69,
+    "Audit result": 16,
+    "New CA": 1,
+    "Data validation and completion": 3,
     "CarAudit preparation": 1,
     "CarAudit Done": 431,
-    "Audit order": 45,
-    "Car check": 48,
-    "CarAudit Closed": 1334,
-    "VIN Check": 6
+    "Audit order": 44,
+    "Car check": 59,
+    "CarAudit Closed": 1337,
+    "VIN Check": 2
   },
   "closed_reasons": {
     "REJECT New CA": 163,
-    "REJECT Data Validation": 248,
-    "REJECT Car Check": 521,
-    "REJECT VIN Check": 119,
-    "REJECT Awaiting Selection": 127
+    "REJECT Data Validation": 252,
+    "REJECT Car Check": 527,
+    "REJECT VIN Check": 120,
+    "REJECT Awaiting Selection": 131
   },
   "country_breakdown": {
     "DE": {
@@ -96,11 +96,11 @@
     }
   },
   "agent_breakdown": {
-    "Agent1": 14,
-    "Agent2": 10,
-    "Neprideleno": 7,
-    "Agent4": 1,
-    "Agent5": 3
+    "Agent1": 24,
+    "Agent2": 16,
+    "Neprideleno": 12,
+    "Agent4": 6,
+    "Agent5": 1
   },
   "nedovolano": [
     {
@@ -1075,10 +1075,10 @@
     }
   },
   "aws_split": {
-    "cases": 70,
-    "customers": 60,
-    "solo": 41,
-    "with_other": 19
+    "cases": 69,
+    "customers": 64,
+    "solo": 47,
+    "with_other": 17
   },
   "phase2_tables": {
     "statuses": [
@@ -1089,16 +1089,16 @@
     ],
     "preferred": {
       "Auditor selection": {
-        "pref": 13,
+        "pref": 9,
         "nopref": 5
       },
       "Audit order": {
-        "pref": 34,
-        "nopref": 14
+        "pref": 35,
+        "nopref": 9
       },
       "Audit result": {
-        "pref": 5,
-        "nopref": 1
+        "pref": 13,
+        "nopref": 3
       },
       "CarAudit preparation": {
         "pref": 1,
@@ -1108,11 +1108,11 @@
     "age": {
       "Auditor selection": {
         "lt2": {
-          "pref": 12,
+          "pref": 9,
           "nopref": 4
         },
         "b23": {
-          "pref": 1,
+          "pref": 0,
           "nopref": 1
         },
         "b35": {
@@ -1130,19 +1130,19 @@
       },
       "Audit order": {
         "lt2": {
-          "pref": 26,
-          "nopref": 12
+          "pref": 35,
+          "nopref": 9
         },
         "b23": {
           "pref": 0,
-          "nopref": 2
+          "nopref": 0
         },
         "b35": {
-          "pref": 3,
+          "pref": 0,
           "nopref": 0
         },
         "b57": {
-          "pref": 5,
+          "pref": 0,
           "nopref": 0
         },
         "gt7": {
@@ -1152,8 +1152,8 @@
       },
       "Audit result": {
         "lt2": {
-          "pref": 5,
-          "nopref": 0
+          "pref": 13,
+          "nopref": 3
         },
         "b23": {
           "pref": 0,
@@ -1165,7 +1165,7 @@
         },
         "b57": {
           "pref": 0,
-          "nopref": 1
+          "nopref": 0
         },
         "gt7": {
           "pref": 0,
