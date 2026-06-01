@@ -141,6 +141,8 @@ def main():
 
     # ---- Tier 1 ----
     sm = {r["Status"]: int(r["cnt"]) for r in status_recs}
+    # All-months open status map for operational calculations (buffer, etc.)
+    sm_all = {r["Status"]: int(r["cnt"]) for r in status_all_recs}
     total = sum(sm.values())
     ip_statuses = ["New CA", "Data validation and completion", "Car check", "VIN Check"]
     ip_total = sum(sm.get(s, 0) for s in ip_statuses)
@@ -303,8 +305,8 @@ def main():
         in_h = _by_local(bh_added)
         vin_h = _by_local(bh_vin)
         rej_h = _by_local(bh_rej)
-        new_ca_count = sm.get("New CA", 0)
-        cc_count = sm.get("Car check", 0)
+        new_ca_count = sm_all.get("New CA", 0)
+        cc_count = sm_all.get("Car check", 0)
         current_buffer = new_ca_count + cc_count
         sum_in = sum(in_h.get(h, 0) for h in range(8, cur_hr + 1))
         sum_vin = sum(vin_h.get(h, 0) for h in range(8, cur_hr + 1))
