@@ -111,6 +111,11 @@ def vc(rec):
 def main():
     # ---- Load inputs ----
     status_recs = load("sf_status.json")["records"]
+    # All-months open cases for status_breakdown (Tier 3 display)
+    try:
+        status_all_recs = load("sf_status_all.json")["records"]
+    except FileNotFoundError:
+        status_all_recs = status_recs
     ip_recs = load("sf_ip.json")["records"]
     closed_status = load("sf_closed_status.json")
     try:
@@ -621,7 +626,7 @@ def main():
         "tier1": {
             "total": total, "closed": closed, "phase2": phase2, "ip_total": ip_total,
         },
-        "status_breakdown": sm,
+        "status_breakdown": {r["Status"]: int(r["cnt"]) for r in status_all_recs},
         "closed_reasons": cl_reasons,
         "country_breakdown": country,
         "agent_breakdown": agents,
