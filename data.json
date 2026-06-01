@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-06-01T08:13:45.105214+00:00",
+  "generated_at_utc": "2026-06-01T08:42:20.996601+00:00",
   "generated_at_local": "2026-06-01T10:13:45.105214+02:00",
   "sf_base_url": "https://carvago.lightning.force.com",
   "month_label": "June 2026",
@@ -11,12 +11,15 @@
     "ip_total": 17
   },
   "status_breakdown": {
-    "Auditor selection": 1,
-    "CarAudit Closed": 6,
-    "Car check": 13,
-    "VIN Check": 1,
-    "Awaiting Selection": 2,
-    "New CA": 3
+    "New CA": 14,
+    "Data validation and completion": 6,
+    "Car check": 70,
+    "VIN Check": 11,
+    "Awaiting Selection": 88,
+    "Auditor selection": 11,
+    "Audit order": 29,
+    "Audit result": 17,
+    "CarAudit preparation": 5
   },
   "closed_reasons": {
     "REJECT New CA": 0,
@@ -589,10 +592,10 @@
     }
   },
   "aws_split": {
-    "cases": 2,
-    "customers": 2,
-    "solo": 2,
-    "with_other": 0
+    "cases": 88,
+    "customers": 80,
+    "solo": 60,
+    "with_other": 20
   },
   "phase2_tables": {
     "statuses": [
@@ -603,31 +606,31 @@
     ],
     "preferred": {
       "Auditor selection": {
-        "pref": 1,
-        "nopref": 0
+        "pref": 7,
+        "nopref": 4
       },
       "Audit order": {
-        "pref": 0,
-        "nopref": 0
+        "pref": 22,
+        "nopref": 7
       },
       "Audit result": {
-        "pref": 0,
-        "nopref": 0
+        "pref": 14,
+        "nopref": 3
       },
       "CarAudit preparation": {
-        "pref": 0,
-        "nopref": 0
+        "pref": 4,
+        "nopref": 1
       }
     },
     "age": {
       "Auditor selection": {
         "lt2": {
-          "pref": 1,
-          "nopref": 0
+          "pref": 6,
+          "nopref": 3
         },
         "b23": {
-          "pref": 0,
-          "nopref": 0
+          "pref": 1,
+          "nopref": 1
         },
         "b35": {
           "pref": 0,
@@ -644,16 +647,16 @@
       },
       "Audit order": {
         "lt2": {
-          "pref": 0,
-          "nopref": 0
+          "pref": 13,
+          "nopref": 6
         },
         "b23": {
-          "pref": 0,
+          "pref": 7,
           "nopref": 0
         },
         "b35": {
-          "pref": 0,
-          "nopref": 0
+          "pref": 2,
+          "nopref": 1
         },
         "b57": {
           "pref": 0,
@@ -666,16 +669,16 @@
       },
       "Audit result": {
         "lt2": {
-          "pref": 0,
+          "pref": 7,
           "nopref": 0
         },
         "b23": {
-          "pref": 0,
-          "nopref": 0
+          "pref": 3,
+          "nopref": 2
         },
         "b35": {
-          "pref": 0,
-          "nopref": 0
+          "pref": 4,
+          "nopref": 1
         },
         "b57": {
           "pref": 0,
@@ -688,15 +691,15 @@
       },
       "CarAudit preparation": {
         "lt2": {
-          "pref": 0,
+          "pref": 1,
           "nopref": 0
         },
         "b23": {
-          "pref": 0,
-          "nopref": 0
+          "pref": 1,
+          "nopref": 1
         },
         "b35": {
-          "pref": 0,
+          "pref": 2,
           "nopref": 0
         },
         "b57": {
