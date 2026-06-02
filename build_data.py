@@ -24,6 +24,14 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 PRAGUE = ZoneInfo("Europe/Prague")
+RE_REZERVACE = re.compile(
+    r"rezervov[aá][nň]|reserviert|res[ae]viert|r[eé]serv[eé]|"
+    r"reserved\s+for(\s+another)?\s+customer|"
+    r"v[uů]z\s+(je\s+)?rezerv|auto\s+(je\s+)?rezerv|"
+    r"fur\s+(einen\s+)?anderen\s+Kunden|"
+    r"reserviert\s+f[uü]r|resaviert|reserviert",
+    re.IGNORECASE,
+)
 NEDOV_RE = re.compile(
     r"nedovol[aá]n[oý]|nebere|nicht\s+er[r]?eicht|"
     r"konnte\s+.*?nicht\s+er[r]?e[ia]cht|immer\s+noch\s+nicht|"
@@ -178,9 +186,11 @@ def main():
         incs_by_case.setdefault(i["Case__c"], []).append(i)
 
     def categorize(body):
-        """Return 'messaging' | 'callback' | 'nedov' | None for a feed body."""
+        """Return 'rezervace' | 'messaging' | 'callback' | 'nedov' | None for a feed body."""
         if not body:
             return None
+        if RE_REZERVACE.search(body):
+            return "rezervace"
         if RE_MESSAGING.search(body):
             return "messaging"
         if RE_CALLBACK.search(body):
@@ -241,6 +251,16 @@ def main():
             # No categorized feed — fall back to incident creator
             last_d = case_incs[0].get("createdDate")
             last_by = case_incs[0].get("createdBy")
+        # Incident-based rezervace override: if any blocking incident subject matches
+        # and no feed already flagged rezervace, override lastType
+        if last_type != "rezervace" and case_incs:
+            for inc in case_incs:
+                if RE_REZERVACE.search(inc.get("subject", "") or ""):
+                    last_type = "rezervace"
+                    if not last_d:
+                        last_d = inc.get("createdDate")
+                        last_by = inc.get("createdBy")
+                    break
         nedov_data.append({
             "id": cid,
             "cn": c["CaseNumber"],
