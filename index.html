@@ -1410,11 +1410,23 @@ function tickCountdown() {
           tooltip: {
             callbacks: {
               title: function(items) { return items[0].label; },
+              label: function(item) {
+                const ds = item.dataset;
+                const v = item.raw;
+                if (v === null || v === undefined) return null;
+                if (ds.yAxisID === 'yPct') {
+                  // % lines — show clearly as percentage
+                  return ' ' + ds.label + ': ' + (v != null ? v.toFixed(2) + '%' : '—');
+                } else {
+                  // bar datasets — show as count
+                  return ' ' + ds.label + ': ' + v + ' CA';
+                }
+              },
               afterBody: function(items) {
                 const idx = WEEKS.length - 1 - items[0].dataIndex;
                 const tot = TOTAL[idx] || 0;
                 const sub = (PREF[idx]||0) + (NOPREF[idx]||0);
-                return ['', '📋 Untrusty/Contacted: ' + sub + ' / ' + tot + ' celkem 1stCall closed'];
+                return ['', '📋 Untrusty/Contacted: ' + sub + ' z ' + tot + ' celkem 1stCall closed'];
               }
             }
           }
