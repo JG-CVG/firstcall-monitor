@@ -296,7 +296,7 @@ tr:hover td { background:#f9fafb; }
   <div id="errorBanner" class="error-banner"></div>
   <div id="tier1"></div>
   <div id="tier2"></div>
-  <div id="tier3"></div><div id="awsSplit"></div>
+  <div id="tier3"></div><div id="awsSplit"></div><div id="awsAge"></div>
 
   <div class="card"><div class="card-title">&#128100; Call Center &mdash; Car Check per Agent</div><div id="tblAgent"></div></div>
 
@@ -355,6 +355,7 @@ function render() {
   renderTier2(t.closed, t.phase2, t.ip_total, t.total);
   renderTier3(d.status_breakdown, d.nedov_count);
   renderAwsSplit(d.aws_split);
+  renderAwsAge(d.aws_age);
   renderAgentTable(d.agent_breakdown);
   renderUrgentCount(d.nedovolano);
   renderUrgentNoCallCount(d.nedovolano);
@@ -786,6 +787,27 @@ function renderAwsSplit(aws) {
       '</div>' +
       '<div style="flex-shrink:0;color:var(--green);font-weight:600">'+aws.solo+' jen AwS <span style="color:var(--muted);font-weight:400">('+pSolo+'%)</span></div>' +
       '<div style="flex-shrink:0;color:var(--amber-text);font-weight:600">'+aws.with_other+' + dal\u0161\u00ed CA <span style="color:var(--muted);font-weight:400">('+pWith+'%)</span></div>' +
+    '</div>';
+}
+
+function renderAwsAge(a) {
+  const el = document.getElementById('awsAge');
+  if (!el) return;
+  if (!a || !a.total) { el.innerHTML = ''; return; }
+  const b = a.buckets, t = a.total;
+  const COL = ['#16a34a','#f59e0b','#ea580c','#b91c1c'];
+  const LAB = ['\u22642','2\u20135','5\u201310','10+'];
+  let seg = '';
+  for (let i=0;i<4;i++){ if(b[i]) seg += '<div title="'+LAB[i]+' prac. dn\u016f: '+b[i]+'" style="width:'+(b[i]/t*100)+'%;background:'+COL[i]+'"></div>'; }
+  let chips = '';
+  for (let i=0;i<4;i++){ chips += '<div style="flex-shrink:0;color:'+COL[i]+';font-weight:600">'+b[i]+' <span style="color:var(--muted);font-weight:400">'+LAB[i]+'d</span></div>'; }
+  el.innerHTML =
+    '<div style="margin:0 0 14px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:16px;font-size:11.5px;color:var(--text);flex-wrap:wrap">' +
+      '<div style="flex-shrink:0;color:var(--muted);font-size:10px;letter-spacing:0.4px;text-transform:uppercase;font-weight:600">&#9203; AwS st\u00e1\u0159\u00ed</div>' +
+      '<div style="flex-shrink:0;color:var(--navy);font-weight:600">'+t+' CA</div>' +
+      '<div style="flex:1;min-width:120px;display:flex;height:8px;border-radius:4px;overflow:hidden;background:#F3F4F6">'+seg+'</div>' +
+      chips +
+      '<div style="flex-shrink:0;color:var(--muted)">prac. dny od vstupu do AwS</div>' +
     '</div>';
 }
 

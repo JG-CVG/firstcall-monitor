@@ -401,6 +401,35 @@ def main():
             "with_other": len(with_other),
         }
 
+    # ---- AwS age buckets (Q17) — stari v Awaiting Selection k dnesku ----
+    def _load_aws_age():
+        try:
+            with open(os.path.join(TMP, "sf_aws_age.json"), "r", encoding="utf-8") as fh:
+                return json.load(fh).get("records", [])
+        except FileNotFoundError:
+            return None
+    aws_age_recs = _load_aws_age()
+    aws_age = None
+    if aws_age_recs is not None:
+        buckets = [0, 0, 0, 0]
+        cases = []
+        for r in aws_age_recs:
+            dt = parse_dt(r.get("CA_Awaiting_Selection_Date__c"))
+            if dt is None:
+                continue
+            wd = round(working_hours_between(dt, now_utc) / 8.0, 1)
+            bi = 0 if wd < 2 else (1 if wd < 5 else (2 if wd < 10 else 3))
+            buckets[bi] += 1
+            ca = r.get("CarAudit__r") or {}
+            cases.append({
+                "id": r["Id"], "cn": r.get("CaseNumber"),
+                "country": ca.get("Vendor_Country__c") or "N/A",
+                "pref": bool((r.get("Order__r") or {}).get("Preferred__c")),
+                "since": r.get("CA_Awaiting_Selection_Date__c"), "wd": wd,
+            })
+        cases.sort(key=lambda x: -x["wd"])
+        aws_age = {"buckets": buckets, "total": sum(buckets), "cases": cases}
+
     # ---- Phase 2 tables (Q13) ----
     def _load_phase2():
         try:
@@ -666,6 +695,8 @@ def main():
         output["buffer_hourly"] = buffer_hourly
     if aws_split is not None:
         output["aws_split"] = aws_split
+    if aws_age is not None:
+        output["aws_age"] = aws_age
     if phase2_tables is not None:
         output["phase2_tables"] = phase2_tables
     if audit_order_expected is not None:
