@@ -1320,168 +1320,139 @@ function tickCountdown() {
 }
 
 
-// ─── Untrusty Seller / Cannot be contacted — weekly trend ────────────────────
+// ─── Untrusty Seller / Cannot be contacted — weekly trend (redesigned) ───────
 (function() {
-  const WEEKS = ["2025-W01","2025-W02","2025-W03","2025-W04","2025-W05","2025-W06","2025-W07","2025-W08","2025-W09","2025-W10","2025-W11","2025-W12","2025-W13","2025-W14","2025-W15","2025-W16","2025-W17","2025-W18","2025-W19","2025-W20","2025-W21","2025-W22","2025-W23","2025-W24","2025-W25","2025-W26","2025-W27","2025-W28","2025-W29","2025-W30","2025-W31","2025-W32","2025-W33","2025-W34","2025-W35","2025-W36","2025-W37","2025-W38","2025-W39","2025-W40","2025-W41","2025-W42","2025-W43","2025-W44","2025-W45","2025-W46","2025-W47","2025-W48","2025-W49","2025-W50","2025-W51","2025-W52","2026-W01","2026-W02","2026-W03","2026-W04","2026-W05","2026-W06","2026-W07","2026-W08","2026-W09","2026-W10","2026-W11","2026-W12","2026-W13","2026-W14","2026-W15","2026-W16","2026-W17","2026-W18","2026-W19","2026-W20","2026-W21","2026-W22"];
-  // Preferred count per week
-  const PREF   = [0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,1,0,1,0,2,0,1,3,2,3,2,4,3,4,2,3,3,3,5,4,2,3,4,4,5];
-  // Not-preferred count per week
-  const NOPREF = [0,1,1,0,0,0,0,1,0,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,0,0,1,0,0,0,1,0,1,1,0,1,0,1,0,1,0,1,0,1,0,0,0,0,1,0,0,1,1,1,1,2,2,3,3,4,4,2,3,5,4,4,3,3,5,4,5,5];
-  // Total 1st Call closed CA per week (all reasons)
-  const TOTAL  = [106,97,87,70,71,99,106,103,101,104,103,107,100,104,105,103,109,100,108,112,108,108,107,110,106,103,102,108,100,99,98,112,104,107,110,103,112,104,108,112,104,107,108,110,112,104,106,99,87,72,66,64,133,128,131,140,147,149,148,161,163,170,162,163,172,165,175,162,163,181,174,180,201];
+  // Weekly series (ISO week of CA CarAudit Closed Date, Prague). Carvago only
+  // (non-Instamotion), vendor country excl. XK/AL. Source: Salesforce.
+  // TOTAL = all 1st Call (Phase 1) closed CarAudits per week.
+  // PREF / NOPREF = subset with CarAudit Detail Reason Code in
+  //   { "Cannot be contacted", "Untrustworthy dealer, practices or inspection procedure" }
+  //   split by Order.Preferred.
+  const WEEKS  = ["2025-W01","2025-W02","2025-W03","2025-W04","2025-W05","2025-W06","2025-W07","2025-W08","2025-W09","2025-W10","2025-W11","2025-W12","2025-W13","2025-W14","2025-W15","2025-W16","2025-W17","2025-W18","2025-W19","2025-W20","2025-W21","2025-W22","2025-W23","2025-W24","2025-W25","2025-W26","2025-W27","2025-W28","2025-W29","2025-W30","2025-W31","2025-W32","2025-W33","2025-W34","2025-W35","2025-W36","2025-W37","2025-W38","2025-W39","2025-W40","2025-W41","2025-W42","2025-W43","2025-W44","2025-W45","2025-W46","2025-W47","2025-W48","2025-W49","2025-W50","2025-W51","2025-W52","2026-W01","2026-W02","2026-W03","2026-W04","2026-W05","2026-W06","2026-W07","2026-W08","2026-W09","2026-W10","2026-W11","2026-W12","2026-W13","2026-W14","2026-W15","2026-W16","2026-W17","2026-W18","2026-W19","2026-W20","2026-W21","2026-W22","2026-W23"];
+  const PREF   = [0,0,0,0,0,0,0,1,0,0,1,0,1,0,0,3,0,1,3,2,2,1,3,1,4,4,5,2,13,1,5,5,4,3,5,6,10,8,5,6,12,9,7,10,11,12,10,9,10,10,9,1,2,8,8,8,11,15,17,18,10,14,22,21,40,25,24,32,32,25,35,24,30,28,21];
+  const NOPREF = [1,10,8,0,6,9,3,7,2,21,7,11,11,9,6,7,7,10,9,9,13,9,12,3,8,16,10,8,16,1,2,6,1,4,2,8,5,5,4,5,7,6,4,12,14,4,10,2,2,1,2,0,2,2,1,7,2,4,5,12,6,9,13,17,22,19,25,21,32,15,17,10,21,20,20];
+  const TOTAL  = [55,137,173,151,175,140,148,166,182,154,167,159,175,140,212,155,162,133,171,175,224,151,212,174,239,210,242,216,207,183,159,263,189,236,255,279,251,180,187,201,247,196,226,243,275,250,208,231,211,204,173,58,100,198,202,170,190,209,176,198,202,173,238,247,317,286,302,407,363,254,348,323,371,341,329];
 
-  function isoWeekLabel(w) { return w.replace('-W','/W'); }
+  const C_PREF = '#2D1FE3', C_NOPREF = '#C3C7D6', C_LINE = '#E8743B', C_MA = 'rgba(232,116,48,0.35)';
+  const N = WEEKS.length;
+  const SUB  = WEEKS.map((_,i)=>PREF[i]+NOPREF[i]);
+  const PCT  = WEEKS.map((_,i)=>TOTAL[i]>0 ? SUB[i]/TOTAL[i]*100 : null);
+  function movingAvg(a,n){return a.map((_,i)=>{ if(i<n-1)return null; const s=a.slice(i-n+1,i+1); return s.every(v=>v!=null)? s.reduce((x,y)=>x+y,0)/n : null;});}
+  const MA = movingAvg(PCT,4);
 
-  function movingAvg(arr, n) {
-    return arr.map((_, i) => {
-      if (i < n - 1) return null;
-      const slice = arr.slice(i - n + 1, i + 1);
-      const valid = slice.filter(v => v !== null);
-      return valid.length === n ? valid.reduce((a,b) => a+b, 0) / n : null;
-    });
+  function lbl(w){return w.replace('-W','/W');}
+  const sumPref = PREF.reduce((a,b)=>a+b,0), sumNo = NOPREF.reduce((a,b)=>a+b,0), sumSub = sumPref+sumNo;
+  const L = N-1;                                   // latest complete week
+  const lastPct = PCT[L], prevPct = PCT[L-1];
+  const wow = (lastPct!=null && prevPct!=null) ? lastPct-prevPct : null;
+  const idx2025 = WEEKS.map((w,i)=>w.startsWith('2025')?i:-1).filter(i=>i>=0);
+  const idx2026 = WEEKS.map((w,i)=>w.startsWith('2026')?i:-1).filter(i=>i>=0);
+  const mean = (idxs)=>{const v=idxs.map(i=>PCT[i]).filter(x=>x!=null); return v.reduce((a,b)=>a+b,0)/v.length;};
+  const avg25 = mean(idx2025), avg26 = mean(idx2026);
+  const last4 = PCT.slice(-4).filter(x=>x!=null); const avgL4 = last4.reduce((a,b)=>a+b,0)/last4.length;
+  const prefShare = sumSub>0 ? sumPref/sumSub*100 : 0;
+  let peak=-1,peakI=0; PCT.forEach((v,i)=>{if(v!=null&&v>peak){peak=v;peakI=i;}});
+  const prefShareWk = SUB[L]>0 ? PREF[L]/SUB[L]*100 : 0;
+
+  function tile(label,val,sub,accent){
+    return '<div style="flex:1;min-width:118px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:11px 14px">'
+      +'<div style="font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">'+label+'</div>'
+      +'<div style="font-size:23px;font-weight:800;color:'+(accent||'var(--text)')+';line-height:1.25;margin-top:2px">'+val+'</div>'
+      +(sub?'<div style="font-size:11px;color:var(--muted);margin-top:1px">'+sub+'</div>':'')+'</div>';
+  }
+  let wowChip='';
+  if(wow!=null){
+    const up = wow>=0; const col = up?'var(--red-text)':'var(--green-text)'; const bg=up?'var(--red-bg)':'var(--green-bg)';
+    wowChip='<span style="font-size:11px;font-weight:700;color:'+col+';background:'+bg+';border-radius:6px;padding:1px 6px;margin-left:6px">'+(up?'▲':'▼')+' '+Math.abs(wow).toFixed(1)+' b.b.</span>';
   }
 
-  function initUntrustyStat() {
-    const el = document.getElementById('untrustyStat');
-    if (!el) return;
+  // Funnel strip for the latest complete week
+  function fblock(big,small,c1,c2,flexg){
+    return '<div style="flex:'+flexg+';min-width:120px;background:linear-gradient(135deg,'+c1+','+c2+');border-radius:12px;padding:12px 14px;color:#fff">'
+      +'<div style="font-size:24px;font-weight:800;line-height:1">'+big+'</div>'
+      +'<div style="font-size:11px;opacity:.92;margin-top:3px;font-weight:600">'+small+'</div></div>';
+  }
+  const arrow='<div style="align-self:center;color:var(--muted);font-size:18px;font-weight:700;padding:0 2px">›</div>';
+  const funnel =
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">'
+    + fblock(TOTAL[L], 'Všech 1st Call closed · '+lbl(WEEKS[L]), '#5b6275', '#3c4254', '1.3')
+    + arrow
+    + fblock(SUB[L]+' &middot; '+ (lastPct!=null?lastPct.toFixed(1)+'%':'—'), 'Untrusty / Cannot be contacted', '#E8743B', '#cf5d24', '1.3')
+    + arrow
+    + fblock(PREF[L]+' &middot; '+prefShareWk.toFixed(0)+'%', 'z toho Preferred', '#2D1FE3', '#1F14B8', '1.1')
+    + '</div>';
 
-    const subset = WEEKS.map((_, i) => PREF[i] + NOPREF[i]);
-    const pctRaw = WEEKS.map((_, i) => TOTAL[i] > 0 ? (subset[i] / TOTAL[i]) * 100 : null);
-    const ma4    = movingAvg(pctRaw, 4);
+  const el = document.getElementById('untrustyStat');
+  if(!el) return;
+  el.innerHTML =
+    '<div class="card-title">📞 1st Call Closed — Untrusty seller / Cannot be contacted'
+      +'<span style="font-size:11px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">&nbsp;týdně dle Closed date</span></div>'
+    +'<div style="font-size:11.5px;color:var(--muted);margin:-6px 0 14px">Z všech 1st Call closed kolik bylo zavřeno kvůli <b style="color:var(--text)">Cannot be contacted</b> nebo <b style="color:var(--text)">Untrustworthy dealer / practices</b> — a kolik z nich byly Preferred vozy.</div>'
+    + funnel
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'
+      + tile('Poslední týden', (lastPct!=null?lastPct.toFixed(1)+'%':'—')+wowChip, lbl(WEEKS[L])+' · '+SUB[L]+' z '+TOTAL[L], C_LINE)
+      + tile('Průměr 2026 YTD', avg26.toFixed(1)+'%', 'podíl ze všech closed', 'var(--text)')
+      + tile('Průměr 2025', avg25.toFixed(1)+'%', 'podíl ze všech closed', 'var(--muted)')
+      + tile('Preferred podíl', prefShare.toFixed(0)+'%', 'z untrusty/cannot-contacted', C_PREF)
+      + tile('Peak týden', peak.toFixed(1)+'%', lbl(WEEKS[peakI]), 'var(--text)')
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
+      +'<div style="font-size:11px;color:var(--muted)">'
+        +'<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+C_PREF+';margin-right:4px;vertical-align:middle"></span>Preferred'
+        +'&nbsp;&nbsp;<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+C_NOPREF+';margin-right:4px;vertical-align:middle"></span>Not preferred'
+        +'&nbsp;&nbsp;<span style="color:'+C_LINE+';font-weight:700">━</span> % ze všech 1st Call closed'
+        +'&nbsp;&nbsp;<span style="color:'+C_LINE+';opacity:.6;font-weight:700">┈</span> 4-týd. průměr'
+      +'</div>'
+      +'<div id="untrustyRange" style="display:flex;gap:4px"></div>'
+    +'</div>'
+    +'<div style="position:relative;height:320px"><canvas id="untrustyStat-canvas"></canvas></div>'
+    +'<div style="font-size:10.5px;color:var(--muted);margin-top:8px">Nejnovější týden vlevo. Sloupce = počet CA (levá osa), oranžová linka = % podíl ze všech 1st Call closed (pravá osa).</div>';
 
-    // Reverse all arrays so newest week is on the left
-    const labels  = [...WEEKS].reverse().map(isoWeekLabel);
-    const rPref   = [...PREF].reverse();
-    const rNopref = [...NOPREF].reverse();
-    const rPct    = [...pctRaw].reverse();
-    const rMa4    = [...ma4].reverse();
+  let chart=null, range = 52; // default 1y
+  const ranges = [[13,'13t'],[26,'26t'],[52,'52t'],[N,'Vše']];
+  const rcont = document.getElementById('untrustyRange');
+  rcont.innerHTML = ranges.map((r,i)=>'<button data-r="'+r[0]+'" style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:7px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted)">'+r[1]+'</button>').join('');
 
-    // KPI stats
-    const pct2025 = pctRaw.slice(0, 52).filter(v => v !== null);
-    const pct2026 = pctRaw.slice(52).filter(v => v !== null);
-    const avg2025 = pct2025.reduce((a,b)=>a+b,0)/pct2025.length;
-    const avg2026 = pct2026.reduce((a,b)=>a+b,0)/pct2026.length;
-    const last4   = pctRaw.slice(-4).filter(v=>v!==null);
-    const avgLast4= last4.reduce((a,b)=>a+b,0)/last4.length;
-    const peakPct = Math.max(...pctRaw.filter(v=>v!==null));
-    const peakWk  = WEEKS[pctRaw.indexOf(peakPct)];
-
-    el.innerHTML = `
-      <div class="card-title" style="margin-bottom:12px">📊 1st Call Closed — Untrusty seller / Cannot be contacted <span style="font-size:11px;font-weight:400;color:var(--muted)">(týdně od 2025)</span></div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px">
-        <div style="background:var(--bg);border-radius:8px;padding:10px 16px;min-width:120px">
-          <div style="font-size:11px;color:var(--muted)">Průměr 2025</div>
-          <div style="font-size:22px;font-weight:700;color:var(--text)">${avg2025.toFixed(1)}%</div>
-        </div>
-        <div style="background:var(--bg);border-radius:8px;padding:10px 16px;min-width:120px">
-          <div style="font-size:11px;color:var(--muted)">Průměr 2026 (YTD)</div>
-          <div style="font-size:22px;font-weight:700;color:#D85A30">${avg2026.toFixed(1)}%</div>
-        </div>
-        <div style="background:var(--bg);border-radius:8px;padding:10px 16px;min-width:120px">
-          <div style="font-size:11px;color:var(--muted)">Poslední 4 týdny</div>
-          <div style="font-size:22px;font-weight:700;color:var(--text)">${avgLast4.toFixed(1)}%</div>
-        </div>
-        <div style="background:var(--bg);border-radius:8px;padding:10px 16px;min-width:160px">
-          <div style="font-size:11px;color:var(--muted)">Peak týden</div>
-          <div style="font-size:22px;font-weight:700;color:var(--text)">${peakPct.toFixed(1)}%</div>
-          <div style="font-size:11px;color:var(--muted)">${isoWeekLabel(peakWk)}</div>
-        </div>
-      </div>
-      <div style="position:relative;height:300px">
-        <canvas id="untrustyStat-canvas"></canvas>
-      </div>
-      <div style="margin-top:8px;font-size:11px;color:var(--muted)">
-        🟣 Preferred &nbsp;⬜ Not preferred &nbsp;&nbsp;
-        <span style="color:#D85A30">─ % z 1stCall closed</span> &nbsp;
-        <span style="color:rgba(216,90,48,0.6)">– – 4-týd. klouzavý průměr %</span>
-      </div>
-    `;
-
+  function draw(){
+    const r = Math.min(range,N);
+    const sl = a => a.slice(N-r).slice().reverse();   // newest-left
+    const labels = sl(WEEKS).map(lbl);
     const ctx = document.getElementById('untrustyStat-canvas').getContext('2d');
-    new Chart(ctx, {
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            type: 'bar', label: 'Preferred', data: rPref,
-            backgroundColor: '#7F77DD', stack: 'subset', order: 2, yAxisID: 'y'
-          },
-          {
-            type: 'bar', label: 'Not preferred', data: rNopref,
-            backgroundColor: '#B4B2A9', stack: 'subset', order: 2, yAxisID: 'y'
-          },
-          {
-            type: 'line', label: '% z 1stCall closed', data: rPct,
-            borderColor: '#D85A30', backgroundColor: 'transparent',
-            borderWidth: 2, pointRadius: 2, pointHoverRadius: 4,
-            tension: 0.3, order: 1, yAxisID: 'yPct', spanGaps: true
-          },
-          {
-            type: 'line', label: '4-týd. MA %', data: rMa4,
-            borderColor: 'rgba(216,90,48,0.40)', backgroundColor: 'transparent',
-            borderWidth: 2, borderDash: [4,3], pointRadius: 0,
-            tension: 0.3, order: 1, yAxisID: 'yPct', spanGaps: false
-          }
-        ]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              title: function(items) { return items[0].label; },
-              label: function(item) {
-                const ds = item.dataset;
-                const v = item.raw;
-                if (v === null || v === undefined) return null;
-                if (ds.yAxisID === 'yPct') {
-                  // % lines — show clearly as percentage
-                  return ' ' + ds.label + ': ' + (v != null ? v.toFixed(2) + '%' : '—');
-                } else {
-                  // bar datasets — show as count
-                  return ' ' + ds.label + ': ' + v + ' CA';
-                }
-              },
-              afterBody: function(items) {
-                const idx = WEEKS.length - 1 - items[0].dataIndex;
-                const tot = TOTAL[idx] || 0;
-                const sub = (PREF[idx]||0) + (NOPREF[idx]||0);
-                return ['', '📋 Untrusty/Contacted: ' + sub + ' z ' + tot + ' celkem 1stCall closed'];
-              }
-            }
-          }
+    if(chart) chart.destroy();
+    chart = new Chart(ctx,{
+      data:{ labels:labels, datasets:[
+        {type:'bar',label:'Preferred',data:sl(PREF),backgroundColor:C_PREF,stack:'s',order:3,yAxisID:'y',borderRadius:3,maxBarThickness:26},
+        {type:'bar',label:'Not preferred',data:sl(NOPREF),backgroundColor:C_NOPREF,stack:'s',order:3,yAxisID:'y',borderRadius:3,maxBarThickness:26},
+        {type:'line',label:'% ze všech closed',data:sl(PCT),borderColor:C_LINE,backgroundColor:'transparent',borderWidth:2.5,pointRadius:r<=26?2.5:0,pointHoverRadius:4,tension:.35,order:1,yAxisID:'yPct',spanGaps:true},
+        {type:'line',label:'4-týd. průměr',data:sl(MA),borderColor:C_MA,backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:0,tension:.35,order:2,yAxisID:'yPct',spanGaps:false}
+      ]},
+      options:{ responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+        plugins:{ legend:{display:false},
+          tooltip:{ callbacks:{
+            title:it=>it[0].label,
+            label:function(item){const ds=item.dataset,v=item.raw; if(v==null)return null;
+              return ds.yAxisID==='yPct' ? ' '+ds.label+': '+v.toFixed(2)+'%' : ' '+ds.label+': '+v+' CA';},
+            afterBody:function(it){const i=N-1-it[0].dataIndex; const tot=TOTAL[i]||0,sub=SUB[i]||0;
+              return ['','📋 '+sub+' z '+tot+' (pref '+PREF[i]+' / no-pref '+NOPREF[i]+')'];}
+          }}
         },
-        scales: {
-          x: {
-            stacked: true,
-            ticks: { maxRotation: 45, font: { size: 10 }, maxTicksLimit: 24 },
-            grid: { display: false }
-          },
-          y: {
-            stacked: true, position: 'left',
-            title: { display: true, text: 'Počet CA', font: { size: 11 } },
-            ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.06)' }
-          },
-          yPct: {
-            position: 'right',
-            title: { display: true, text: '% z 1stCall closed', font: { size: 11 } },
-            ticks: { callback: v => v.toFixed(1) + '%', font: { size: 10 } },
-            grid: { display: false },
-            min: 0
-          }
+        scales:{
+          x:{stacked:true,grid:{display:false},ticks:{maxRotation:45,font:{size:10},maxTicksLimit:r>40?26:r}},
+          y:{stacked:true,position:'left',beginAtZero:true,title:{display:true,text:'Počet CA',font:{size:11}},grid:{color:'rgba(27,33,48,0.06)'},ticks:{precision:0}},
+          yPct:{position:'right',beginAtZero:true,title:{display:true,text:'% ze všech closed',font:{size:11}},grid:{display:false},ticks:{callback:v=>v.toFixed(0)+'%',font:{size:10}}}
         }
       }
     });
+    rcont.querySelectorAll('button').forEach(b=>{
+      const on = (+b.dataset.r)===range;
+      b.style.background = on?C_PREF:'var(--card)';
+      b.style.color = on?'#fff':'var(--muted)';
+      b.style.borderColor = on?C_PREF:'var(--border)';
+    });
   }
+  rcont.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{range=+b.dataset.r;draw();}));
 
-  // Run after DOM is ready; loadData may not have finished, but this chart is static
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initUntrustyStat);
-  } else {
-    initUntrustyStat();
-  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',draw); else draw();
 })();
 
 loadData();
