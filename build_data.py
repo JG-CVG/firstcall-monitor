@@ -369,6 +369,13 @@ def main():
             },
         }
 
+        # --- STALE-GUARD: po 12:00 nesmi byt 0 prichodu od 9:00 (skoro jiste nenactene Q9) ---
+        _post9_in = sum(in_h.get(h, 0) for h in range(9, cur_hr + 1))
+        if cur_hr >= 12 and _post9_in == 0:
+            print("WARN: buffer_hourly vypada STALE (0 prichodu CA od 9:00 pres cely den) "
+                  "-> Q9/Q10/Q11 zrejme nebezely cerstve. Vynechavam buffer_hourly.")
+            buffer_hourly = None
+
     # ---- AwS customer split (Q12) ----
     def _load_aws():
         try:
