@@ -430,6 +430,88 @@ def main():
         cases.sort(key=lambda x: -x["wd"])
         aws_age = {"buckets": buckets, "total": sum(buckets), "cases": cases}
 
+    # ---- AwS detailed breakdown a-f (Q17 enriched + Q18 other-cases) -> #awsDetail ----
+    # Reuses Q17 records (must include Order__r.Status, CarAudit_Status__c, AccountId).
+    # (f) reads sf_aws_other.json (Q18). Degrades gracefully if inputs missing.
+    aws_detail = None
+    if aws_age_recs is not None:
+        EXC_AWS = {"APPROVED Awaiting Selection", "REJECT Awaiting Selection"}
+        DONE_S, CLOSED_S = "CarAudit Done", "CarAudit Closed"
+        ORDER_TERM = {"ord-lost", "ord-completed"}
+        ORDER_ACCEPTED = {"ord-caraudit-accepted", "ord-contract-data-collected",
+                          "ord-contract-uploaded", "ord-contract-accepted", "ord-contract-paid",
+                          "ord-import", "ord-service", "ord-delivery", "ord-completed"}
+        def _ostat(r):
+            o = r.get("Order__r"); return (o or {}).get("Status") if o else None
+        base = [r for r in aws_age_recs if r.get("CarAudit_Status__c") not in EXC_AWS]
+        have_order = any(_ostat(r) for r in base)
+        BL = ["le2", "b25", "b510", "gt10"]
+        bk = {k: {"active": [], "inactive": []} for k in BL}
+        a_ids = set(r["Id"] for r in base)
+        for r in base:
+            dt = parse_dt(r.get("CA_Awaiting_Selection_Date__c"))
+            if dt is None:
+                continue
+            wd = round(working_hours_between(dt, now_utc) / 8.0, 1)
+            bi = BL[0] if wd < 2 else (BL[1] if wd < 5 else (BL[2] if wd < 10 else BL[3]))
+            ost = _ostat(r)
+            ca = r.get("CarAudit__r") or {}
+            item = {"id": r["Id"], "cn": r.get("CaseNumber"),
+                    "country": ca.get("Vendor_Country__c") or "N/A",
+                    "pref": bool((r.get("Order__r") or {}).get("Preferred__c")),
+                    "wd": wd, "order": ost}
+            active = ost not in ORDER_TERM
+            bk[bi]["active" if active else "inactive"].append(item)
+        total = len(base)
+        active_n = sum(len(bk[k]["active"]) for k in BL)
+        def _load_other():
+            try:
+                with open(os.path.join(TMP, "sf_aws_other.json"), "r", encoding="utf-8") as fh:
+                    return json.load(fh).get("records", [])
+            except FileNotFoundError:
+                return None
+        other_recs = _load_other()
+        f_available = other_recs is not None
+        f_inprog, f_wait = [], []
+        if f_available:
+            from collections import defaultdict as _dd2
+            byacc = _dd2(list)
+            for r in other_recs:
+                byacc[r.get("AccountId")].append(r)
+            aws_by_acct = _dd2(list)
+            for r in base:
+                aws_by_acct[r.get("AccountId")].append(r)
+            for acc in set(r.get("AccountId") for r in base if r.get("AccountId")):
+                q = []
+                for r in byacc.get(acc, []):
+                    if r["Id"] in a_ids:
+                        continue
+                    s = r.get("Status"); o = _ostat(r)
+                    if s == CLOSED_S:
+                        continue
+                    if s == DONE_S:
+                        if o in ORDER_ACCEPTED or o == "ord-lost":
+                            continue
+                        kind = "wait"
+                    else:
+                        kind = "inprog"
+                    q.append({"cn": r.get("CaseNumber"), "id": r["Id"], "status": s, "order": o, "kind": kind})
+                if q:
+                    awscases = []
+                    for x in aws_by_acct.get(acc, []):
+                        dtx = parse_dt(x.get("CA_Awaiting_Selection_Date__c"))
+                        awscases.append({"cn": x.get("CaseNumber"), "id": x["Id"],
+                                         "wd": round(working_hours_between(dtx, now_utc) / 8.0, 1) if dtx else None})
+                    entry = {"aws": awscases, "others": q}
+                    (f_inprog if any(o["kind"] == "inprog" for o in q) else f_wait).append(entry)
+        aws_detail = {
+            "total": total, "active": active_n, "inactive": total - active_n,
+            "have_order": have_order, "f_available": f_available,
+            "f_customers_total": len(set(r.get("AccountId") for r in base if r.get("AccountId"))),
+            "buckets": {k: {"active": bk[k]["active"], "inactive": bk[k]["inactive"]} for k in BL},
+            "f_inprog": f_inprog, "f_wait": f_wait,
+        }
+
     # ---- Phase 2 tables (Q13) ----
     def _load_phase2():
         try:
@@ -697,6 +779,8 @@ def main():
         output["aws_split"] = aws_split
     if aws_age is not None:
         output["aws_age"] = aws_age
+    if aws_detail is not None:
+        output["aws_detail"] = aws_detail
     if phase2_tables is not None:
         output["phase2_tables"] = phase2_tables
     if audit_order_expected is not None:

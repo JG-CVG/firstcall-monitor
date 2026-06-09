@@ -296,7 +296,7 @@ tr:hover td { background:#f9fafb; }
   <div id="errorBanner" class="error-banner"></div>
   <div id="tier1"></div>
   <div id="tier2"></div>
-  <div id="tier3"></div><div id="awsSplit"></div><div id="awsAge"></div>
+  <div id="tier3"></div><div id="awsSplit"></div><div id="awsAge"></div><div id="awsDetail"></div>
 
   <div class="card"><div class="card-title">&#128100; Call Center &mdash; Car Check per Agent</div><div id="tblAgent"></div></div>
 
@@ -356,6 +356,7 @@ function render() {
   renderTier3(d.status_breakdown, d.nedov_count);
   renderAwsSplit(d.aws_split);
   renderAwsAge(d.aws_age);
+  renderAwsDetail(d.aws_detail);
   renderAgentTable(d.agent_breakdown);
   renderUrgentCount(d.nedovolano);
   renderUrgentNoCallCount(d.nedovolano);
@@ -809,6 +810,123 @@ function renderAwsAge(a) {
       chips +
       '<div style="flex-shrink:0;color:var(--muted)">prac. dny od vstupu do AwS</div>' +
     '</div>';
+}
+
+/* ===== Awaiting Selection — detailni rozbor (a-f), klikatelne -> SF ===== */
+function _awsEsc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function _awsEnsureChrome(){
+  if(document.getElementById('awsStyle')===null){
+    var st=document.createElement('style'); st.id='awsStyle';
+    st.textContent=
+      '.awsd-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin:0 0 14px;box-shadow:var(--shadow-md)}'+
+      '.awsd-h{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}'+
+      '.awsd-h>span:first-child{font-size:15px;font-weight:700;color:var(--navy)}'+
+      '.awsd-hint{font-size:11px;color:var(--muted)}'+
+      '.awsd-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}'+
+      '.awsd-kpi{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px}'+
+      '.awsd-kpi .n{font-size:30px;font-weight:800;line-height:1;color:var(--navy)}'+
+      '.awsd-kpi .l{font-size:11.5px;color:var(--muted);margin-top:5px}'+
+      '.awsd-sub{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:16px 0 8px}'+
+      '.awsd-row{display:flex;align-items:center;gap:12px;padding:9px 8px;border-radius:8px;cursor:pointer}'+
+      '.awsd-row:hover{background:var(--carvago-50)}'+
+      '.awsd-lbl{width:130px;flex:none;font-size:13px;font-weight:600;color:var(--text)}'+
+      '.awsd-barwrap{flex:none;height:24px;min-width:30px;background:#F3F4F6;border-radius:6px;overflow:hidden;display:flex}'+
+      '.awsd-seg{height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}'+
+      '.awsd-seg.act{background:var(--carvago)} .awsd-seg.ina{background:#B6BCC6}'+
+      '.awsd-tot{margin-left:auto;font-weight:800;font-size:14px;color:var(--navy)}'+
+      '.awsd-chev{color:var(--muted);font-size:17px;flex:none}'+
+      '.awsd-flag .awsd-lbl{color:var(--amber-text)}'+
+      '.awsd-legend{display:flex;gap:16px;font-size:11.5px;color:var(--muted);margin-top:10px;align-items:center}'+
+      '.awsd-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}'+
+      '.awsd-dot.act{background:var(--carvago)} .awsd-dot.ina{background:#B6BCC6}'+
+      '.awsd-note{font-size:11.5px;color:var(--amber-text);margin-top:10px}'+
+      '.awsd-fgrid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:10px}'+
+      '.awsd-fcard{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer}'+
+      '.awsd-fcard:hover{border-color:var(--carvago);box-shadow:0 4px 14px rgba(45,31,227,.10)}'+
+      '.awsd-fcard .n{font-size:28px;font-weight:800} .awsd-fcard .l{font-size:12.5px;font-weight:600;margin-top:3px;color:var(--text)}'+
+      '.awsd-fcard .d{font-size:11px;color:var(--muted);margin-top:7px} .awsd-fcard .o{font-size:11px;color:var(--carvago);font-weight:700;margin-top:10px}'+
+      '#awsScrim{position:fixed;inset:0;background:rgba(20,22,32,.45);opacity:0;pointer-events:none;transition:.2s;z-index:120}'+
+      '#awsScrim.on{opacity:1;pointer-events:auto}'+
+      '#awsDrawer{position:fixed;top:0;right:0;height:100%;width:min(560px,94vw);background:#fff;z-index:130;transform:translateX(100%);transition:.25s;box-shadow:-8px 0 30px rgba(0,0,0,.18);display:flex;flex-direction:column}'+
+      '#awsDrawer.on{transform:translateX(0)}'+
+      '.awsdh{padding:16px 20px;border-bottom:1px solid var(--border)} .awsdh h3{margin:0;font-size:16px;color:var(--navy)} .awsdh p{margin:4px 0 0;color:var(--muted);font-size:12px}'+
+      '.awsdx{position:absolute;right:14px;top:14px;border:0;background:var(--bg);width:30px;height:30px;border-radius:8px;font-size:15px;cursor:pointer;color:#444}'+
+      '.awsdb{overflow:auto;padding:14px 16px 30px}'+
+      '.awsci{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;text-decoration:none;color:inherit}'+
+      '.awsci:hover{background:var(--carvago-50)} .awsci .cn{font-weight:700;font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--carvago)}'+
+      '.awsci .m{font-size:11.5px;color:var(--muted);margin-top:2px} .awsci .bg{margin-left:auto;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap}'+
+      '.bg-act{background:var(--green-bg);color:var(--green-text)} .bg-ina{background:#EFF1F4;color:#6B7280}'+
+      '.bg-run{background:var(--carvago-50);color:var(--carvago)} .bg-wait{background:var(--amber-bg);color:var(--amber-text)}'+
+      '.awscb{border:1px solid var(--border);border-radius:11px;padding:11px 12px;margin-bottom:11px;background:#FCFCFE}'+
+      '.awscb .t{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}'+
+      '.awsmini{display:flex;align-items:center;gap:9px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;text-decoration:none;color:inherit;background:#fff}'+
+      '.awsmini:hover{background:var(--carvago-50)} .awsmini .cn{font-weight:700;font-family:ui-monospace,monospace;font-size:12.5px;color:var(--carvago)} .awsmini .m{font-size:11px;color:var(--muted)}'+
+      '.awsarr{color:var(--muted);font-size:11.5px;font-weight:600;padding:3px 0 7px}';
+    document.head.appendChild(st);
+  }
+  if(document.getElementById('awsDrawer')===null){
+    var sc=document.createElement('div'); sc.id='awsScrim'; sc.onclick=awsCloseDrawer; document.body.appendChild(sc);
+    var dr=document.createElement('aside'); dr.id='awsDrawer';
+    dr.innerHTML='<div class="awsdh"><button class="awsdx" onclick="awsCloseDrawer()">&#10005;</button><h3 id="awsDT"></h3><p id="awsDS"></p></div><div class="awsdb" id="awsDB"></div>';
+    document.body.appendChild(dr);
+  }
+}
+function awsCloseDrawer(){document.getElementById('awsScrim').classList.remove('on');document.getElementById('awsDrawer').classList.remove('on');}
+function awsOpenDrawer(title,sub,html){_awsEnsureChrome();document.getElementById('awsDT').textContent=title;document.getElementById('awsDS').textContent=sub;document.getElementById('awsDB').innerHTML=html;document.getElementById('awsScrim').classList.add('on');document.getElementById('awsDrawer').classList.add('on');document.getElementById('awsDB').scrollTop=0;}
+function _awsCaseLink(id){return window.__awsSf+'/lightning/r/Case/'+id+'/view';}
+function awsOpenAge(k){
+  var ad=window.__awsData; var LAB={le2:'≤ 2 prac. dny',b25:'2–5 prac. dnů',b510:'5–10 prac. dnů',gt10:'10+ prac. dnů'};
+  var arr=ad.buckets[k].active.map(function(c){c.act=true;return c;}).concat(ad.buckets[k].inactive.map(function(c){c.act=false;return c;}));
+  arr.sort(function(a,b){return (b.wd||0)-(a.wd||0);});
+  var h=arr.map(function(c){
+    return '<a class="awsci" href="'+_awsCaseLink(c.id)+'" target="_blank" rel="noopener">'+
+      '<div><div class="cn">#'+_awsEsc(c.cn)+(c.pref?' ★':'')+'</div>'+
+      '<div class="m">'+(c.wd!=null?c.wd+' prac. dnů':'')+' · '+_awsEsc(c.country)+' · objednavka: '+_awsEsc(c.order||'?')+'</div></div>'+
+      '<span class="bg '+(c.act?'bg-act':'bg-ina')+'">'+(c.act?'živá':'mrtvá')+'</span></a>';
+  }).join('');
+  awsOpenDrawer('Awaiting Selection · '+LAB[k], arr.length+' casů · klikni na case = otevře v Salesforce', h);
+}
+function _awsCust(x){
+  var h='<div class="awscb"><div class="t">Zákazník — čeká na výběr auditora:</div>';
+  x.aws.forEach(function(c){h+='<a class="awsmini" href="'+_awsCaseLink(c.id)+'" target="_blank" rel="noopener"><div><div class="cn">#'+_awsEsc(c.cn)+' ↗</div><div class="m">Awaiting Selection · '+(c.wd!=null?c.wd+' prac. dnů':'')+'</div></div></a>';});
+  h+='<div class="awsarr">a zároveň řeší další auto ↓</div>';
+  var SC={'Data validation and completion':'Data validation','Car check':'Car check','VIN Check':'VIN Check','Awaiting Selection':'Awaiting Selection','Auditor selection':'Auditor selection','Audit order':'Audit order','Audit result':'Audit result','CarAudit preparation':'CarAudit preparation','New CA':'New CarAudit'};
+  x.others.forEach(function(o){var run=o.kind==='inprog';var lab=run?(SC[o.status]||o.status):'hotový audit – čeká na akceptaci';
+    h+='<a class="awsmini" href="'+_awsCaseLink(o.id)+'" target="_blank" rel="noopener" style="border-left:3px solid '+(run?'var(--carvago)':'var(--amber)')+'"><div><div class="cn">#'+_awsEsc(o.cn)+' ↗</div><div class="m">'+_awsEsc(lab)+' · objednavka: '+_awsEsc(o.order||'?')+'</div></div><span class="bg '+(run?'bg-run':'bg-wait')+'">'+(run?'audit běží':'čeká na akceptaci')+'</span></a>';});
+  h+='</div>'; return h;
+}
+function awsOpenF(which){
+  var ad=window.__awsData; var list,title;
+  if(which==='inprog'){list=ad.f_inprog;title='Další auto: audit právě běží';}
+  else if(which==='wait'){list=ad.f_wait;title='Další auto: hotový audit čeká na akceptaci';}
+  else{list=ad.f_inprog.concat(ad.f_wait);title='Zákazníci čekající i na jiné auto';}
+  awsOpenDrawer(title, list.length+' zákazníků · každý case je odkaz do Salesforce', list.map(_awsCust).join(''));
+}
+function _awsFcard(which,n,l,d,col){return '<div class="awsd-fcard" onclick="awsOpenF(\''+which+'\')"><div class="n" style="color:'+col+'">'+n+'</div><div class="l">'+l+'</div><div class="d">'+d+'</div><div class="o">Zobrazit seznam ›</div></div>';}
+function renderAwsDetail(ad){
+  var el=document.getElementById('awsDetail'); if(!el) return;
+  if(!ad||!ad.total){ el.innerHTML=''; return; }
+  _awsEnsureChrome();
+  window.__awsData=ad; window.__awsSf=(DATA&&DATA.sf_base_url)||'https://carvago.lightning.force.com';
+  var BL=['le2','b25','b510','gt10'];
+  var LAB={le2:'≤ 2 prac. dny',b25:'2–5 prac. dnů',b510:'5–10 prac. dnů',gt10:'10+ prac. dnů'};
+  var maxT=1; BL.forEach(function(k){var t=ad.buckets[k].active.length+ad.buckets[k].inactive.length; if(t>maxT)maxT=t;});
+  var rows='';
+  BL.forEach(function(k){var a=ad.buckets[k].active.length,i=ad.buckets[k].inactive.length,t=a+i;var w=Math.max(t/maxT*100,t?6:0);
+    rows+='<div class="awsd-row'+(k==='gt10'?' awsd-flag':'')+'" onclick="awsOpenAge(\''+k+'\')"><div class="awsd-lbl">'+LAB[k]+'</div><div class="awsd-barwrap" style="width:'+w+'%">'+(a?'<div class="awsd-seg act" style="flex:'+a+'">'+a+'</div>':'')+(i?'<div class="awsd-seg ina" style="flex:'+i+'">'+i+'</div>':'')+'</div><div class="awsd-tot">'+t+'</div><div class="awsd-chev">›</div></div>';});
+  var fhtml='';
+  if(ad.f_available){fhtml='<div class="awsd-sub">Zákazníci čekající i na jiné auto</div><div class="awsd-fgrid">'+
+    _awsFcard('all',ad.f_inprog.length+ad.f_wait.length,'zákazníků čeká i na jiné auto','z '+ad.f_customers_total+' zákazníků s autem v AwS','var(--carvago)')+
+    _awsFcard('inprog',ad.f_inprog.length,'další auto: audit právě běží','Car check / VIN / Auditor sel. / Audit order…','var(--carvago)')+
+    _awsFcard('wait',ad.f_wait.length,'další auto: hotový audit čeká na akceptaci','CarAudit hotový, zákazník zatím neakceptoval','var(--amber-text)')+'</div>';}
+  var note=ad.have_order?'':'<div class="awsd-note">Pozn.: rozdělení živá/mrtvá objednávka se doplní po refreshi s rozšířeným dotazem.</div>';
+  el.innerHTML='<div class="awsd-card"><div class="awsd-h"><span>&#9203; Awaiting Selection — detail (rozbor)</span><span class="awsd-hint">klikni na řádek → seznam casů s odkazem do Salesforce</span></div>'+
+    '<div class="awsd-kpis"><div class="awsd-kpi"><div class="n">'+ad.total+'</div><div class="l">aut čeká na výběr auditora</div></div>'+
+    '<div class="awsd-kpi"><div class="n" style="color:var(--carvago)">'+ad.active+'</div><div class="l">živá objednávka (řešit)</div></div>'+
+    '<div class="awsd-kpi"><div class="n" style="color:var(--muted)">'+ad.inactive+'</div><div class="l">mrtvá objednávka (pročistit)</div></div></div>'+
+    '<div class="awsd-sub">Jak dlouho už čekají (pracovní dny)</div>'+rows+
+    '<div class="awsd-legend"><span><i class="awsd-dot act"></i>živá objednávka</span><span><i class="awsd-dot ina"></i>mrtvá (ztracená)</span><span style="margin-left:auto;color:var(--amber-text)">⚠ 10+ dnů = po termínu</span></div>'+
+    note+fhtml+'</div>';
 }
 
 function renderAgentTable(agents) {
