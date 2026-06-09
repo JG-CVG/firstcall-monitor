@@ -826,6 +826,7 @@ function _awsEnsureChrome(){
       '.awsd-kpi{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px}'+
       '.awsd-kpi .n{font-size:30px;font-weight:800;line-height:1;color:var(--navy)}'+
       '.awsd-kpi .l{font-size:11.5px;color:var(--muted);margin-top:5px}'+
+      '.awsd-explain{background:var(--carvago-50);border:1px solid var(--carvago-100);border-radius:10px;padding:11px 14px;margin:2px 0 14px;font-size:12.5px;color:var(--navy);line-height:1.55}'+'.awsd-explain b{color:var(--carvago)}'+
       '.awsd-sub{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:16px 0 8px}'+
       '.awsd-row{display:flex;align-items:center;gap:12px;padding:9px 8px;border-radius:8px;cursor:pointer}'+
       '.awsd-row:hover{background:var(--carvago-50)}'+
@@ -908,6 +909,9 @@ function renderAwsDetail(ad){
   if(!ad||!ad.total){ el.innerHTML=''; return; }
   _awsEnsureChrome();
   window.__awsData=ad; window.__awsSf=(DATA&&DATA.sf_base_url)||'https://carvago.lightning.force.com';
+  var _ftot=ad.f_inprog.length+ad.f_wait.length;
+  var _expl='&#128161; <b>'+ad.total+'</b> CarAuditů čeká na výběr auditora a patří <b>'+(ad.f_customers_total||'?')+'</b> zákazníkům (jeden zákazník může mít víc aut ve frontě najednou).';
+  if(ad.f_available){ _expl+=' Z nich <b>'+_ftot+'</b> současně řeší ještě další CarAudit — ten buď právě probíhá, nebo je už odevzdaný, ale zákazník ho zatím neakceptoval.'; }
   var BL=['le2','b25','b510','gt10'];
   var LAB={le2:'≤ 2 prac. dny',b25:'2–5 prac. dnů',b510:'5–10 prac. dnů',gt10:'10+ prac. dnů'};
   var maxT=1; BL.forEach(function(k){var t=ad.buckets[k].active.length+ad.buckets[k].inactive.length; if(t>maxT)maxT=t;});
@@ -921,6 +925,7 @@ function renderAwsDetail(ad){
     _awsFcard('wait',ad.f_wait.length,'další auto: hotový audit čeká na akceptaci','CarAudit hotový, zákazník zatím neakceptoval','var(--amber-text)')+'</div>';}
   var note=ad.have_order?'':'<div class="awsd-note">Pozn.: rozdělení živá/mrtvá objednávka se doplní po refreshi s rozšířeným dotazem.</div>';
   el.innerHTML='<div class="awsd-card"><div class="awsd-h"><span>&#9203; Awaiting Selection — detail (rozbor)</span><span class="awsd-hint">klikni na řádek → seznam casů s odkazem do Salesforce</span></div>'+
+    '<div class="awsd-explain">'+_expl+'</div>'+
     '<div class="awsd-kpis"><div class="awsd-kpi"><div class="n">'+ad.total+'</div><div class="l">aut čeká na výběr auditora</div></div>'+
     '<div class="awsd-kpi"><div class="n" style="color:var(--carvago)">'+ad.active+'</div><div class="l">živá objednávka (řešit)</div></div>'+
     '<div class="awsd-kpi"><div class="n" style="color:var(--muted)">'+ad.inactive+'</div><div class="l">mrtvá objednávka (pročistit)</div></div></div>'+
