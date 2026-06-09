@@ -789,6 +789,26 @@ def main():
         output["cebia_audit_order_expected"] = cebia_audit_order_expected
     if prep_to_done_daily is not None:
         output["prep_to_done_daily"] = prep_to_done_daily
+    # ---- REGRESSION GUARD: nedovol, aby z data.json tiše zmizela sekce, kterou jsme uz meli ----
+    # Porovna novy output s naposledy commitnutym ./data.json. Pokud kriticka sekce
+    # (vcetne aws_detail) byla driv pritomna a ted chybi -> FAIL, nezapisuj a nepushuj.
+    CRITICAL_KEYS = ["tier1", "status_breakdown", "aws_age", "aws_detail",
+                     "country_breakdown", "agent_breakdown",
+                     "cebia_audit_order_expected", "prep_to_done_daily"]
+    try:
+        _prev_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.json")
+        with open(_prev_path, "r", encoding="utf-8") as _pf:
+            _prev = json.load(_pf)
+    except Exception:
+        _prev = {}
+    _lost = [k for k in CRITICAL_KEYS
+             if _prev.get(k) is not None and output.get(k) is None]
+    if _lost:
+        raise SystemExit(
+            "REGRESSION GUARD: tyto sekce existovaly v predchozim data.json, ale "
+            "v novem chybi: " + ", ".join(_lost) + ". Nezapisuji /tmp/data.json. "
+            "Dobehni chybejici SOQL (napr. Q17 sf_aws_age + Q18 sf_aws_other pro aws_detail) a spust build znovu."
+        )
     with open("/tmp/data.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2, default=str)
     print(
