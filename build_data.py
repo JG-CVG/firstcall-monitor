@@ -200,6 +200,29 @@ def main():
         return None
 
     now_utc = datetime.now(timezone.utc)
+    # ---- STALE INPUT GUARD: zadny sf_*.json vstup nesmi byt starsi nez 30 min ----
+    # Chrani pred situaci, kdy refresh bumpne generated_at, ale build bezi na STARYCH
+    # sf_*.json (reuse misto cerstveho pullu) -> tise stale buffer / nedovolano / status.
+    import time as _time
+    _STALE_MAX = 30 * 60
+    _stale = []
+    try:
+        for _fn in os.listdir(TMP):
+            if _fn.startswith("sf_") and _fn.endswith(".json"):
+                try:
+                    _age = _time.time() - os.path.getmtime(os.path.join(TMP, _fn))
+                except OSError:
+                    continue
+                if _age > _STALE_MAX:
+                    _stale.append((_fn, int(_age / 60)))
+    except FileNotFoundError:
+        pass
+    if _stale:
+        raise SystemExit(
+            "STALE INPUT GUARD: tyto SF vstupy jsou starsi nez 30 min (reuse starych dat "
+            "misto cerstveho pullu): " + ", ".join(f"{n}({m}min)" for n, m in _stale) +
+            ". Refresh MUSI znovu spustit prislusne SOQL. Nezapisuji /tmp/data.json."
+        )
     nedov_data = []
     nedov_count = 0
     cc_recs = [r for r in ip_recs if r["Status"] == "Car check"]
