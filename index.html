@@ -830,10 +830,10 @@ function _awsEnsureChrome(){
       '.awsd-row{display:flex;align-items:center;gap:12px;padding:9px 8px;border-radius:8px;cursor:pointer}'+
       '.awsd-row:hover{background:var(--carvago-50)}'+
       '.awsd-lbl{width:130px;flex:none;font-size:13px;font-weight:600;color:var(--text)}'+
-      '.awsd-barwrap{flex:none;height:24px;min-width:30px;background:#F3F4F6;border-radius:6px;overflow:hidden;display:flex}'+
+      '.awsd-track{flex:1;min-width:0;height:24px;background:#F3F4F6;border-radius:6px;overflow:hidden;display:flex}'+'.awsd-fill{height:100%;display:flex;border-radius:6px;overflow:hidden;min-width:18px}'+
       '.awsd-seg{height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}'+
       '.awsd-seg.act{background:var(--carvago)} .awsd-seg.ina{background:#B6BCC6}'+
-      '.awsd-tot{margin-left:auto;font-weight:800;font-size:14px;color:var(--navy)}'+
+      '.awsd-tot{flex:none;width:42px;text-align:right;font-weight:800;font-size:14px;color:var(--navy)}'+
       '.awsd-chev{color:var(--muted);font-size:17px;flex:none}'+
       '.awsd-flag .awsd-lbl{color:var(--amber-text)}'+
       '.awsd-legend{display:flex;gap:16px;font-size:11.5px;color:var(--muted);margin-top:10px;align-items:center}'+
@@ -913,7 +913,7 @@ function renderAwsDetail(ad){
   var maxT=1; BL.forEach(function(k){var t=ad.buckets[k].active.length+ad.buckets[k].inactive.length; if(t>maxT)maxT=t;});
   var rows='';
   BL.forEach(function(k){var a=ad.buckets[k].active.length,i=ad.buckets[k].inactive.length,t=a+i;var w=Math.max(t/maxT*100,t?6:0);
-    rows+='<div class="awsd-row'+(k==='gt10'?' awsd-flag':'')+'" onclick="awsOpenAge(\''+k+'\')"><div class="awsd-lbl">'+LAB[k]+'</div><div class="awsd-barwrap" style="width:'+w+'%">'+(a?'<div class="awsd-seg act" style="flex:'+a+'">'+a+'</div>':'')+(i?'<div class="awsd-seg ina" style="flex:'+i+'">'+i+'</div>':'')+'</div><div class="awsd-tot">'+t+'</div><div class="awsd-chev">›</div></div>';});
+    rows+='<div class="awsd-row'+(k==='gt10'?' awsd-flag':'')+'" onclick="awsOpenAge(\''+k+'\')"><div class="awsd-lbl">'+LAB[k]+'</div><div class="awsd-track"><div class="awsd-fill" style="width:'+w+'%">'+(a?'<div class="awsd-seg act" style="flex:'+a+'">'+a+'</div>':'')+(i?'<div class="awsd-seg ina" style="flex:'+i+'">'+i+'</div>':'')+'</div></div><div class="awsd-tot">'+t+'</div><div class="awsd-chev">›</div></div>';});
   var fhtml='';
   if(ad.f_available){fhtml='<div class="awsd-sub">Zákazníci čekající i na jiné auto</div><div class="awsd-fgrid">'+
     _awsFcard('all',ad.f_inprog.length+ad.f_wait.length,'zákazníků čeká i na jiné auto','z '+ad.f_customers_total+' zákazníků s autem v AwS','var(--carvago)')+
