@@ -205,18 +205,25 @@ def main():
     # sf_*.json (reuse misto cerstveho pullu) -> tise stale buffer / nedovolano / status.
     import time as _time
     _STALE_MAX = 30 * 60
+    # POZOR: kontroluj jen soubory, ktere build SKUTECNE cte (ne vsechny sf_*.json v /tmp —
+    # tam muzou byt leftover soubory od jinych behu, ktere by zpusobily false-positive).
+    _CHECK_FILES = [
+        "sf_status.json", "sf_status_all.json", "sf_ip.json", "sf_closed_status.json",
+        "sf_feeds.json", "sf_incidents.json", "sf_heatmap.json", "sf_agents.json",
+        "sf_agents_per_case.json", "sf_hourly_added.json", "sf_hourly_vin.json",
+        "sf_hourly_rej.json", "sf_aws_open.json", "sf_aws_age.json", "sf_aws_other.json",
+        "sf_phase2.json", "sf_audit_order_expected.json",
+        "sf_cebia_audit_order_expected.json", "sf_prep_to_done.json",
+    ]
     _stale = []
-    try:
-        for _fn in os.listdir(TMP):
-            if _fn.startswith("sf_") and _fn.endswith(".json"):
-                try:
-                    _age = _time.time() - os.path.getmtime(os.path.join(TMP, _fn))
-                except OSError:
-                    continue
-                if _age > _STALE_MAX:
-                    _stale.append((_fn, int(_age / 60)))
-    except FileNotFoundError:
-        pass
+    for _fn in _CHECK_FILES:
+        _fp = os.path.join(TMP, _fn)
+        try:
+            _age = _time.time() - os.path.getmtime(_fp)
+        except OSError:
+            continue  # chybi -> resi degrade/regression guard, ne tady
+        if _age > _STALE_MAX:
+            _stale.append((_fn, int(_age / 60)))
     if _stale:
         raise SystemExit(
             "STALE INPUT GUARD: tyto SF vstupy jsou starsi nez 30 min (reuse starych dat "
