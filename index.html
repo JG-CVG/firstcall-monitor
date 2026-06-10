@@ -295,7 +295,6 @@ tr:hover td { background:#f9fafb; }
   <div id="tier1"></div>
   <div id="tier2"></div>
   <div id="tier3"></div><div id="awsDetail"></div>
-  <div id="backlogEstimate"></div>
 
   <div class="card"><div class="card-title">&#128100; Call Center &mdash; Car Check per Agent</div><div id="tblAgent"></div></div>
 
@@ -316,6 +315,7 @@ tr:hover td { background:#f9fafb; }
   <div id="auditOrderTimeline"></div>
   <div id="cebiaAuditOrderTimeline"></div>
   <div id="prepToDoneHeatmap"></div>
+  <div id="backlogEstimate"></div>
   <div id="untrustyStat" class="card" style="margin-bottom:14px;padding:16px 20px;"></div>
 </div>
 
@@ -334,18 +334,35 @@ function renderBacklogEstimate(be){
   if(!be||!be.carvago){ el.innerHTML=''; return; }
   const tgt=be.target||5;
   const kpi=(lbl,val,col)=>`<div style="flex:1;min-width:120px;border:1px solid var(--border);border-radius:10px;padding:10px 12px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);font-weight:700">${lbl}</div><div style="font-size:26px;font-weight:800;color:${col||'var(--text)'}">${val}</div></div>`;
+  const reco=(v)=>{
+    if(v.capacity==null){
+      return `<div style="margin-top:10px;font-size:12.5px;color:var(--muted)">&#9888; ${v.note||''} &middot; backlog ted ${v.backlog_now} &middot; no-show ${Math.round((v.no_show||0)*100)} %</div>`;
+    }
+    if(v.end_of_day<=tgt){
+      return `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;font-size:13px;background:var(--green-bg);color:var(--green-text)">&#127919; Cil &le; ${tgt} splnen &mdash; projektovany zustatek ${(+v.end_of_day).toFixed(0)}.</div>`;
+    }
+    const gap=+(v.extra_ca_for_target||0);
+    const ppl=v.extra_people_for_target||0;
+    const owners=Object.entries(v.capacity_by_owner||{}).filter(([k])=>k!=='Ostatní / systém');
+    const active=owners.filter(([k,r])=>r>0);
+    const nA=active.length||1;
+    const perLift=gap/nA;
+    const rates=owners.map(([k,r])=>r);
+    const top=rates.length?Math.max.apply(null,rates):0;
+    const lo=rates.length?Math.min.apply(null,rates):0;
+    const levelGain=owners.reduce((s,[k,r])=>s+Math.max(0,top-r),0);
+    const weak=owners.filter(([k,r])=>r<top*0.5).map(([k,r])=>k.split(' ').slice(-1)[0]).join(', ');
+    return `<div style="margin-top:10px;padding:12px 14px;border-radius:8px;background:var(--amber-bg);color:var(--amber-text)">
+      <div style="font-weight:800;margin-bottom:6px">&#127919; K cili &le; ${tgt} dnes chybi zpracovat ~${gap.toFixed(0)} CA/den. Tri cesty:</div>
+      <ul style="margin:0;padding-left:18px;line-height:1.55">
+        <li><b>Vice lidi:</b> +${ppl} zpracovatelu (pri prumeru 5,6 CA/den/os) &mdash; ale najit je hned neni snadne.</li>
+        <li><b>Vyssi produktivita:</b> ${nA} aktivnich by muselo pridat ~+${perLift.toFixed(1)} CA/den kazdy. Vykony nejsou rovne (${lo.toFixed(1)}&ndash;${top.toFixed(1)} CA/den) &mdash; srovnanim slabsich na tempo nejlepsiho (${top.toFixed(1)}) by se ziskalo ~+${levelGain.toFixed(0)} CA/den${weak?' (rezerva hl. u: '+weak+')':''}.</li>
+        <li><b>Kombinace:</b> par lidi navic + dorovnani nejslabsich &mdash; realnejsi nez ${ppl} novych naraz.</li>
+      </ul></div>`;
+  };
   const card=(title,badge,bc,v)=>{
     const endTxt = v.end_of_day==null?'—':(+v.end_of_day).toFixed(0);
     const endColor = v.end_of_day==null?'var(--muted)':(v.end_of_day<=tgt?'var(--green-text)':(v.end_of_day<=tgt+8?'var(--amber-text)':'var(--red-text)'));
-    let reco='';
-    if(v.capacity==null){
-      reco=`<div style="margin-top:10px;font-size:12.5px;color:var(--muted)">&#9888; ${v.note||''} &middot; backlog ted ${v.backlog_now} &middot; no-show ${Math.round((v.no_show||0)*100)} %</div>`;
-    } else {
-      const ok=v.end_of_day<=tgt;
-      const body = ok ? ('Cil &le; '+tgt+' splnen &mdash; projektovany zustatek '+endTxt+'.')
-        : ('Pro zustatek &le; '+tgt+' je treba dnes zpracovat '+(v.start_of_day+v.inflow-tgt).toFixed(0)+' CA &mdash; o '+(v.extra_ca_for_target).toFixed(0)+' vic nez kapacita '+(v.capacity).toFixed(0)+'/den &asymp; +'+v.extra_people_for_target+' zpracovatelu navic.');
-      reco=`<div style="margin-top:10px;padding:10px 12px;border-radius:8px;font-size:13px;background:${ok?'var(--green-bg)':'var(--red-bg)'};color:${ok?'var(--green-text)':'var(--red-text)'}">&#127919; ${body}</div>`;
-    }
     const sub=`backlog ted ${v.backlog_now} &middot; dnes dorazilo ${v.arrived_today}${v.inflow!=null?'/~'+Math.round(v.inflow):''} &middot; zpracovano ${v.done_today}${v.capacity!=null?'/~'+Math.round(v.capacity):''}`;
     return `<div class="card"><div class="card-title">${title} <span style="font-size:11px;background:${bc};color:#fff;border-radius:5px;padding:2px 7px;margin-left:6px;vertical-align:middle">${badge}</span></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -355,13 +372,12 @@ function renderBacklogEstimate(be){
         ${kpi('Konec dne (17:00) &middot; cil &le;'+tgt,endTxt,endColor)}
       </div>
       <div style="margin-top:8px;font-size:12px;color:var(--muted)">${sub}</div>
-      ${reco}</div>`;
+      ${reco(v)}</div>`;
   };
   el.innerHTML = `<div class="card-title" style="margin:14px 0 2px;font-size:16px">&#129518; Dohad zustatku nezpracovanych CarAuditu &mdash; dnesni den</div>`
     + card('Carvago','CARVAGO','var(--carvago)',be.carvago)
     + card('Cebia CarAudit (externi)','CEBIA','#00B3A4',be.cebia||{});
 }
-
 
 async function loadData() {
   const overlay=document.getElementById('ov');
