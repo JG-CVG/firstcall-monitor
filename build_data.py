@@ -499,7 +499,7 @@ def main():
                     "wd": wd, "order": ost}
             active = ost not in ORDER_TERM
             bk[bi]["active" if active else "inactive"].append(item)
-        total = len(base)
+        aws_dtl_total = len(base)
         active_n = sum(len(bk[k]["active"]) for k in BL)
         def _load_other():
             try:
@@ -542,7 +542,7 @@ def main():
                     entry = {"aws": awscases, "others": q}
                     (f_inprog if any(o["kind"] == "inprog" for o in q) else f_wait).append(entry)
         aws_detail = {
-            "total": total, "active": active_n, "inactive": total - active_n,
+            "total": aws_dtl_total, "active": active_n, "inactive": aws_dtl_total - active_n,
             "have_order": have_order, "f_available": f_available,
             "f_customers_total": len(set(r.get("AccountId") for r in base if r.get("AccountId"))),
             "buckets": {k: {"active": bk[k]["active"], "inactive": bk[k]["inactive"]} for k in BL},
@@ -894,7 +894,7 @@ def main():
             "v novem chybi: " + ", ".join(_lost) + ". Nezapisuji /tmp/data.json. "
             "Dobehni chybejici SOQL (napr. Q17 sf_aws_age + Q18 sf_aws_other pro aws_detail) a spust build znovu."
         )
-    with open("/tmp/data.json", "w", encoding="utf-8") as f:
+    with open(os.environ.get("FCM_OUT","/tmp/data.json"), "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2, default=str)
     print(
         f"total={total} ip={ip_total} closed={closed} "
