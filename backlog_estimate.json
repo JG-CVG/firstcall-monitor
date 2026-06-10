@@ -1,42 +1,42 @@
 {
-  "generated_at_local": "2026-06-10T11:58:23",
+  "generated_at_local": "2026-06-10T14:14:04",
   "target": 5,
   "window_capacity_wd": 11,
   "window_noshow_days": 32,
   "carvago": {
-    "backlog_now": 32,
-    "arrived_today": 17,
-    "done_today": 16,
+    "backlog_now": 21,
+    "arrived_today": 24,
+    "done_today": 34,
     "start_of_day": 31,
-    "promised_today": 30,
-    "realization": 0.8566,
-    "no_show": 0.1434,
-    "inflow": 25.7,
-    "capacity": 27.8,
-    "capacity_named": 21.5,
-    "capacity_other": 6.3,
+    "promised_today": 33,
+    "realization": 0.8579,
+    "no_show": 0.1421,
+    "inflow": 28.3,
+    "capacity": 29.1,
+    "capacity_named": 22.6,
+    "capacity_other": 6.5,
     "capacity_by_owner": {
-      "Daniel Forman": 7.8,
-      "Marek Moťovský": 7.4,
-      "Daniel Noga": 4.1,
-      "Ostatní / systém": 6.3,
-      "Vladimír Uher": 2.0,
-      "Martin Linhart": 0.3
+      "Daniel Forman": 8.0,
+      "Marek Moťovský": 7.7,
+      "Daniel Noga": 4.2,
+      "Ostatní / systém": 6.6,
+      "Vladimír Uher": 2.3,
+      "Martin Linhart": 0.5
     },
-    "end_of_day": 28.9,
-    "extra_ca_for_target": 23.9,
+    "end_of_day": 30.2,
+    "extra_ca_for_target": 25.2,
     "extra_people_for_target": 5,
     "pipeline": {
-      "overdue": 4,
-      "today": 9,
-      "tomorrow": 11
+      "overdue": 2,
+      "today": 10,
+      "tomorrow": 13
     }
   },
   "cebia": {
-    "backlog_now": 2,
+    "backlog_now": 0,
     "arrived_today": 1,
     "done_today": 0,
-    "start_of_day": 1,
+    "start_of_day": -1,
     "promised_today": 5,
     "realization": 0.907,
     "no_show": 0.093,
@@ -44,6 +44,11 @@
     "capacity": null,
     "capacity_source": "casehistory_prep_done",
     "end_of_day": null,
-    "note": "Cebia Done date not populated; capacity via CaseHistory Prep->Done (Q16)"
+    "note": "Cebia Done date not populated; capacity via CaseHistory Prep->Done (Q16)",
+    "pipeline": {
+      "overdue": 3,
+      "today": 2,
+      "tomorrow": 1
+    }
   }
 }
