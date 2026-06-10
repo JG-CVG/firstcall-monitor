@@ -534,13 +534,23 @@ function renderPhase2Tables(p2) {
     '</div>';
 }
 
+// Whitelist operátorů pro PREP → Done/Closed heatmap (Carvago + Cebia).
+// Pouze tyto osoby se zobrazí v obou tabulkách + day_totals/max_cell se přepočítávají na filtrovanou podmnožinu.
+const PDC_ALLOWED_OPERATORS = new Set([
+  'Marek Moťovský',
+  'Daniel Forman',
+  'Daniel Noga',
+  'Vladimír Uher',
+  'Martin Linhart',
+]);
+
 function renderPrepToDoneHeatmap(p) {
   const el = document.getElementById('prepToDoneHeatmap');
   if (!el) return;
   if (!p || !p.days) { el.innerHTML = ''; return; }
   const sections = [
-    { key: 'carvago', label: 'CARVAGO CARAUDIT', badgeCls: 'pdc-badge-carvago', cardCls: 'pdc-card-carvago', cellPrefix: 'cv', subtitle: 'Record Type = CarAudit · OldValue = CarAudit preparation · NewValue ∈ {Done, Closed} · pouze pracovní dny' },
-    { key: 'cebia',   label: 'CEBIA CARAUDIT',   badgeCls: 'pdc-badge-cebia',   cardCls: 'pdc-card-cebia',   cellPrefix: 'tv', subtitle: 'Record Type = Cebia CarAudit · OldValue = CarAudit preparation · NewValue ∈ {Done, Closed} · pouze pracovní dny' }
+    { key: 'carvago', label: 'CARVAGO CARAUDIT', badgeCls: 'pdc-badge-carvago', cardCls: 'pdc-card-carvago', cellPrefix: 'cv', subtitle: 'Record Type = CarAudit · OldValue = CarAudit preparation · NewValue ∈ {Done, Closed} · pouze pracovní dny · filtr: 5 operátorů' },
+    { key: 'cebia',   label: 'CEBIA CARAUDIT',   badgeCls: 'pdc-badge-cebia',   cardCls: 'pdc-card-cebia',   cellPrefix: 'tv', subtitle: 'Record Type = Cebia CarAudit · OldValue = CarAudit preparation · NewValue ∈ {Done, Closed} · pouze pracovní dny · filtr: 5 operátorů' }
   ];
   function bucket(v, maxCell, isCarvago) {
     if (!v || v <= 0) return 0;
@@ -556,8 +566,20 @@ function renderPrepToDoneHeatmap(p) {
   }
   let html = '';
   sections.forEach(sec => {
-    const data = p[sec.key];
-    if (!data || !data.users || data.users.length === 0) return;
+    const rawData = p[sec.key];
+    if (!rawData || !rawData.users || rawData.users.length === 0) return;
+    // Filtruj users na povolený whitelist; přepočítej day_totals + max_cell pro filtrovanou podmnožinu.
+    const filteredUsers = rawData.users.filter(u => PDC_ALLOWED_OPERATORS.has(u.name));
+    if (filteredUsers.length === 0) return;
+    const dayTotals = p.days.map(d => filteredUsers.reduce((s, u) => s + ((u.by_date && u.by_date[d.date]) || 0), 0));
+    let maxCell = 0;
+    filteredUsers.forEach(u => {
+      if (u.by_date) Object.values(u.by_date).forEach(v => { if (v > maxCell) maxCell = v; });
+    });
+    if (maxCell === 0) maxCell = 1;
+    // Re-sort podle součtu v rámci filtrované podmnožiny (medaily potom sedí)
+    filteredUsers.sort((a, b) => (b.total || 0) - (a.total || 0));
+    const data = { users: filteredUsers, day_totals: dayTotals, max_cell: maxCell };
     let headThs = '<th class="pdc-name">Operátor</th>';
     p.days.forEach((d, idx) => {
       const isToday = idx === 0;
