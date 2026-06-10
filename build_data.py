@@ -815,6 +815,20 @@ def main():
             f"Fix: Re-run Q1 with correct filters per SKILL.md §6.\n"
             f"Build aborted to prevent bad data deployment.\n"
         )
+    # NOVÝ INVARIANT (2026-06-10): total == closed + phase2 + ip_total (jinak procenta jdou přes 100%)
+    if total != (closed + phase2 + ip_total):
+        raise SystemExit(
+            f"\n\n🛑 TIER1 INVARIANT FAILED: total={total} != closed({closed})+phase2({phase2})+ip({ip_total})={closed+phase2+ip_total}.\n"
+            f"Probable cause: Q1 vrátil nekonzistentní hodnoty (chybějící Status v GROUP BY nebo space-only Status).\n"
+            f"Toto je root cause '426% closed rate' bugu (2026-06-10). NEPUSHUJI.\n"
+        )
+    # NOVÝ INVARIANT: žádné procento přes 100% (closed/total a phase2/total)
+    if total > 0:
+        if closed / total > 1.0 or phase2 / total > 1.0:
+            raise SystemExit(
+                f"\n\n🛑 TIER1 RATIO FAILED: closed/total={closed/total:.2%} phase2/total={phase2/total:.2%} (oba musí být <= 100%).\n"
+                f"Pravděpodobně total spočítaný ze špatné podmnožiny. NEPUSHUJI.\n"
+            )
     if ip_total > 300:
         raise SystemExit(f"\n\n🛑 SANITY CHECK FAILED: ip_total={ip_total} (max 300 expected). Filtr chybí v Q1.\n")
     if closed > 3000:
