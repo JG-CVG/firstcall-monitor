@@ -716,59 +716,93 @@ def main():
 
     ptd_recs = _load_ptd()
     prep_to_done_daily = None
+    # Akumulátor pattern — historická data se nikdy nepřepisují, dnešek vždy.
+    # Display window: 44 pracovních dnů (~2 měsíce zpět).
+    # History file `data/prep_to_done_history.json` se commituje vedle data.json.
+    HISTORY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "prep_to_done_history.json")
+    history = {"carvago": {}, "cebia": {}}
+    if os.path.exists(HISTORY_PATH):
+        try:
+            with open(HISTORY_PATH, "r", encoding="utf-8") as fh:
+                history = json.load(fh)
+                history.setdefault("carvago", {})
+                history.setdefault("cebia", {})
+        except Exception as e:
+            print(f"  WARN: failed to load prep_to_done_history.json: {e}", file=sys.stderr)
+
     if ptd_recs is not None:
         from datetime import date as _date
         DOW_CS = ["po", "út", "st", "čt", "pá", "so", "ne"]
         today_pg = datetime.now(PRAGUE).date()
-        DAYS_BACK_WORKING = 14
+        today_key = today_pg.isoformat()
+        # Build fresh per-day per-user counts from current Q16 fetch
+        fresh = {"carvago": {}, "cebia": {}}
+        for r in ptd_recs:
+            rt = r.get("RecordType")
+            if rt == "CarAudit":
+                sec = "carvago"
+            elif rt == "Cebia CarAudit":
+                sec = "cebia"
+            else:
+                continue
+            name = r.get("CreatedByName") or "Unknown"
+            cd = parse_dt(r.get("CreatedDate"))
+            if cd is None:
+                continue
+            cd_local = cd.astimezone(PRAGUE)
+            if cd_local.weekday() >= 5:  # skip weekends
+                continue
+            day_key = cd_local.date().isoformat()
+            day_map = fresh[sec].setdefault(day_key, {})
+            day_map[name] = day_map.get(name, 0) + 1
+        # Merge into history: dnešek vždy přepiš, starší dny jen pokud chybí
+        for sec in ("carvago", "cebia"):
+            for day_key, by_user in fresh[sec].items():
+                if day_key == today_key:
+                    history[sec][day_key] = by_user
+                elif day_key not in history[sec]:
+                    history[sec][day_key] = by_user
+        # Save updated history back to file (will be commited alongside data.json)
+        os.makedirs(os.path.dirname(HISTORY_PATH), exist_ok=True)
+        with open(HISTORY_PATH, "w", encoding="utf-8") as fh:
+            json.dump(history, fh, ensure_ascii=False, indent=1, sort_keys=True)
+    # Build display from history (regardless of whether Q16 ran — show stale history if Q16 missing)
+    if history["carvago"] or history["cebia"]:
+        from datetime import date as _date
+        DOW_CS = ["po", "út", "st", "čt", "pá", "so", "ne"]
+        today_pg = datetime.now(PRAGUE).date()
+        DAYS_WINDOW = 44  # working days ≈ 2 months
         days_list = []
         cur = today_pg
-        while len(days_list) < DAYS_BACK_WORKING:
+        while len(days_list) < DAYS_WINDOW:
             if cur.weekday() < 5:
                 days_list.append(cur)
             cur = cur - timedelta(days=1)
-        date_keys = set(d.isoformat() for d in days_list)
-        agg = {"CarAudit": {}, "Cebia CarAudit": {}}
-        for r in ptd_recs:
-            rt = r.get("RecordType")
-            if rt not in agg:
-                continue
-            name = r.get("CreatedByName") or "Unknown"
-            cd_str = r.get("CreatedDate")
-            if not cd_str:
-                continue
-            cd = parse_dt(cd_str)
-            if cd is None:
-                continue
-            d = cd.astimezone(PRAGUE).date()
-            dk = d.isoformat()
-            if dk not in date_keys:
-                continue
-            user_map = agg[rt].setdefault(name, {})
-            user_map[dk] = user_map.get(dk, 0) + 1
-        def _section(rt):
-            users_data = agg[rt]
+        date_keys = [d.isoformat() for d in days_list]
+        def _section_from_history(sec_name):
+            sec_data = history.get(sec_name, {})
+            # Gather all operators that appear in any day in window
+            ops = set()
+            for dk in date_keys:
+                ops.update(sec_data.get(dk, {}).keys())
             users = []
-            for name, dm in users_data.items():
+            for name in ops:
                 row = {"name": name, "by_date": {}, "total": 0}
-                for d in days_list:
-                    dk = d.isoformat()
-                    cnt = dm.get(dk, 0)
+                for dk in date_keys:
+                    cnt = sec_data.get(dk, {}).get(name, 0)
                     row["by_date"][dk] = cnt
                     row["total"] += cnt
-                users.append(row)
-            users.sort(key=lambda r: r["total"], reverse=True)
-            day_totals = []
-            for d in days_list:
-                dk = d.isoformat()
-                day_totals.append(sum(u["by_date"][dk] for u in users))
-            max_cell = max([max(u["by_date"].values()) for u in users] + [0]) if users else 0
+                if row["total"] > 0:
+                    users.append(row)
+            users.sort(key=lambda u: u["total"], reverse=True)
+            day_totals = [sum(sec_data.get(dk, {}).values()) for dk in date_keys]
+            max_cell = max([max(sec_data.get(dk, {}).values()) for dk in date_keys if sec_data.get(dk)] + [0])
             return {"users": users, "day_totals": day_totals, "max_cell": max_cell}
         prep_to_done_daily = {
             "today_iso": today_pg.isoformat(),
             "days": [{"date": d.isoformat(), "label": f"{d.day}.{d.month}.", "dow": DOW_CS[d.weekday()]} for d in days_list],
-            "carvago": _section("CarAudit"),
-            "cebia": _section("Cebia CarAudit"),
+            "carvago": _section_from_history("carvago"),
+            "cebia": _section_from_history("cebia"),
         }
 
     # ---- SANITY CHECK — fail-fast pokud filtry chybí v Q1 ----
