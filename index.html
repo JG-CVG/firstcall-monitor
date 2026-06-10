@@ -296,7 +296,7 @@ tr:hover td { background:#f9fafb; }
   <div id="errorBanner" class="error-banner"></div>
   <div id="tier1"></div>
   <div id="tier2"></div>
-  <div id="tier3"></div><div id="awsSplit"></div><div id="awsAge"></div><div id="awsDetail"></div>
+  <div id="tier3"></div><div id="awsDetail"></div>
 
   <div class="card"><div class="card-title">&#128100; Call Center &mdash; Car Check per Agent</div><div id="tblAgent"></div></div>
 
@@ -354,8 +354,6 @@ function render() {
   renderTier1(t.total, t.closed, t.phase2, t.ip_total, d.month_label);
   renderTier2(t.closed, t.phase2, t.ip_total, t.total);
   renderTier3(d.status_breakdown, d.nedov_count);
-  renderAwsSplit(d.aws_split);
-  renderAwsAge(d.aws_age);
   renderAwsDetail(d.aws_detail);
   renderAgentTable(d.agent_breakdown);
   renderUrgentCount(d.nedovolano);
