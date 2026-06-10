@@ -295,6 +295,7 @@ tr:hover td { background:#f9fafb; }
   <div id="tier1"></div>
   <div id="tier2"></div>
   <div id="tier3"></div><div id="awsDetail"></div>
+  <div id="backlogEstimate"></div>
 
   <div class="card"><div class="card-title">&#128100; Call Center &mdash; Car Check per Agent</div><div id="tblAgent"></div></div>
 
@@ -328,6 +329,40 @@ function showError(m) { const el=document.getElementById('errorBanner'); el.text
 function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmtEta(d) { if (!d) return null; const p = String(d).slice(0,10).split('-'); if (p.length !== 3) return d; return parseInt(p[2],10)+'.'+parseInt(p[1],10)+'.'; }
 
+function renderBacklogEstimate(be){
+  const el=document.getElementById('backlogEstimate'); if(!el) return;
+  if(!be||!be.carvago){ el.innerHTML=''; return; }
+  const tgt=be.target||5;
+  const kpi=(lbl,val,col)=>`<div style="flex:1;min-width:120px;border:1px solid var(--border);border-radius:10px;padding:10px 12px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);font-weight:700">${lbl}</div><div style="font-size:26px;font-weight:800;color:${col||'var(--text)'}">${val}</div></div>`;
+  const card=(title,badge,bc,v)=>{
+    const endTxt = v.end_of_day==null?'—':(+v.end_of_day).toFixed(0);
+    const endColor = v.end_of_day==null?'var(--muted)':(v.end_of_day<=tgt?'var(--green-text)':(v.end_of_day<=tgt+8?'var(--amber-text)':'var(--red-text)'));
+    let reco='';
+    if(v.capacity==null){
+      reco=`<div style="margin-top:10px;font-size:12.5px;color:var(--muted)">&#9888; ${v.note||''} &middot; backlog ted ${v.backlog_now} &middot; no-show ${Math.round((v.no_show||0)*100)} %</div>`;
+    } else {
+      const ok=v.end_of_day<=tgt;
+      const body = ok ? ('Cil &le; '+tgt+' splnen &mdash; projektovany zustatek '+endTxt+'.')
+        : ('Pro zustatek &le; '+tgt+' je treba dnes zpracovat '+(v.start_of_day+v.inflow-tgt).toFixed(0)+' CA &mdash; o '+(v.extra_ca_for_target).toFixed(0)+' vic nez kapacita '+(v.capacity).toFixed(0)+'/den &asymp; +'+v.extra_people_for_target+' zpracovatelu navic.');
+      reco=`<div style="margin-top:10px;padding:10px 12px;border-radius:8px;font-size:13px;background:${ok?'var(--green-bg)':'var(--red-bg)'};color:${ok?'var(--green-text)':'var(--red-text)'}">&#127919; ${body}</div>`;
+    }
+    const sub=`backlog ted ${v.backlog_now} &middot; dnes dorazilo ${v.arrived_today}${v.inflow!=null?'/~'+Math.round(v.inflow):''} &middot; zpracovano ${v.done_today}${v.capacity!=null?'/~'+Math.round(v.capacity):''}`;
+    return `<div class="card"><div class="card-title">${title} <span style="font-size:11px;background:${bc};color:#fff;border-radius:5px;padding:2px 7px;margin-left:6px;vertical-align:middle">${badge}</span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${kpi('Zacatek dne (08:00)',(+v.start_of_day).toFixed(0),'var(--carvago)')}
+        ${kpi('+ Prirustek',v.inflow==null?'—':'+'+(+v.inflow).toFixed(0),'var(--amber-text)')}
+        ${kpi('- Zpracovano',v.capacity==null?'—':'-'+(+v.capacity).toFixed(0),'var(--green-text)')}
+        ${kpi('Konec dne (17:00) &middot; cil &le;'+tgt,endTxt,endColor)}
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:var(--muted)">${sub}</div>
+      ${reco}</div>`;
+  };
+  el.innerHTML = `<div class="card-title" style="margin:14px 0 2px;font-size:16px">&#129518; Dohad zustatku nezpracovanych CarAuditu &mdash; dnesni den</div>`
+    + card('Carvago','CARVAGO','var(--carvago)',be.carvago)
+    + card('Cebia CarAudit (externi)','CEBIA','#00B3A4',be.cebia||{});
+}
+
+
 async function loadData() {
   const overlay=document.getElementById('ov');
   overlay.classList.remove('hidden');
@@ -337,6 +372,7 @@ async function loadData() {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('HTTP '+resp.status);
     DATA = await resp.json();
+    try { const r2 = await fetch('./backlog_estimate.json?t='+Date.now()); if (r2.ok) DATA.backlog_estimate = await r2.json(); } catch(_e) {}
     render();
   } catch (e) {
     showError('Chyba pri nacitani data.json: ' + e.message);
@@ -352,6 +388,7 @@ function render() {
   renderTier2(t.closed, t.phase2, t.ip_total, t.total);
   renderTier3(d.status_breakdown, d.nedov_count);
   renderAwsDetail(d.aws_detail);
+  renderBacklogEstimate(d.backlog_estimate);
   renderAgentTable(d.agent_breakdown);
   renderUrgentCount(d.nedovolano);
   renderUrgentNoCallCount(d.nedovolano);
