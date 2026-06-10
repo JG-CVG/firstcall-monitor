@@ -333,50 +333,68 @@ function renderBacklogEstimate(be){
   const el=document.getElementById('backlogEstimate'); if(!el) return;
   if(!be||!be.carvago){ el.innerHTML=''; return; }
   const tgt=be.target||5;
+  const R=Math.round;
+  const surname=k=>k.split(' ').slice(-1)[0];
   const kpi=(lbl,val,col)=>`<div style="flex:1;min-width:120px;border:1px solid var(--border);border-radius:10px;padding:10px 12px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);font-weight:700">${lbl}</div><div style="font-size:26px;font-weight:800;color:${col||'var(--text)'}">${val}</div></div>`;
+
   const reco=(v)=>{
     if(v.capacity==null){
-      return `<div style="margin-top:10px;font-size:12.5px;color:var(--muted)">&#9888; ${v.note||''} &middot; backlog ted ${v.backlog_now} &middot; no-show ${Math.round((v.no_show||0)*100)} %</div>`;
+      return `<div style="margin-top:10px;font-size:12.5px;color:var(--muted)">&#9888; ${v.note||''} &middot; backlog teď ${v.backlog_now} &middot; no-show ${R((v.no_show||0)*100)} %</div>`;
     }
     if(v.end_of_day<=tgt){
-      return `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;font-size:13px;background:var(--green-bg);color:var(--green-text)">&#127919; Cil &le; ${tgt} splnen &mdash; projektovany zustatek ${(+v.end_of_day).toFixed(0)}.</div>`;
+      return `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;font-size:13px;background:var(--green-bg);color:var(--green-text)">&#127919; Cíl &le; ${tgt} je splněn — na konci dne zbyde ~${R(v.end_of_day)} CA. Kapacita ${R(v.capacity)}/den dnešní nápor pokryje.</div>`;
     }
-    const gap=+(v.extra_ca_for_target||0);
-    const ppl=v.extra_people_for_target||0;
-    const owners=Object.entries(v.capacity_by_owner||{}).filter(([k])=>k!=='Ostatní / systém');
-    const active=owners.filter(([k,r])=>r>0);
-    const nA=active.length||1;
-    const perLift=gap/nA;
-    const rates=owners.map(([k,r])=>r);
-    const top=rates.length?Math.max.apply(null,rates):0;
-    const lo=rates.length?Math.min.apply(null,rates):0;
-    const levelGain=owners.reduce((s,[k,r])=>s+Math.max(0,top-r),0);
-    const weak=owners.filter(([k,r])=>r<top*0.5).map(([k,r])=>k.split(' ').slice(-1)[0]).join(', ');
-    return `<div style="margin-top:10px;padding:12px 14px;border-radius:8px;background:var(--amber-bg);color:var(--amber-text)">
-      <div style="font-weight:800;margin-bottom:6px">&#127919; K cili &le; ${tgt} dnes chybi zpracovat ~${gap.toFixed(0)} CA/den. Tri cesty:</div>
-      <ul style="margin:0;padding-left:18px;line-height:1.55">
-        <li><b>Vice lidi:</b> +${ppl} zpracovatelu (pri prumeru 5,6 CA/den/os) &mdash; ale najit je hned neni snadne.</li>
-        <li><b>Vyssi produktivita:</b> ${nA} aktivnich by muselo pridat ~+${perLift.toFixed(1)} CA/den kazdy. Vykony nejsou rovne (${lo.toFixed(1)}&ndash;${top.toFixed(1)} CA/den) &mdash; srovnanim slabsich na tempo nejlepsiho (${top.toFixed(1)}) by se ziskalo ~+${levelGain.toFixed(0)} CA/den${weak?' (rezerva hl. u: '+weak+')':''}.</li>
-        <li><b>Kombinace:</b> par lidi navic + dorovnani nejslabsich &mdash; realnejsi nez ${ppl} novych naraz.</li>
-      </ul></div>`;
+    const start=+v.start_of_day, inflow=+v.inflow, cap=+v.capacity;
+    const total=R(start+inflow), need=R(start+inflow-tgt), gap=R(need-cap);
+    const owners=Object.entries(v.capacity_by_owner||{}).filter(([k])=>k!=='Ostatní / systém' && k!=='Ostatni / system');
+    const other=(v.capacity_by_owner||{})['Ostatní / systém'] || (v.capacity_by_owner||{})['Ostatni / system'] || 0;
+    const nN=owners.length||1;
+    const sorted=owners.slice().sort((a,b)=>b[1]-a[1]);
+    const top=sorted.length?sorted[0][1]:0;
+    const curList=sorted.map(([k,r])=>`${surname(k)} ${R(r)}`).join(', ');
+    const flat=(need-other)/nN;                       // každý stejně
+    const levelTotal=other + top*nN;                  // všichni na tempo nejlepšího
+    const endLevel=Math.max(0, start+inflow-levelTotal);
+    const weakNames=sorted.filter(([k,r])=>r<top*0.5).map(([k])=>surname(k));
+    const weak=weakNames.length?weakNames.join(' a '):'nejslabší';
+    const net=cap-inflow, netL=levelTotal-inflow;
+    const days=net>0?Math.ceil((start-tgt)/net):null;
+    const daysL=netL>0?Math.ceil((start-tgt)/netL):null;
+
+    const realita = (endLevel<=tgt)
+      ? `Dotažením ${weak} na tempo nejlepšího by se cíl &le; ${tgt} stihl <b>i dnes</b>.`
+      : `&le; ${tgt} za <u>jeden den</u> z ${start} nedáte ani kdyby všichni jeli na maximum (~${R(levelTotal)} &lt; potřebných ${need}). Reálná cesta je <b>přes víc dní</b>: teď backlog klesá ~${net.toFixed(1)}/den → na &le; ${tgt} za ~<b>${days} prac. dní</b>. Když dotáhnete ${weak}, klesal by ~${netL.toFixed(1)}/den → &le; ${tgt} už za ~<b>${daysL} ${daysL===1?'den':(daysL<5?'dny':'dní')}</b>.`;
+
+    return `<div style="margin-top:10px;padding:13px 15px;border-radius:8px;background:var(--amber-bg);color:var(--amber-text);font-size:13px">
+      <div style="font-weight:800;margin-bottom:7px;font-size:14px">&#127919; Co udělat, aby na konci dne zbylo &le; ${tgt} CA</div>
+      <div style="margin-bottom:9px">Ráno bylo <b>${R(start)}</b> + dnes dorazí ~<b>${R(inflow)}</b> = <b>~${total}</b> k vyřízení. Aby večer zbylo &le; ${tgt}, musí tým dnes zpracovat <b>~${need} CA</b>. Teď zvládá <b>~${R(cap)}/den</b> → <b>chybí ~${gap}/den</b>.</div>
+      <div style="font-weight:700;margin:4px 0 3px">Tři možnosti, jak ten schodek ~${gap}/den pokrýt:</div>
+      <ol style="margin:0;padding-left:20px;line-height:1.65">
+        <li><b>Všichni přidají stejně:</b> každý z ${nN} zpracovatelů by jel ~<b>${R(flat)} CA/den</b> <span style="opacity:.85">(teď: ${curList})</span>. Pro nejsilnější malý krok, pro ${weak} skoro nereálný skok.</li>
+        <li><b>Dorovnat nejslabší na nejsilnější:</b> ${weak} na tempo nejlepšího (~${R(top)}/den) → tým z ~${R(cap)} na <b>~${R(levelTotal)}/den</b>. Nejreálnější a největší páka.</li>
+        <li><b>Přidat lidi:</b> +${v.extra_people_for_target} zpracovatelů (~5–6 CA/den/os). Hned je sehnat těžké.</li>
+      </ol>
+      <div style="margin-top:9px;padding-top:8px;border-top:1px solid rgba(0,0,0,.10)"><b>Realita:</b> ${realita}</div>
+    </div>`;
   };
+
   const card=(title,badge,bc,v)=>{
-    const endTxt = v.end_of_day==null?'—':(+v.end_of_day).toFixed(0);
+    const endTxt = v.end_of_day==null?'—':R(v.end_of_day);
     const endColor = v.end_of_day==null?'var(--muted)':(v.end_of_day<=tgt?'var(--green-text)':(v.end_of_day<=tgt+8?'var(--amber-text)':'var(--red-text)'));
-    const sub=`backlog ted ${v.backlog_now} &middot; dnes dorazilo ${v.arrived_today}${v.inflow!=null?'/~'+Math.round(v.inflow):''} &middot; zpracovano ${v.done_today}${v.capacity!=null?'/~'+Math.round(v.capacity):''}`;
+    const sub=`backlog teď ${v.backlog_now} &middot; dnes dorazilo ${v.arrived_today}${v.inflow!=null?'/~'+R(v.inflow):''} &middot; zpracováno ${v.done_today}${v.capacity!=null?'/~'+R(v.capacity):''}`;
     return `<div class="card"><div class="card-title">${title} <span style="font-size:11px;background:${bc};color:#fff;border-radius:5px;padding:2px 7px;margin-left:6px;vertical-align:middle">${badge}</span></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        ${kpi('Zacatek dne (08:00)',(+v.start_of_day).toFixed(0),'var(--carvago)')}
-        ${kpi('+ Prirustek',v.inflow==null?'—':'+'+(+v.inflow).toFixed(0),'var(--amber-text)')}
-        ${kpi('- Zpracovano',v.capacity==null?'—':'-'+(+v.capacity).toFixed(0),'var(--green-text)')}
-        ${kpi('Konec dne (17:00) &middot; cil &le;'+tgt,endTxt,endColor)}
+        ${kpi('Začátek dne (08:00)',R(v.start_of_day),'var(--carvago)')}
+        ${kpi('+ Přírůstek',v.inflow==null?'—':'+'+R(v.inflow),'var(--amber-text)')}
+        ${kpi('− Zpracováno',v.capacity==null?'—':'−'+R(v.capacity),'var(--green-text)')}
+        ${kpi('Konec dne (17:00) &middot; cíl &le;'+tgt,endTxt,endColor)}
       </div>
       <div style="margin-top:8px;font-size:12px;color:var(--muted)">${sub}</div>
       ${reco(v)}</div>`;
   };
-  el.innerHTML = `<div class="card-title" style="margin:14px 0 2px;font-size:16px">&#129518; Dohad zustatku nezpracovanych CarAuditu &mdash; dnesni den</div>`
+  el.innerHTML = `<div class="card-title" style="margin:14px 0 2px;font-size:16px">&#129518; Dohad zůstatku nezpracovaných CarAuditů — dnešní den</div>`
     + card('Carvago','CARVAGO','var(--carvago)',be.carvago)
-    + card('Cebia CarAudit (externi)','CEBIA','#00B3A4',be.cebia||{});
+    + card('Cebia CarAudit (externí)','CEBIA','#00B3A4',be.cebia||{});
 }
 
 async function loadData() {
