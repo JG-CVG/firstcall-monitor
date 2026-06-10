@@ -578,7 +578,18 @@ function renderPrepToDoneHeatmap(p) {
     });
     if (maxCell === 0) maxCell = 1;
     // Re-sort podle součtu v rámci filtrované podmnožiny (medaily potom sedí)
-    filteredUsers.sort((a, b) => (b.total || 0) - (a.total || 0));
+    // Medaile + sort = výkon aktuálního týdne (od pondělí tohoto týdne do dnes/posledního dne v okně).
+    // Today_iso je první v p.days (newest left). Najdeme Mon dle ISO weekday.
+    const todayIso = (p.today_iso) || (p.days[0] && p.days[0].date);
+    const todayObj = todayIso ? new Date(todayIso + 'T00:00:00Z') : new Date();
+    const dayIdx = (todayObj.getUTCDay() + 6) % 7; // Mon=0 .. Sun=6
+    const monday = new Date(todayObj.getTime() - dayIdx * 86400000);
+    const mondayIso = monday.toISOString().slice(0, 10);
+    const weekDates = p.days.map(d => d.date).filter(d => d >= mondayIso && d <= todayIso);
+    filteredUsers.forEach(u => {
+      u._weekTotal = weekDates.reduce((s, dk) => s + ((u.by_date && u.by_date[dk]) || 0), 0);
+    });
+    filteredUsers.sort((a, b) => (b._weekTotal || 0) - (a._weekTotal || 0) || (b.total || 0) - (a.total || 0));
     const data = { users: filteredUsers, day_totals: dayTotals, max_cell: maxCell };
     let headThs = '<th class="pdc-name">Operátor</th>';
     p.days.forEach((d, idx) => {
