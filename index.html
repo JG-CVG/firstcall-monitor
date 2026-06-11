@@ -309,6 +309,8 @@ tr:hover td { background:#f9fafb; }
 
   <div class="card"><div class="card-title">&#128202; 1st Call Buffer &mdash; kolik práce před sebou (po hodinách dnes)</div><div id="bufferTower"></div></div>
 
+  <div class="card"><div class="card-title">&#127919; Doporučení kapacity &mdash; predikce CA</div><div id="capacityReco"></div></div>
+
   <div class="card card-hm"><div class="card-title">&#128293; CarAudit New &mdash; Heatmap (prumer / den x hodina, plovouci mesic)</div><div id="heatmapWrap"></div></div>
   <div class="card card-hm"><div class="card-title">&#9201; CarAudit New &mdash; Heatmap (pracovni okno, Po-Pa 8-17, So 8-13)</div><div id="heatmapWorkWrap"></div></div>
   <div id="phase2Tables"></div>
@@ -430,6 +432,7 @@ function render() {
   renderClosedTable(d.closed_reasons);
   renderCountryTable(d.country_breakdown);
   renderBufferTower(d.buffer_hourly, d.status_breakdown);
+  renderCapacityReco(d.capacity_reco);
   renderHeatmap(d.heatmap);
   renderHeatmapWork(d.heatmap);
   renderPhase2Tables(d.phase2_tables);
@@ -1293,6 +1296,54 @@ function pushToWorking(d, h) {
   return {d:d+1,h:8};
 }
 function padH(h){return h<10?'0'+h:''+h;}
+
+function renderCapacityReco(cr) {
+  const el = document.getElementById('capacityReco'); if (!el) return;
+  if (!cr) {
+    el.innerHTML = '<div style="padding:18px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6">'+
+      'Doporučení se aktivuje s dalším refreshem &mdash; vyžaduje throughput per agent (CA &rarr;VIN / &rarr;reject) a aktivní buffer. Kapacita 9&ndash;10 CA/os./den.</div>';
+    return;
+  }
+  const LV = {
+    0: {c:'#00805F', bg:'rgba(0,128,95,0.08)'},
+    1: {c:'#B66B2A', bg:'rgba(182,107,42,0.10)'},
+    2: {c:'#C2671A', bg:'rgba(194,103,26,0.12)'},
+    3: {c:'#C2293A', bg:'rgba(194,41,58,0.10)'}
+  };
+  const lv = LV[cr.level] || LV[0];
+  let h = '<div style="border-left:4px solid '+lv.c+';background:'+lv.bg+';border-radius:8px;padding:14px 16px;margin-bottom:14px">'+
+    '<div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;color:'+lv.c+'">Úroveň '+cr.level+' &middot; '+escapeHtml(cr.label)+'</div>'+
+    '<div style="font-size:15px;font-weight:600;color:var(--text);margin-top:5px;line-height:1.45">'+escapeHtml(cr.headline)+'</div></div>';
+  const kpi = (lbl,val,sub)=>'<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px">'+
+    '<div style="font-size:9.5px;letter-spacing:0.05em;color:var(--muted);text-transform:uppercase;font-weight:600">'+lbl+'</div>'+
+    '<div style="font-size:22px;font-weight:700;color:var(--text);line-height:1.1">'+val+'</div>'+
+    '<div style="font-size:10px;color:var(--muted);margin-top:3px">'+(sub||'')+'</div></div>';
+  h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">';
+  h += kpi('Zpracovatelé', cr.n_agents, 'aktivní dnes');
+  h += kpi('Kapacita/den', cr.team_capacity_low+'&ndash;'+cr.team_capacity_high, 'CA (9&ndash;10/os.)');
+  h += kpi('Poptávka dnes', cr.demand_today, cr.processed_today+' hotovo &middot; '+cr.current_buffer+' fronta &middot; +'+cr.incoming_rest+' příchozí');
+  h += kpi('Rozdíl', (cr.gap_mid>0?'&minus;':'+')+Math.abs(Math.round(cr.gap_mid)), (cr.gap_mid>0?'deficit kapacity':'kapacita stačí'));
+  h += '</div>';
+  h += '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:4px 0 6px">'+
+    'Produktivita zpracovatelů &middot; baseline = průměr CA/den za '+cr.window_days+' prac. dny</div>';
+  h += '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left;color:var(--muted);font-size:11px">'+
+    '<th style="padding:5px 8px">Zpracovatel</th><th style="padding:5px 8px;text-align:right">Baseline (CA/den)</th>'+
+    '<th style="padding:5px 8px;text-align:right">Dnes</th><th style="padding:5px 8px;text-align:center">Pásmo 9&ndash;10</th></tr></thead><tbody>';
+  (cr.agents||[]).forEach(a=>{
+    const bc = a.band==='below'?'#C2293A':a.band==='above'?'#00805F':'#6B7280';
+    const bt = a.band==='below'?'pod':a.band==='above'?'nad':'v pásmu';
+    h += '<tr style="border-top:1px solid var(--border)">'+
+      '<td style="padding:6px 8px;font-weight:600;color:var(--text)">'+escapeHtml(a.agent)+'</td>'+
+      '<td style="padding:6px 8px;text-align:right;font-weight:700;color:'+bc+'">'+a.baseline+'</td>'+
+      '<td style="padding:6px 8px;text-align:right;color:var(--text)">'+a.today+'</td>'+
+      '<td style="padding:6px 8px;text-align:center"><span style="font-size:10px;font-weight:700;color:'+bc+';background:'+bc+'1A;padding:2px 7px;border-radius:10px">'+bt+'</span></td></tr>';
+  });
+  h += '</tbody></table>';
+  h += '<div style="font-size:11px;color:var(--muted);margin-top:8px">Průměr týmu '+cr.team_avg+' CA/den &middot; rozptyl '+cr.spread+' CA &middot; '+
+    (cr.uniform?'tým rovnoměrný':'nerovnoměrný')+
+    ((cr.overtime && cr.gap_mid>0)?(' &middot; přesčas '+cr.overtime.per_person_low+'&ndash;'+cr.overtime.per_person_high+' h/os.'):'')+'</div>';
+  el.innerHTML = h;
+}
 
 function renderBufferTower(bh, sb) {
   const el = document.getElementById('bufferTower');

@@ -406,6 +406,146 @@ def main():
                   "-> Q9/Q10/Q11 zrejme nebezely cerstve. Vynechavam buffer_hourly.")
             buffer_hourly = None
 
+    # ---- Capacity recommendation (CA prediction) — optional (Q_TP_VIN/Q_TP_REJ) ----
+    # Prahy odsouhlaseny 2026-06-11 (Josef): kapacita 9-10 CA/os./den, spread 2 CA/den,
+    # presčas->nabor 1.5 h/os./den, baseline okno = dokoncene vsedni dny v poslednich 7 dnech.
+    CAP_LOW, CAP_HIGH = 9.0, 10.0
+    CAP_MID = (CAP_LOW + CAP_HIGH) / 2.0
+    NET_HOURS = 8.0
+    SPREAD_THRESHOLD = 2.0   # rozptyl baseline => tym "rovnomerny"
+    OT_THRESHOLD_H = 1.5     # h/os./den; nad => doporuc nabor
+
+    def _load_tp(name):
+        try:
+            with open(os.path.join(TMP, name), "r", encoding="utf-8") as fh:
+                return json.load(fh).get("records", [])
+        except FileNotFoundError:
+            return None
+
+    tp_vin = _load_tp("sf_tp_vin.json")
+    tp_rej = _load_tp("sf_tp_rej.json")
+    capacity_reco = None
+    if tp_vin is not None and tp_rej is not None and buffer_hourly is not None:
+        import math
+        cr_now_local = now_utc.astimezone(PRAGUE)
+        today_str = cr_now_local.strftime("%Y-%m-%d")
+
+        per_agent_day = {}
+        for rec in (tp_vin + tp_rej):
+            ag = rec.get("Call_Center_Agent__c") or "Neprideleno"
+            d = rec.get("d")
+            if not d:
+                continue
+            d = str(d)[:10]
+            cnt = int(rec.get("cnt", rec.get("expr0", 0)))
+            per_agent_day.setdefault(ag, {})
+            per_agent_day[ag][d] = per_agent_day[ag].get(d, 0) + cnt
+
+        all_dates = set()
+        for dd in per_agent_day.values():
+            all_dates.update(dd.keys())
+
+        def _is_weekday(ds):
+            try:
+                return datetime.strptime(ds, "%Y-%m-%d").weekday() < 5
+            except ValueError:
+                return False
+
+        baseline_dates = sorted(d for d in all_dates if d != today_str and _is_weekday(d))
+        divisor = len(baseline_dates) or 1
+
+        agent_stats = {}
+        for ag, dd in per_agent_day.items():
+            if ag in ("Neprideleno", None):
+                continue
+            base_total = sum(dd.get(d, 0) for d in baseline_dates)
+            today_total = dd.get(today_str, 0)
+            if base_total == 0 and today_total == 0:
+                continue
+            agent_stats[ag] = {"baseline": round(base_total / divisor, 1), "today": today_total}
+
+        active = sorted(agent_stats.keys())
+        N = len(active)
+        if N > 0:
+            baselines = [agent_stats[a]["baseline"] for a in active]
+            team_avg = round(sum(baselines) / N, 1)
+            spread = round(max(baselines) - min(baselines), 1)
+            laggards = [{"agent": a, "baseline": agent_stats[a]["baseline"]}
+                        for a in active if agent_stats[a]["baseline"] < CAP_LOW]
+            potential_gain = round(sum(CAP_MID - agent_stats[a]["baseline"]
+                                       for a in active if agent_stats[a]["baseline"] < CAP_LOW), 1)
+            uniform = (spread <= SPREAD_THRESHOLD) and not laggards
+
+            current_buffer = buffer_hourly["current_buffer"]
+            hrs = buffer_hourly["hours"]
+            sum_in = sum(h["in"] for h in hrs if h["in"] is not None)
+            elapsed = len([h for h in hrs if h["in"] is not None]) or 1
+            remaining = len([h for h in hrs if h["in"] is None])
+            incoming_rest = round((sum_in / elapsed) * remaining)
+            processed_today = sum(agent_stats[a]["today"] for a in active)
+            demand_remaining = current_buffer + incoming_rest
+            demand_today = processed_today + demand_remaining
+
+            cap_mid_total = N * CAP_MID
+            gap_mid = round(demand_today - cap_mid_total, 1)
+            extra_low = max(0.0, demand_today - N * CAP_LOW)
+            extra_high = max(0.0, demand_today - N * CAP_HIGH)
+            extra_mid = max(0.0, demand_today - cap_mid_total)
+            ot_total_low = round(extra_low / (CAP_LOW / NET_HOURS), 1)
+            ot_total_high = round(extra_high / (CAP_HIGH / NET_HOURS), 1)
+            ot_pp_low = round(ot_total_low / N, 1)
+            ot_pp_high = round(ot_total_high / N, 1)
+            ot_pp_mid = (extra_mid / (CAP_MID / NET_HOURS)) / N
+            add_low = math.ceil(extra_low / CAP_LOW) if extra_low > 0 else 0
+            add_high = math.ceil(extra_high / CAP_HIGH) if extra_high > 0 else 0
+
+            if gap_mid <= 0:
+                level, label = 0, "OK"
+                headline = (f"✅ Kapacita stačí — {N} zpracovatelů pokryje dnešní objem "
+                            f"(~{round(demand_today)} CA vs kapacita {int(N*CAP_LOW)}–{int(N*CAP_HIGH)}).")
+            elif laggards and potential_gain >= gap_mid:
+                level, label = 1, "Produktivita"
+                names = ", ".join(l["agent"] for l in laggards)
+                headline = (f"⚠ Zařiď produktivitu týmu — {len(laggards)} pod pásmem 9–10 CA/den "
+                            f"({names}). Srovnáním získáš ~{potential_gain:g} CA/den, "
+                            f"pokryje dnešní deficit (~{round(gap_mid)} CA).")
+            elif ot_pp_mid <= OT_THRESHOLD_H:
+                level, label = 2, "Přesčas"
+                headline = (f"⏱ Při tomto tempu potřeba ~{ot_pp_low:g}–{ot_pp_high:g} h přesčasu "
+                            f"na osobu ({ot_total_low:g}–{ot_total_high:g} h celkem) — chybí ~{round(gap_mid)} CA.")
+            else:
+                level, label = 3, "Nábor"
+                headline = (f"🚨 Nutné doplnit lidi — tým je produktivní, ale i při plné kapacitě "
+                            f"chybí ~{round(gap_mid)} CA/den. Doporučeno +{add_high}–{add_low} zpracovatel(é).")
+
+            capacity_reco = {
+                "level": level, "label": label, "headline": headline,
+                "n_agents": N,
+                "cap_low": CAP_LOW, "cap_high": CAP_HIGH, "net_hours": NET_HOURS,
+                "team_capacity_low": int(N * CAP_LOW), "team_capacity_high": int(N * CAP_HIGH),
+                "processed_today": processed_today,
+                "current_buffer": current_buffer,
+                "incoming_rest": incoming_rest,
+                "demand_remaining": demand_remaining,
+                "demand_today": round(demand_today),
+                "gap_mid": gap_mid,
+                "team_avg": team_avg, "spread": spread, "uniform": uniform,
+                "laggards": laggards, "potential_gain": potential_gain,
+                "overtime": {
+                    "per_person_low": ot_pp_low, "per_person_high": ot_pp_high,
+                    "total_low": ot_total_low, "total_high": ot_total_high,
+                },
+                "add_people_low": add_low, "add_people_high": add_high,
+                "window_days": divisor,
+                "agents": [
+                    {"agent": a, "baseline": agent_stats[a]["baseline"],
+                     "today": agent_stats[a]["today"],
+                     "band": ("below" if agent_stats[a]["baseline"] < CAP_LOW
+                              else "above" if agent_stats[a]["baseline"] > CAP_HIGH else "in")}
+                    for a in sorted(active, key=lambda x: agent_stats[x]["baseline"], reverse=True)
+                ],
+            }
+
     # ---- AwS customer split (Q12) ----
     def _load_aws():
         try:
@@ -860,6 +1000,8 @@ def main():
     }
     if buffer_hourly is not None:
         output["buffer_hourly"] = buffer_hourly
+    if capacity_reco is not None:
+        output["capacity_reco"] = capacity_reco
     if aws_split is not None:
         output["aws_split"] = aws_split
     if aws_age is not None:
