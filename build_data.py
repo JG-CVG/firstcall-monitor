@@ -181,6 +181,12 @@ def compute_capacity_reco(tp_vin, tp_rej, buffer_hourly, now_utc):
     potential_gain = round(sum(CAP_MID - agent_stats[a]["baseline"]
                                for a in active if agent_stats[a]["baseline"] < CAP_LOW), 1)
     uniform = (spread <= SPREAD_THRESHOLD) and not laggards
+    outliers = [a for a in active if agent_stats[a]["baseline"] > 2 * CAP_HIGH]
+    note = ""
+    if outliers:
+        note = ("Pozn.: " + ", ".join(outliers) + " překračuje 2× modelový strop (>"
+                + str(int(2 * CAP_HIGH)) + " CA/den) — reálná kapacita týmu může být vyšší "
+                "než model 9–10/os., skutečný deficit proto může být menší.")
 
     current_buffer = buffer_hourly["current_buffer"]
     hrs = buffer_hourly["hours"]
@@ -243,6 +249,8 @@ def compute_capacity_reco(tp_vin, tp_rej, buffer_hourly, now_utc):
         },
         "add_people_low": add_low, "add_people_high": add_high,
         "window_days": divisor,
+        "outlier_agents": outliers,
+        "note": note,
         "agents": [
             {"agent": a, "baseline": agent_stats[a]["baseline"],
              "today": agent_stats[a]["today"],

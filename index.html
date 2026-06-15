@@ -1314,6 +1314,7 @@ function renderCapacityReco(cr) {
   let h = '<div style="border-left:4px solid '+lv.c+';background:'+lv.bg+';border-radius:8px;padding:14px 16px;margin-bottom:14px">'+
     '<div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;color:'+lv.c+'">Úroveň '+cr.level+' &middot; '+escapeHtml(cr.label)+'</div>'+
     '<div style="font-size:15px;font-weight:600;color:var(--text);margin-top:5px;line-height:1.45">'+escapeHtml(cr.headline)+'</div></div>';
+  if (cr.note) { h += '<div style="font-size:12px;color:#B66B2A;background:rgba(182,107,42,0.08);border-radius:6px;padding:8px 12px;margin-bottom:12px;line-height:1.5">&#9888; '+escapeHtml(cr.note)+'</div>'; }
   const kpi = (lbl,val,sub)=>'<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px">'+
     '<div style="font-size:9.5px;letter-spacing:0.05em;color:var(--muted);text-transform:uppercase;font-weight:600">'+lbl+'</div>'+
     '<div style="font-size:22px;font-weight:700;color:var(--text);line-height:1.1">'+val+'</div>'+
