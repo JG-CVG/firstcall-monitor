@@ -89,6 +89,27 @@ Scheduled task `firstcall-monitor-refresh` (hourly Mon-Fri 08-19 UTC) volá `bui
 
 V `Build & push` sekci skillu: `git add data.json data/` — **nezapomenout commit-ovat history file** vedle data.json.
 
+
+
+### 8. lastCategory v nedovolano detail (2026-06-16)
+
+`data.json.nedovolano[i].lastCategory` — 6-kategorie posledního CaseFeed záznamu pro každý otevřený Car Check case:
+
+- **prodano** — vůz prodán / není k dispozici / bez zájmu (verkauft, no interest, gutachten verweigert)
+- **rezervovano** — rezervováno pro jiného zákazníka (reserviert für, immer noch reserviert)
+- **necekan_fyzicky** — vůz fyzicky chybí (noch nicht angeliefert, im transport)
+- **zavolejte_jindy** — call back / později / slíbil zaslat info (spaeter anrufen, fin sendet per mail, ozve se)
+- **nedovolano** — nedostupný (nedovoláno, nicht erreicht, mailbox, im Kundengespräch, na dovolené)
+- **ostatni** — bez pattern matche (interní @mentions, FC objednání, dokumenty, případy bez feedu)
+
+Priority: terminal stavy (prodano, rezervovano) → necekan_fyzicky → akce (zavolejte_jindy) → status (nedovolano) → ostatni.
+
+build_data.py: `categorize_full()` funkce, používá `RE_PRODANO`, `RE_REZERVACE`, `RE_NECEKAN_FYZICKY`, `RE_CALLBACK`/`RE_MESSAGING`, `NEDOV_RE`. Vstup = `cf[0].Body` (poslední feed po DESC sortu CreatedDate).
+
+index.html `renderNedovTable`: render přes `cat = d.lastCategory || legacy lastType mapping`. Každá kategorie má barevný badge s tooltip.
+
+Sort priorita: nedovolano > rezervovano > prodano > zavolejte_jindy > necekan_fyzicky > ostatni (highest = nejakutnější).
+
 ## Anti-patterns
 
 Viz `firstcall-monitor-refresh/SKILL.md` sekce "ANTI-PATTERNS".
