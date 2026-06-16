@@ -1135,7 +1135,7 @@ function nedovSortValue(d, col) {
     case 'ageW': return d.ageW ?? -1;
     case 'isN': return (d.isN ? 1 : 0) * 1000 + (d.nCnt || 0); // composite (kept for backwards compat)
     case 'ctCnt': return d.ctCnt || 0;
-    case 'lastType': return typeRank[d.lastType] || 0;
+    case 'lastType': return catRank[d.lastCategory] || typeRank[d.lastType] || 0;
     case 'lastD': return d.lastD || '';
     case 'lastBy': return d.lastBy || 'zzz';
     case 'incs': return (d.incs || []).length;
@@ -1204,9 +1204,18 @@ function renderNedovTable(data, sfBase) {
     const ctBadgeCls = cc === 0 ? 'b-gray' : cc === 1 ? 'b-amber' : 'b-green';
     const ctCell = cc > 0 ? '<span class="badge '+ctBadgeCls+'">'+cc+'×</span>' : '<span style="color:var(--muted)">—</span>';
     let typeCell = '<span style="color:var(--muted)">—</span>';
-    if (d.lastType === 'nedov') typeCell = '<span class="badge b-amber" title="Posledni pokus byl nedovolano nebo obsazeno">&#10006; Nedovoláno</span>';
-    else if (d.lastType === 'callback') typeCell = '<span class="badge b-blue" title="Prodejce zavola zpet / preda kolegovi">&#8634; Zavolá zpět</span>';
-    else if (d.lastType === 'messaging') typeCell = '<span class="badge" style="background:rgba(126,52,255,0.12);color:#534AB7" title="Poslano nebo plan poslat email/WhatsApp/SMS">&#9993; Email/SMS</span>';
+    // 6-category lastCategory (preferred), fallback na starý lastType (3-kategorie) pokud chybí
+    const cat = d.lastCategory || (
+      d.lastType === 'nedov' ? 'nedovolano' :
+      d.lastType === 'callback' ? 'zavolejte_jindy' :
+      d.lastType === 'messaging' ? 'zavolejte_jindy' : null
+    );
+    if (cat === 'nedovolano') typeCell = '<span class="badge b-amber" title="Posledni feed: nedovolano, mailbox, im Kundengespraech, neni v praci">&#10006; Nedovoláno</span>';
+    else if (cat === 'rezervovano') typeCell = '<span class="badge" style="background:rgba(245,158,11,0.15);color:#92400E" title="Posledni feed: rezervovano pro jineho zakaznika">&#128274; Rezervováno</span>';
+    else if (cat === 'prodano') typeCell = '<span class="badge" style="background:rgba(220,38,38,0.12);color:#991B1B" title="Posledni feed: voz prodan / neni k dispozici / bez zajmu">&#10060; Prodáno/Nedostupný</span>';
+    else if (cat === 'necekan_fyzicky') typeCell = '<span class="badge" style="background:rgba(99,102,241,0.12);color:#3730A3" title="Voz neni fyzicky na pobocce, ceka na transport">&#128666; Není fyzicky</span>';
+    else if (cat === 'zavolejte_jindy') typeCell = '<span class="badge b-blue" title="Zavola zpet / posle info pozdeji / call back / spaeter anrufen">&#8634; Zavolá jindy</span>';
+    else if (cat === 'ostatni') typeCell = '<span class="badge" style="background:#F3F4F6;color:#6B7280" title="Posledni feed bez jasne kategorie (interni @mention, FC objednani, dokumenty)">&#8230; Ostatní</span>';
     let incCell='<span style="color:var(--muted)">—</span>';
     if (d.incs && d.incs.length>0) {
       incCell = d.incs.map(i=>{

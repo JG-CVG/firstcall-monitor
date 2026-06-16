@@ -53,7 +53,28 @@ RE_CALLBACK = re.compile(
     r"meldet\s+sich|wird\s+sich\s+melden|ruft\s+zur[uü]ck|r[uü]ckruf|"
     r"kolega\s+(p[rř]i?jde|zavol[aá]|p[rř]eb[ií]r[aá])|"
     r"call(s|ed)?\s*back|callback|gets?\s+back|"
-    r"\bAP\s*[:=]",
+    r"\bAP\s*[:=]|"
+    r"sp[aä]+t?er\s+anrufen|spaerter|am\s+(?:morgen|nachmittag|montag|dienstag|mittwoch|donnerstag|freitag)\s+anrufen|morgen\s+anrufen|jindy|pozdeji|hodinu|"
+    r"(?:fin|vin|gutachten|info|infos|informace)\s*(?:posila|posílá|sendet|wird\s+gesendet|geschickt|schickt|per\s+mail|per\s+wa|per\s+whatsapp)|"
+    r"sendet\s+(?:alles|sobald)|hat\s+mich\s+gebeten\s+alle\s+fragen\s+per\s+mail|"
+    r"zaneprázdněn|moment[aá]ln[ěe]\s+zaneprázdněn",
+    re.IGNORECASE,
+)
+
+# 6-category extension (2026-06-16) — pro lastCategory field v nedovolano detail
+RE_PRODANO = re.compile(
+    r"(?:auto|vůz|fahrzeug|car|wagen)\s*(?:je|ist|wurde|already|uz|už)?\s*(?:prod[aá]n[aoy]?|verkauft|sold)|"
+    r"prod[aá]no|verkauft|already\s+sold|odprodan|verkoupen|"
+    r"nen[ií]\s*(?:k\s*dispozici|available|stále\s+k\s+dispozici)|"
+    r"nicht\s*(?:mehr\s+)?verf[uü]gbar|not\s+available|not\s+anymore|"
+    r"kein(?:e|en)?\s+interes+e|nem[aá]\s+z[aá]jem|no\s+interest|hat\s+keine\s+interesse|"
+    r"kann\s+nicht\s+an\s+H[aä]ndler|nur\s+an\s+Endkunde|kein\s+gutachten|gutachten\s+verweigert",
+    re.IGNORECASE,
+)
+RE_NECEKAN_FYZICKY = re.compile(
+    r"je\s+na\s+cest[ěe]\b|nedorazi[lo]|je[št][ěe]\s+nen[ií]\s+(?:na|v|u\s+n[aá]s)|"
+    r"noch\s+nicht\s+(?:da|angekommen|angeliefert|im\s+lager|im\s+depot)|"
+    r"noch\s+(?:auf|in)\s+transport(?:er)?|in\s+transit|on\s+the\s+way|chyb[ií]\s+fyzicky|im\s+transport",
     re.IGNORECASE,
 )
 
@@ -331,7 +352,7 @@ def main():
         incs_by_case.setdefault(i["Case__c"], []).append(i)
 
     def categorize(body):
-        """Return 'rezervace' | 'messaging' | 'callback' | 'nedov' | None for a feed body."""
+        """Legacy 4-kategorie: 'rezervace' | 'messaging' | 'callback' | 'nedov' | None. Drží potClose logiku + lastType field."""
         if not body:
             return None
         if RE_REZERVACE.search(body):
@@ -343,6 +364,19 @@ def main():
         if NEDOV_RE.search(body):
             return "nedov"
         return None
+
+    def categorize_full(body):
+        """6-kategorie pro lastCategory (2026-06-16): prodano | rezervovano | necekan_fyzicky |
+        zavolejte_jindy | nedovolano | ostatni. Priority: terminal states first."""
+        if not body:
+            return "ostatni"
+        if RE_PRODANO.search(body): return "prodano"
+        if RE_REZERVACE.search(body): return "rezervovano"
+        if RE_NECEKAN_FYZICKY.search(body): return "necekan_fyzicky"
+        if RE_CALLBACK.search(body) or RE_MESSAGING.search(body): return "zavolejte_jindy"
+        if NEDOV_RE.search(body): return "nedovolano"
+        return "ostatni"
+
 
     now_utc = datetime.now(timezone.utc)
     # ---- STALE INPUT GUARD: zadny sf_*.json vstup nesmi byt starsi nez 30 min ----
@@ -436,6 +470,10 @@ def main():
                         last_d = inc.get("createdDate")
                         last_by = inc.get("createdBy")
                     break
+        # 6-category lastCategory — z POSLEDNÍHO feedu (cf[0]), bez ohledu na categorize() — pro hover badge v Car Check tabulce
+        last_category = "ostatni"
+        if cf and cf[0].get("Body"):
+            last_category = categorize_full(cf[0]["Body"])
         nedov_data.append({
             "id": cid,
             "cn": c["CaseNumber"],
@@ -447,6 +485,7 @@ def main():
             "nCnt": len(nf),
             "ctCnt": len(cat_feeds),
             "lastType": last_type,
+            "lastCategory": last_category,
             "lastD": last_d,
             "lastBy": last_by,
             "incs": case_incs,
