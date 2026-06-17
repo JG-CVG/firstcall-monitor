@@ -1740,4 +1740,67 @@ const REFRESH_MS = 5 * 60 * 1000;
       + tile('Peak týden', peak.toFixed(1)+'%', lbl(WEEKS[peakI]), 'var(--text)')
     +'</div>'
     +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
-      +'<di
+      +'<div style="font-size:11px;color:var(--muted)">'
+        +'<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+C_PREF+';margin-right:4px;vertical-align:middle"></span>Preferred'
+        +'&nbsp;&nbsp;<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+C_NOPREF+';margin-right:4px;vertical-align:middle"></span>Not preferred'
+        +'&nbsp;&nbsp;<span style="color:'+C_LINE+';font-weight:700">━</span> % ze všech 1st Call closed'
+        +'&nbsp;&nbsp;<span style="color:'+C_LINE+';opacity:.6;font-weight:700">┈</span> 4-týd. průměr'
+      +'</div>'
+      +'<div id="untrustyRange" style="display:flex;gap:4px"></div>'
+    +'</div>'
+    +'<div style="position:relative;height:320px"><canvas id="untrustyStat-canvas"></canvas></div>'
+    +'<div style="font-size:10.5px;color:var(--muted);margin-top:8px">Nejnovější týden vlevo. Sloupce = počet CA (levá osa), oranžová linka = % podíl ze všech 1st Call closed (pravá osa).</div>';
+
+  let chart=null, range = 52; // default 1y
+  const ranges = [[13,'13t'],[26,'26t'],[52,'52t'],[N,'Vše']];
+  const rcont = document.getElementById('untrustyRange');
+  rcont.innerHTML = ranges.map((r,i)=>'<button data-r="'+r[0]+'" style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:7px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted)">'+r[1]+'</button>').join('');
+
+  function draw(){
+    const r = Math.min(range,N);
+    const sl = a => a.slice(N-r).slice().reverse();   // newest-left
+    const labels = sl(WEEKS).map(lbl);
+    const ctx = document.getElementById('untrustyStat-canvas').getContext('2d');
+    if(chart) chart.destroy();
+    chart = new Chart(ctx,{
+      data:{ labels:labels, datasets:[
+        {type:'bar',label:'Preferred',data:sl(PREF),backgroundColor:C_PREF,stack:'s',order:3,yAxisID:'y',borderRadius:3,maxBarThickness:26},
+        {type:'bar',label:'Not preferred',data:sl(NOPREF),backgroundColor:C_NOPREF,stack:'s',order:3,yAxisID:'y',borderRadius:3,maxBarThickness:26},
+        {type:'line',label:'% ze všech closed',data:sl(PCT),borderColor:C_LINE,backgroundColor:'transparent',borderWidth:2.5,pointRadius:r<=26?2.5:0,pointHoverRadius:4,tension:.35,order:1,yAxisID:'yPct',spanGaps:true},
+        {type:'line',label:'4-týd. průměr',data:sl(MA),borderColor:C_MA,backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:0,tension:.35,order:2,yAxisID:'yPct',spanGaps:false}
+      ]},
+      options:{ responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+        plugins:{ legend:{display:false},
+          tooltip:{ callbacks:{
+            title:it=>it[0].label,
+            label:function(item){const ds=item.dataset,v=item.raw; if(v==null)return null;
+              return ds.yAxisID==='yPct' ? ' '+ds.label+': '+v.toFixed(2)+'%' : ' '+ds.label+': '+v+' CA';},
+            afterBody:function(it){const i=N-1-it[0].dataIndex; const tot=TOTAL[i]||0,sub=SUB[i]||0;
+              return ['','📋 '+sub+' z '+tot+' (pref '+PREF[i]+' / no-pref '+NOPREF[i]+')'];}
+          }}
+        },
+        scales:{
+          x:{stacked:true,grid:{display:false},ticks:{maxRotation:45,font:{size:10},maxTicksLimit:r>40?26:r}},
+          y:{stacked:true,position:'left',beginAtZero:true,title:{display:true,text:'Počet CA',font:{size:11}},grid:{color:'rgba(27,33,48,0.06)'},ticks:{precision:0}},
+          yPct:{position:'right',beginAtZero:true,title:{display:true,text:'% ze všech closed',font:{size:11}},grid:{display:false},ticks:{callback:v=>v.toFixed(0)+'%',font:{size:10}}}
+        }
+      }
+    });
+    rcont.querySelectorAll('button').forEach(b=>{
+      const on = (+b.dataset.r)===range;
+      b.style.background = on?C_PREF:'var(--card)';
+      b.style.color = on?'#fff':'var(--muted)';
+      b.style.borderColor = on?C_PREF:'var(--border)';
+    });
+  }
+  rcont.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{range=+b.dataset.r;draw();}));
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',draw); else draw();
+})();
+
+loadData();
+setInterval(loadData, REFRESH_MS);
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</body>
+</html>
