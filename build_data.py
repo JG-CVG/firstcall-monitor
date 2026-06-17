@@ -178,6 +178,73 @@ def vc(rec):
     return ca.get("Vendor_Country__c") or "N/A"
 
 
+def compute_agent_activity(move_recs, feed_recs, now_utc):
+    """Aktivita agentu DNES po hodinach. Radky = Call Center Agent case (prazdne -> 'Neprideleno').
+    Sloupce = hodiny dne (Europe/Prague). Bunka = pocet "logu" daneho agenta v te hodine.
+
+    Log = jedna ze dvou udalosti behem dneska:
+      (move) Case presel Car check -> VIN Check  (CA_VIN_Check_Date__c = TODAY)
+      (feed) CaseFeed log jineho typu nez 'Case Created' (CreateRecordEvent) a 'Case status
+             updated' (ChangeStatusPost) -> tj. TextPost / EmailMessageEvent / LinkPost ...
+
+    Vstup = dva agregovane SOQL vystupy (agent, hr, cnt). Hodina je uz v Prague TZ
+    (HOUR_IN_DAY(convertTimezone(...))). Vraci dict nebo None pokud nejsou zadna data.
+    """
+    if not move_recs and not feed_recs:
+        return None
+    from collections import defaultdict
+    by_hour = defaultdict(lambda: defaultdict(int))
+    move_by = defaultdict(int)
+    feed_by = defaultdict(int)
+    hours_seen = set()
+
+    def _ingest(recs, per_agent):
+        tot = 0
+        for r in (recs or []):
+            hr = r.get("hr")
+            if hr is None:
+                continue
+            hr = int(hr)
+            ag = r.get("agent") or "Neprideleno"
+            cnt = int(r.get("cnt", r.get("expr0", 0)))
+            if cnt <= 0:
+                continue
+            by_hour[ag][hr] += cnt
+            per_agent[ag] += cnt
+            hours_seen.add(hr)
+            tot += cnt
+        return tot
+
+    move_total = _ingest(move_recs, move_by)
+    feed_total = _ingest(feed_recs, feed_by)
+    if not by_hour:
+        return None
+
+    hours = sorted(set(range(7, 19)) | hours_seen)
+    rows = []
+    for ag, hm in by_hour.items():
+        rows.append({
+            "agent": ag,
+            "by_hour": {str(h): c for h, c in hm.items()},
+            "total": sum(hm.values()),
+            "move": move_by.get(ag, 0),
+            "feed": feed_by.get(ag, 0),
+        })
+    rows.sort(key=lambda x: (x["agent"] == "Neprideleno", -x["total"], x["agent"]))
+    col_totals = {str(h): sum(hm.get(h, 0) for hm in by_hour.values()) for h in hours}
+    now_pg = now_utc.astimezone(PRAGUE)
+    return {
+        "today_iso": now_pg.strftime("%Y-%m-%d"),
+        "current_hour": now_pg.hour,
+        "hours": hours,
+        "rows": rows,
+        "col_totals": col_totals,
+        "grand_total": move_total + feed_total,
+        "src_move_total": move_total,
+        "src_feed_total": feed_total,
+    }
+
+
 def compute_capacity_reco(tp_vin, tp_rej, buffer_hourly, now_utc):
     """Capacity recommendation (predikce CA). Prahy odsouhlaseny 2026-06-11 (Josef):
     kapacita 9-10 CA/os./den, spread 2 CA/den, presčas->nabor 1.5 h/os./den,
@@ -435,6 +502,7 @@ def main():
         "sf_hourly_rej.json", "sf_aws_open.json", "sf_aws_age.json", "sf_aws_other.json",
         "sf_phase2.json", "sf_audit_order_expected.json",
         "sf_cebia_audit_order_expected.json", "sf_prep_to_done.json",
+        "sf_agent_activity_move.json", "sf_agent_activity_feed.json",
     ]
     _stale = []
     for _fn in _CHECK_FILES:
@@ -1066,6 +1134,21 @@ def main():
     if closed > 3000:
         raise SystemExit(f"\n\n🛑 SANITY CHECK FAILED: closed={closed} (max 3000 expected/month). Filtr chybí v Q1.\n")
 
+    # ---- Agent activity dnes (po hodinach) ----
+    # Ctu dva agregovane SOQL vystupy. Pokud chybi oba -> sekce se vynecha (degrade),
+    # NENI v CRITICAL_KEYS, takze jeji absence nikdy nezablokuje refresh.
+    try:
+        _aa_move = load("sf_agent_activity_move.json").get("records", [])
+    except Exception:
+        _aa_move = None
+    try:
+        _aa_feed = load("sf_agent_activity_feed.json").get("records", [])
+    except Exception:
+        _aa_feed = None
+    agent_activity = None
+    if _aa_move is not None or _aa_feed is not None:
+        agent_activity = compute_agent_activity(_aa_move or [], _aa_feed or [], now_utc)
+
     # ---- Output ----
     output = {
         "schema_version": 1,
@@ -1108,6 +1191,8 @@ def main():
         output["cebia_audit_order_expected"] = cebia_audit_order_expected
     if prep_to_done_daily is not None:
         output["prep_to_done_daily"] = prep_to_done_daily
+    if agent_activity is not None:
+        output["agent_activity"] = agent_activity
     # ---- REGRESSION GUARD: nedovol, aby z data.json tiše zmizela sekce, kterou jsme uz meli ----
     # Porovna novy output s naposledy commitnutym ./data.json. Pokud kriticka sekce
     # (vcetne aws_detail) byla driv pritomna a ted chybi -> FAIL, nezapisuj a nepushuj.

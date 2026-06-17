@@ -298,6 +298,8 @@ tr:hover td { background:#f9fafb; }
 
   <div class="card"><div class="card-title">&#128100; Call Center &mdash; Car Check per Agent</div><div id="tblAgent"></div></div>
 
+  <div class="card"><div class="card-title">&#128338; Call Center &mdash; Aktivita agentů dnes (po hodinách)</div><div id="tblAgentActivity"></div></div>
+
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
     <div class="card" style="margin-bottom:0"><div class="card-title">&#9888; Urgent &mdash; opakuj volání</div><div id="tblUrgent"></div></div>
     <div class="card" style="margin-bottom:0"><div class="card-title">&#9760;&#65039; Urgent &mdash; nemáme ani jedno volání</div><div id="tblUrgentNoCall"></div></div>
@@ -426,6 +428,7 @@ function render() {
   renderAwsDetail(d.aws_detail);
   renderBacklogEstimate(d.backlog_estimate);
   renderAgentTable(d.agent_breakdown);
+  renderAgentActivity(d.agent_activity);
   renderUrgentCount(d.nedovolano);
   renderUrgentNoCallCount(d.nedovolano);
   renderNedovTable(d.nedovolano, d.sf_base_url);
@@ -1063,6 +1066,68 @@ function renderAgentTable(agents) {
   el.innerHTML = h;
 }
 
+function renderAgentActivity(aa) {
+  const el = document.getElementById('tblAgentActivity');
+  if (!el) return;
+  if (!aa || !aa.rows || !aa.rows.length) {
+    el.innerHTML = '<span style="color:var(--muted)">Dnes zatím žádná aktivita (sekce se naplní s dalším refreshem).</span>';
+    return;
+  }
+  const hours = aa.hours || [];
+  const curH = aa.current_hour;
+  let maxCell = 1;
+  aa.rows.forEach(r => Object.values(r.by_hour || {}).forEach(v => { if (v > maxCell) maxCell = v; }));
+  function cellStyle(v) {
+    if (!v) return 'background:transparent;color:var(--border)';
+    const ratio = v / maxCell;
+    const alpha = (0.12 + ratio * 0.78).toFixed(2);
+    const txt = ratio > 0.55 ? '#fff' : 'var(--carvago-dark)';
+    return 'background:rgba(45,31,227,'+alpha+');color:'+txt+';font-weight:600';
+  }
+  const pad = h => (h < 10 ? '0' : '') + h;
+  let h = '';
+  h += '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.55">';
+  h += 'Počet logů jednotlivých agentů <strong style="color:var(--text)">dnes</strong> po hodinách (Europe/Prague). '
+     + 'Log = přechod <strong>Car check &rarr; VIN Check</strong> nebo feed záznam jiného typu než <em>Case Created</em> / <em>Case status updated</em>. '
+     + 'Řádek = pole <strong>Call Center Agent</strong> daného case (prázdné &rarr; Nepřiděleno).';
+  h += '<br>Celkem dnes: <strong style="color:var(--text)">' + aa.grand_total + '</strong> '
+     + '<span style="color:var(--muted)">(přechody na VIN: ' + aa.src_move_total + ' &middot; feed logy: ' + aa.src_feed_total + ')</span></div>';
+  h += '<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:12px;width:100%;min-width:520px">';
+  h += '<thead><tr>';
+  h += '<th style="text-align:left;padding:6px 10px;position:sticky;left:0;background:var(--card);border-bottom:2px solid var(--border);color:var(--muted);font-weight:600">Agent</th>';
+  hours.forEach(hh => {
+    const isCur = hh === curH;
+    h += '<th style="padding:6px 4px;text-align:center;border-bottom:2px solid var(--border);min-width:34px;'
+       + (isCur ? 'background:var(--blue-bg);' : '') + 'color:' + (isCur ? 'var(--blue-text)' : 'var(--muted)') + ';font-weight:600">'
+       + pad(hh) + '<div style="font-size:9px;font-weight:400;color:var(--muted)">&ndash;' + pad((hh + 1) % 24) + '</div></th>';
+  });
+  h += '<th style="padding:6px 10px;text-align:center;border-bottom:2px solid var(--border);color:var(--text);font-weight:700">&Sigma;</th>';
+  h += '</tr></thead><tbody>';
+  aa.rows.forEach(r => {
+    const isNA = r.agent === 'Neprideleno';
+    const disp = isNA ? 'Nepřiděleno' : r.agent;
+    h += '<tr>';
+    h += '<td style="text-align:left;padding:5px 10px;position:sticky;left:0;background:var(--card);border-bottom:1px solid var(--border);font-weight:600;'
+       + (isNA ? 'color:var(--muted)' : 'color:var(--text)') + '" title="přechody na VIN: ' + r.move + ' · feed logy: ' + r.feed + '">' + escapeHtml(disp) + '</td>';
+    hours.forEach(hh => {
+      const v = (r.by_hour && r.by_hour[String(hh)]) || 0;
+      h += '<td style="text-align:center;padding:5px 4px;border-bottom:1px solid var(--border);' + cellStyle(v) + '">' + (v || '') + '</td>';
+    });
+    h += '<td style="text-align:center;padding:5px 10px;border-bottom:1px solid var(--border);font-weight:700;color:var(--text)">' + r.total + '</td>';
+    h += '</tr>';
+  });
+  h += '<tr>';
+  h += '<td style="text-align:left;padding:7px 10px;font-weight:700;color:var(--text);border-top:2px solid var(--border)">Celkem</td>';
+  hours.forEach(hh => {
+    const v = (aa.col_totals && aa.col_totals[String(hh)]) || 0;
+    const isCur = hh === curH;
+    h += '<td style="text-align:center;padding:7px 4px;font-weight:700;color:' + (isCur ? 'var(--blue-text)' : 'var(--text)') + ';border-top:2px solid var(--border)">' + (v || '') + '</td>';
+  });
+  h += '<td style="text-align:center;padding:7px 10px;font-weight:800;color:var(--carvago);border-top:2px solid var(--border)">' + aa.grand_total + '</td>';
+  h += '</tr></tbody></table></div>';
+  el.innerHTML = h;
+}
+
 function renderUrgentCount(nedov) {
   const el = document.getElementById('tblUrgent');
   if (!nedov || !nedov.length) { el.innerHTML='<span style="color:var(--muted)">Žádné case</span>'; return; }
@@ -1675,67 +1740,4 @@ const REFRESH_MS = 5 * 60 * 1000;
       + tile('Peak týden', peak.toFixed(1)+'%', lbl(WEEKS[peakI]), 'var(--text)')
     +'</div>'
     +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
-      +'<div style="font-size:11px;color:var(--muted)">'
-        +'<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+C_PREF+';margin-right:4px;vertical-align:middle"></span>Preferred'
-        +'&nbsp;&nbsp;<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+C_NOPREF+';margin-right:4px;vertical-align:middle"></span>Not preferred'
-        +'&nbsp;&nbsp;<span style="color:'+C_LINE+';font-weight:700">━</span> % ze všech 1st Call closed'
-        +'&nbsp;&nbsp;<span style="color:'+C_LINE+';opacity:.6;font-weight:700">┈</span> 4-týd. průměr'
-      +'</div>'
-      +'<div id="untrustyRange" style="display:flex;gap:4px"></div>'
-    +'</div>'
-    +'<div style="position:relative;height:320px"><canvas id="untrustyStat-canvas"></canvas></div>'
-    +'<div style="font-size:10.5px;color:var(--muted);margin-top:8px">Nejnovější týden vlevo. Sloupce = počet CA (levá osa), oranžová linka = % podíl ze všech 1st Call closed (pravá osa).</div>';
-
-  let chart=null, range = 52; // default 1y
-  const ranges = [[13,'13t'],[26,'26t'],[52,'52t'],[N,'Vše']];
-  const rcont = document.getElementById('untrustyRange');
-  rcont.innerHTML = ranges.map((r,i)=>'<button data-r="'+r[0]+'" style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:7px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted)">'+r[1]+'</button>').join('');
-
-  function draw(){
-    const r = Math.min(range,N);
-    const sl = a => a.slice(N-r).slice().reverse();   // newest-left
-    const labels = sl(WEEKS).map(lbl);
-    const ctx = document.getElementById('untrustyStat-canvas').getContext('2d');
-    if(chart) chart.destroy();
-    chart = new Chart(ctx,{
-      data:{ labels:labels, datasets:[
-        {type:'bar',label:'Preferred',data:sl(PREF),backgroundColor:C_PREF,stack:'s',order:3,yAxisID:'y',borderRadius:3,maxBarThickness:26},
-        {type:'bar',label:'Not preferred',data:sl(NOPREF),backgroundColor:C_NOPREF,stack:'s',order:3,yAxisID:'y',borderRadius:3,maxBarThickness:26},
-        {type:'line',label:'% ze všech closed',data:sl(PCT),borderColor:C_LINE,backgroundColor:'transparent',borderWidth:2.5,pointRadius:r<=26?2.5:0,pointHoverRadius:4,tension:.35,order:1,yAxisID:'yPct',spanGaps:true},
-        {type:'line',label:'4-týd. průměr',data:sl(MA),borderColor:C_MA,backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:0,tension:.35,order:2,yAxisID:'yPct',spanGaps:false}
-      ]},
-      options:{ responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-        plugins:{ legend:{display:false},
-          tooltip:{ callbacks:{
-            title:it=>it[0].label,
-            label:function(item){const ds=item.dataset,v=item.raw; if(v==null)return null;
-              return ds.yAxisID==='yPct' ? ' '+ds.label+': '+v.toFixed(2)+'%' : ' '+ds.label+': '+v+' CA';},
-            afterBody:function(it){const i=N-1-it[0].dataIndex; const tot=TOTAL[i]||0,sub=SUB[i]||0;
-              return ['','📋 '+sub+' z '+tot+' (pref '+PREF[i]+' / no-pref '+NOPREF[i]+')'];}
-          }}
-        },
-        scales:{
-          x:{stacked:true,grid:{display:false},ticks:{maxRotation:45,font:{size:10},maxTicksLimit:r>40?26:r}},
-          y:{stacked:true,position:'left',beginAtZero:true,title:{display:true,text:'Počet CA',font:{size:11}},grid:{color:'rgba(27,33,48,0.06)'},ticks:{precision:0}},
-          yPct:{position:'right',beginAtZero:true,title:{display:true,text:'% ze všech closed',font:{size:11}},grid:{display:false},ticks:{callback:v=>v.toFixed(0)+'%',font:{size:10}}}
-        }
-      }
-    });
-    rcont.querySelectorAll('button').forEach(b=>{
-      const on = (+b.dataset.r)===range;
-      b.style.background = on?C_PREF:'var(--card)';
-      b.style.color = on?'#fff':'var(--muted)';
-      b.style.borderColor = on?C_PREF:'var(--border)';
-    });
-  }
-  rcont.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{range=+b.dataset.r;draw();}));
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',draw); else draw();
-})();
-
-loadData();
-setInterval(loadData, REFRESH_MS);
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-</body>
-</html>
+      +'<di
