@@ -1128,7 +1128,7 @@ function nedovSortValue(d, col) {
   // Ordering for lastType: nedov (highest) > callback > messaging > null
   const typeRank = { 'nedov': 3, 'callback': 2, 'messaging': 1 };
   // 6-category ordering for lastCategory (Typ kontaktu)
-  const catRank = { 'nedovolano':5, 'rezervovano':4, 'prodano':4, 'necekan_fyzicky':3, 'zavolejte_jindy':2, 'ostatni':1 };
+  const catRank = { 'nedovolano':6, 'prodano':5, 'nelze_prodat':5, 'rezervovano':4, 'necekan_fyzicky':3, 'zavolejte_jindy':2, 'ostatni':1 };
   switch (col) {
     case 'cn': return d.cn || '';
     case 'country': return d.country || '';
@@ -1171,7 +1171,8 @@ function renderNedovTable(data, sfBase) {
   h+='<span style="color:#d97706">&#10006; Nedovoláno: <strong>'+cCnt('nedovolano')+'</strong></span>';
   h+='<span style="color:#2D4FBC">&#8634; Zavolat později: <strong>'+cCnt('zavolejte_jindy')+'</strong></span>';
   h+='<span style="color:#3730A3">&#128666; Není vůz na pobočce: <strong>'+cCnt('necekan_fyzicky')+'</strong></span>';
-  h+='<span style="color:#991B1B">&#10060; Nelze prodat: <strong>'+cCnt('prodano')+'</strong></span>';
+  h+='<span style="color:#991B1B">&#10060; Vůz prodán: <strong>'+cCnt('prodano')+'</strong></span>';
+  h+='<span style="color:#9A3412">&#128683; Nelze prodat: <strong>'+cCnt('nelze_prodat')+'</strong></span>';
   h+='<span style="color:#92400E">&#128274; Rezervováno: <strong>'+cCnt('rezervovano')+'</strong></span>';
   h+='<span style="color:#6B7280">&#8230; Ostatní: <strong>'+cCnt('ostatni')+'</strong></span>';
   h+='<span style="color:#6B7280">– Bez kontaktu: <strong>'+noneCnt+'</strong></span></div>';
@@ -1218,7 +1219,8 @@ function renderNedovTable(data, sfBase) {
     );
     if (cat === 'nedovolano') typeCell = '<span class="badge b-amber" title="Posledni feed: nedovolano, mailbox, im Kundengespraech, neni v praci">&#10006; Nedovoláno</span>';
     else if (cat === 'rezervovano') typeCell = '<span class="badge" style="background:rgba(245,158,11,0.15);color:#92400E" title="Posledni feed: voz rezervovan pro jineho zakaznika">&#128274; Rezervováno pro jiného zákazníka</span>';
-    else if (cat === 'prodano') typeCell = '<span class="badge" style="background:rgba(220,38,38,0.12);color:#991B1B" title="Posledni feed: voz prodan / bez zajmu / nelze prodat (jen koncovy zakaznik)">&#10060; Nelze vůz prodat</span>';
+    else if (cat === 'prodano') typeCell = '<span class="badge" style="background:rgba(220,38,38,0.12);color:#991B1B" title="Posledni feed: voz JE prodan (verkauft / sold)">&#10060; Vůz prodán</span>';
+    else if (cat === 'nelze_prodat') typeCell = '<span class="badge" style="background:rgba(154,52,18,0.12);color:#9A3412" title="Posledni feed: voz nelze prodat / neni k dispozici / bez zajmu / jen koncovy zakaznik">&#128683; Nelze vůz prodat</span>';
     else if (cat === 'necekan_fyzicky') typeCell = '<span class="badge" style="background:rgba(99,102,241,0.12);color:#3730A3" title="Voz neni fyzicky na pobocce, ceka na transport / na ceste">&#128666; Není vůz k dispozici na pobočce</span>';
     else if (cat === 'zavolejte_jindy') typeCell = '<span class="badge b-blue" title="Zavolat pozdeji / ozve se / posle info pozdeji / spaeter anrufen">&#8634; Zavolat později</span>';
     else if (cat === 'ostatni') typeCell = '<span class="badge" style="background:#F3F4F6;color:#6B7280" title="Posledni feed bez jasne kategorie (interni @mention, FC objednani, dokumenty)">&#8230; Ostatní</span>';

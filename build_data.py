@@ -62,10 +62,15 @@ RE_CALLBACK = re.compile(
 )
 
 # 6-category extension (2026-06-16) — pro lastCategory field v nedovolano detail
+# "Vuz prodan" = voz JE prodan (sold). Oddeleno od "Nelze prodat" (Josef 2026-06-17).
 RE_PRODANO = re.compile(
-    r"(?:auto|vůz|fahrzeug|car|wagen)\s*(?:je|ist|wurde|already|uz|už)?\s*(?:prod[aá]n[aoy]?|verkauft|sold)|"
-    r"prod[aá]n[aoeéyý]*|verkauft|already\s+sold|odprodan|verkoupen|"
-    r"nen[ií]\s*(?:k\s*dispozici|available|stále\s+k\s+dispozici)|"
+    r"(?:auto|v[uů]z|fahrzeug|car|wagen)\s*(?:je|ist|wurde|already|uz|už)?\s*(?:prod[aá]n[aoeéyý]*|verkauft|sold)|"
+    r"prod[aá]n[aoeéyý]*|verkauft|\bsold\b|already\s+sold|odprod[aá]n[aoy]*|verkoupen",
+    re.IGNORECASE,
+)
+# "Nelze prodat" = voz nelze prodat / neni k dispozici / bez zajmu / jen koncovy zakaznik.
+RE_NELZE_PRODAT = re.compile(
+    r"nen[ií]\s*(?:k\s*dispozici|available|st[aá]le\s+k\s+dispozici)|"
     r"nicht\s*(?:mehr\s+)?verf[uü]gbar|not\s+available|not\s+anymore|"
     r"kein(?:e|en)?\s+interes+e|nem[aá]\s+z[aá]jem|no\s+interest|hat\s+keine\s+interesse|"
     r"kann\s+nicht\s+an\s+H[aä]ndler|nur\s+an\s+Endkunde|kein\s+gutachten|gutachten\s+verweigert",
@@ -407,6 +412,7 @@ def main():
         if not body:
             return "ostatni"
         if RE_PRODANO.search(body): return "prodano"
+        if RE_NELZE_PRODAT.search(body): return "nelze_prodat"
         if RE_REZERVACE.search(body): return "rezervovano"
         if RE_NECEKAN_FYZICKY.search(body): return "necekan_fyzicky"
         if RE_CALLBACK.search(body) or RE_MESSAGING.search(body): return "zavolejte_jindy"
