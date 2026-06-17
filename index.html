@@ -1127,6 +1127,8 @@ function sortNedov(col) {
 function nedovSortValue(d, col) {
   // Ordering for lastType: nedov (highest) > callback > messaging > null
   const typeRank = { 'nedov': 3, 'callback': 2, 'messaging': 1 };
+  // 6-category ordering for lastCategory (Typ kontaktu)
+  const catRank = { 'nedovolano':5, 'rezervovano':4, 'prodano':4, 'necekan_fyzicky':3, 'zavolejte_jindy':2, 'ostatni':1 };
   switch (col) {
     case 'cn': return d.cn || '';
     case 'country': return d.country || '';
@@ -1134,7 +1136,7 @@ function nedovSortValue(d, col) {
     case 'ageH': return d.ageH ?? -1;
     case 'ageW': return d.ageW ?? -1;
     case 'isN': return (d.isN ? 1 : 0) * 1000 + (d.nCnt || 0); // composite (kept for backwards compat)
-    case 'ctCnt': return d.ctCnt || 0;
+    case 'ctCnt': return (d.potContacts != null ? d.potContacts : (d.ctCnt || 0));
     case 'lastType': return catRank[d.lastCategory] || typeRank[d.lastType] || 0;
     case 'lastD': return d.lastD || '';
     case 'lastBy': return d.lastBy || 'zzz';
@@ -1159,15 +1161,19 @@ function renderNedovTable(data, sfBase) {
     // tiebreaker: ageH desc
     return (b.ageH||0)-(a.ageH||0);
   });
-  const nedCnt = data.filter(d=>d.lastType==='nedov').length;
-  const cbCnt = data.filter(d=>d.lastType==='callback').length;
-  const msgCnt = data.filter(d=>d.lastType==='messaging').length;
-  const noneCnt = data.filter(d=>!d.lastType).length;
+  const catOf = d => d.lastCategory || (
+    d.lastType==='nedov' ? 'nedovolano' :
+    (d.lastType==='callback'||d.lastType==='messaging') ? 'zavolejte_jindy' : null);
+  const cCnt = c => data.filter(d=>catOf(d)===c).length;
+  const noneCnt = data.filter(d=>!catOf(d)).length;
   let h='<div style="margin-bottom:8px;display:flex;gap:14px;font-size:12px;flex-wrap:wrap">';
   h+='<span>&#128222; Car Check: <strong>'+data.length+'</strong></span>';
-  h+='<span style="color:#d97706">&#10006; Nedovoláno: <strong>'+nedCnt+'</strong></span>';
-  h+='<span style="color:#2D4FBC">&#8634; Zavolá zpět: <strong>'+cbCnt+'</strong></span>';
-  h+='<span style="color:#534AB7">&#9993; Email/SMS: <strong>'+msgCnt+'</strong></span>';
+  h+='<span style="color:#d97706">&#10006; Nedovoláno: <strong>'+cCnt('nedovolano')+'</strong></span>';
+  h+='<span style="color:#2D4FBC">&#8634; Zavolat později: <strong>'+cCnt('zavolejte_jindy')+'</strong></span>';
+  h+='<span style="color:#3730A3">&#128666; Není vůz na pobočce: <strong>'+cCnt('necekan_fyzicky')+'</strong></span>';
+  h+='<span style="color:#991B1B">&#10060; Nelze prodat: <strong>'+cCnt('prodano')+'</strong></span>';
+  h+='<span style="color:#92400E">&#128274; Rezervováno: <strong>'+cCnt('rezervovano')+'</strong></span>';
+  h+='<span style="color:#6B7280">&#8230; Ostatní: <strong>'+cCnt('ostatni')+'</strong></span>';
   h+='<span style="color:#6B7280">– Bez kontaktu: <strong>'+noneCnt+'</strong></span></div>';
   
   const arr = dir => dir === 'asc' ? '&#9650;' : '&#9660;';
@@ -1200,7 +1206,7 @@ function renderNedovTable(data, sfBase) {
     const wCls = d.ageW==null ? '' : (d.ageW>27 ? 'b-red' : d.ageW>9 ? 'b-amber' : 'b-green');
     const wb = d.ageW!=null ? '<span class="badge '+wCls+'">'+wTxt+'</span>' : '—';
     const lt=d.lastD?new Date(d.lastD).toLocaleString('cs-CZ',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
-    const cc = (d.ctCnt || 0);
+    const cc = (d.potContacts != null ? d.potContacts : (d.ctCnt || 0));
     const ctBadgeCls = cc === 0 ? 'b-gray' : cc === 1 ? 'b-amber' : 'b-green';
     const ctCell = cc > 0 ? '<span class="badge '+ctBadgeCls+'">'+cc+'×</span>' : '<span style="color:var(--muted)">—</span>';
     let typeCell = '<span style="color:var(--muted)">—</span>';
@@ -1211,10 +1217,10 @@ function renderNedovTable(data, sfBase) {
       d.lastType === 'messaging' ? 'zavolejte_jindy' : null
     );
     if (cat === 'nedovolano') typeCell = '<span class="badge b-amber" title="Posledni feed: nedovolano, mailbox, im Kundengespraech, neni v praci">&#10006; Nedovoláno</span>';
-    else if (cat === 'rezervovano') typeCell = '<span class="badge" style="background:rgba(245,158,11,0.15);color:#92400E" title="Posledni feed: rezervovano pro jineho zakaznika">&#128274; Rezervováno</span>';
-    else if (cat === 'prodano') typeCell = '<span class="badge" style="background:rgba(220,38,38,0.12);color:#991B1B" title="Posledni feed: voz prodan / neni k dispozici / bez zajmu">&#10060; Prodáno/Nedostupný</span>';
-    else if (cat === 'necekan_fyzicky') typeCell = '<span class="badge" style="background:rgba(99,102,241,0.12);color:#3730A3" title="Voz neni fyzicky na pobocce, ceka na transport">&#128666; Není fyzicky</span>';
-    else if (cat === 'zavolejte_jindy') typeCell = '<span class="badge b-blue" title="Zavola zpet / posle info pozdeji / call back / spaeter anrufen">&#8634; Zavolá jindy</span>';
+    else if (cat === 'rezervovano') typeCell = '<span class="badge" style="background:rgba(245,158,11,0.15);color:#92400E" title="Posledni feed: voz rezervovan pro jineho zakaznika">&#128274; Rezervováno pro jiného zákazníka</span>';
+    else if (cat === 'prodano') typeCell = '<span class="badge" style="background:rgba(220,38,38,0.12);color:#991B1B" title="Posledni feed: voz prodan / bez zajmu / nelze prodat (jen koncovy zakaznik)">&#10060; Nelze vůz prodat</span>';
+    else if (cat === 'necekan_fyzicky') typeCell = '<span class="badge" style="background:rgba(99,102,241,0.12);color:#3730A3" title="Voz neni fyzicky na pobocce, ceka na transport / na ceste">&#128666; Není vůz k dispozici na pobočce</span>';
+    else if (cat === 'zavolejte_jindy') typeCell = '<span class="badge b-blue" title="Zavolat pozdeji / ozve se / posle info pozdeji / spaeter anrufen">&#8634; Zavolat později</span>';
     else if (cat === 'ostatni') typeCell = '<span class="badge" style="background:#F3F4F6;color:#6B7280" title="Posledni feed bez jasne kategorie (interni @mention, FC objednani, dokumenty)">&#8230; Ostatní</span>';
     let incCell='<span style="color:var(--muted)">—</span>';
     if (d.incs && d.incs.length>0) {
@@ -1224,7 +1230,7 @@ function renderNedovTable(data, sfBase) {
         return '<div style="margin:2px 0"><span style="color:#dc2626;font-weight:700">&#9888;</span> '+escapeHtml(i.subject)+etaBadge+'</div>';
       }).join('');
     }
-    const skullTitle = d.potClose ? ('Potencial na uzavreni: '+d.nCnt+' nedovolano, span '+(d.potSpanH!=null?d.potSpanH.toFixed(1):'?')+'h, '+(d.ageW!=null?d.ageW.toFixed(1):'?')+' prac. hod.') : '';
+    const skullTitle = d.potClose ? ('Na uzavreni: '+(d.potContacts!=null?d.potContacts:0)+'\u00d7 kontakt, odstup '+(d.potSpanH!=null?d.potSpanH.toFixed(1):'?')+' prac. hod. (Po-Pa 8-17), bez blokacniho incidentu') : '';
     const skullCell = d.potClose ? '<span title="'+escapeHtml(skullTitle)+'" style="font-size:18px">&#128128;</span>' : '<span style="color:var(--muted)">—</span>';
     const isUrgent = d.nCnt === 1 && d.lastD && (Date.now() - new Date(d.lastD).getTime()) > 2*3600*1000;
     const urgentIcon = isUrgent ? '<span title="Urgent &mdash; opakuj vol\u00e1n\u00ed (1\u00d7 vol\u00e1no, posledn\u00ed pokus p\u0159ed v\u00edce ne\u017e 2h)" style="display:inline-block;vertical-align:middle;margin-right:6px;line-height:0"><svg viewBox="0 0 24 24" width="20" height="18"><path d="M12 2 L22 21 L2 21 Z" fill="#FCD34D" stroke="#D97706" stroke-width="1.5" stroke-linejoin="round"/><g transform="translate(8.2 10) scale(0.38)" fill="#DC2626"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></g></svg></span>' : '';
@@ -1232,7 +1238,7 @@ function renderNedovTable(data, sfBase) {
     const urgentNoCallIcon = isUrgentNoCall ? '<span title="Urgent &mdash; nem\u00e1me ani jedno vol\u00e1n\u00ed (0\u00d7 vol\u00e1no, \u017e\u00e1dn\u00fd blokac\u030cn\u00ed incident, &ge; 1.5 prac. hod.)" style="display:inline-block;vertical-align:middle;margin-right:6px;line-height:0"><svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="11" fill="#FCD34D" stroke="#D97706" stroke-width="1.5"/><path d="M12 6 C8.7 6 6 8.7 6 12 C6 13.6 6.6 15 7.5 16 L7.5 17.5 C7.5 17.8 7.7 18 8 18 L9 18 L9 17 L10 17 L10 18 L11 18 L11 17 L13 17 L13 18 L14 18 L14 17 L15 17 L15 18 L16 18 C16.3 18 16.5 17.8 16.5 17.5 L16.5 16 C17.4 15 18 13.6 18 12 C18 8.7 15.3 6 12 6 Z" fill="#000"/><ellipse cx="9.7" cy="11.7" rx="1.2" ry="1.5" fill="#FCD34D"/><ellipse cx="14.3" cy="11.7" rx="1.2" ry="1.5" fill="#FCD34D"/><path d="M11.5 13.8 L12.5 13.8 L12 15 Z" fill="#FCD34D"/></svg></span>' : '';
     const prefBadge = d.pref ? '<span title="Preferovaný vůz" style="display:inline-block;background:var(--carvago);color:#fff;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:0.06em;margin-right:8px;vertical-align:middle">&#9733; PREFERRED</span>' : '';
     const caseLink = prefBadge + urgentIcon + urgentNoCallIcon + ((sfBase && d.id) ? '<a href="'+sfBase+'/lightning/r/Case/'+d.id+'/view" target="_blank" rel="noopener" style="color:var(--carvago);text-decoration:none;font-weight:500"><strong>'+d.cn+'</strong></a>' : '<strong>'+d.cn+'</strong>');
-    const agentCell = d.agent ? '<span class="badge b-blue">'+escapeHtml(d.agent)+'</span>' : '<span style="color:var(--muted)">—</span>';
+    const agentCell = d.agent ? '<span class="badge b-blue">'+escapeHtml(d.agent)+'</span>' : '<span style="color:#9CA3AF;font-style:italic">Nepřiřazen Agent</span>';
     h+='<tr'+rc+'><td>'+caseLink+'</td><td>'+d.country+'</td><td>'+agentCell+'</td><td class="r">'+ab+'</td><td class="r">'+wb+'</td><td class="c">'+ctCell+'</td><td>'+lt+'</td><td class="c">'+typeCell+'</td><td>'+escapeHtml(d.lastBy||'—')+'</td><td>'+incCell+'</td><td class="c">'+skullCell+'</td></tr>';
   });
   h+='</tbody></table>';

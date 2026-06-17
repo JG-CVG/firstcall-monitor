@@ -64,7 +64,7 @@ RE_CALLBACK = re.compile(
 # 6-category extension (2026-06-16) — pro lastCategory field v nedovolano detail
 RE_PRODANO = re.compile(
     r"(?:auto|vůz|fahrzeug|car|wagen)\s*(?:je|ist|wurde|already|uz|už)?\s*(?:prod[aá]n[aoy]?|verkauft|sold)|"
-    r"prod[aá]no|verkauft|already\s+sold|odprodan|verkoupen|"
+    r"prod[aá]n[aoeéyý]*|verkauft|already\s+sold|odprodan|verkoupen|"
     r"nen[ií]\s*(?:k\s*dispozici|available|stále\s+k\s+dispozici)|"
     r"nicht\s*(?:mehr\s+)?verf[uü]gbar|not\s+available|not\s+anymore|"
     r"kein(?:e|en)?\s+interes+e|nem[aá]\s+z[aá]jem|no\s+interest|hat\s+keine\s+interesse|"
@@ -75,6 +75,15 @@ RE_NECEKAN_FYZICKY = re.compile(
     r"je\s+na\s+cest[ěe]\b|nedorazi[lo]|je[št][ěe]\s+nen[ií]\s+(?:na|v|u\s+n[aá]s)|"
     r"noch\s+nicht\s+(?:da|angekommen|angeliefert|im\s+lager|im\s+depot)|"
     r"noch\s+(?:auf|in)\s+transport(?:er)?|in\s+transit|on\s+the\s+way|chyb[ií]\s+fyzicky|im\s+transport",
+    re.IGNORECASE,
+)
+
+# Systemove feed zaznamy, ktere se NEPOCITAJI jako pokus o kontakt ani jako "Posledni pokus"
+# (Josef 2026-06-17): "DO feed se nepocitaji zaznamy Case status updated a Case created"
+RE_SYSTEM_FEED = re.compile(
+    r"case\s+status\s+updated|case\s+created|"
+    r"changed\s+status\s+from|status\s+changed\s+from|"
+    r"stav\s+p[rř][ií]padu\s+(?:zm[eě]n[eě]n|aktualiz)|p[rř][ií]pad\s+vytvo[rř]en",
     re.IGNORECASE,
 )
 
@@ -122,6 +131,33 @@ def working_hours_between(start_utc, end_utc):
         e = min(end, day_close)
         if e > s:
             total_sec += (e - s).total_seconds()
+        cur = (cur + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    return round(total_sec / 3600, 2)
+
+
+def working_hours_mf(start_utc, end_utc):
+    """Pracovni hodiny POUZE Po-Pa 08:00-17:00 (Europe/Prague), bez soboty/nedele.
+    Pouziva se LOKALNE v Car Check 'nedovolano detail' tabulce (b5 Prac. hod. + b9 odstup
+    mezi kontakty). Josef 2026-06-17: jen pro tuto tabulku, zbytek dashboardu nemenit."""
+    if start_utc is None or end_utc is None or start_utc >= end_utc:
+        return 0.0
+    start = start_utc.astimezone(PRAGUE)
+    end = end_utc.astimezone(PRAGUE)
+    total_sec = 0.0
+    cur = start
+    guard = 0
+    while cur < end and guard < 5000:
+        guard += 1
+        wd = cur.weekday()
+        if wd >= 5:  # sobota / nedele se nepocita
+            cur = (cur + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            continue
+        day_open = cur.replace(hour=8, minute=0, second=0, microsecond=0)
+        day_close = cur.replace(hour=17, minute=0, second=0, microsecond=0)
+        ss = max(cur, day_open)
+        ee = min(end, day_close)
+        if ee > ss:
+            total_sec += (ee - ss).total_seconds()
         cur = (cur + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
     return round(total_sec / 3600, 2)
 
@@ -414,20 +450,28 @@ def main():
     cc_recs = [r for r in ip_recs if r["Status"] == "Car check"]
     for c in cc_recs:
         cid = c["Id"]
-        cf = sorted(feeds_by_case.get(cid, []), key=lambda x: x.get("CreatedDate") or "", reverse=True)
-        nf = [f for f in cf if f.get("Body") and NEDOV_RE.search(f["Body"])]
-        # All categorized feeds (any of 3 categories) — used for potClose and lastType
+        # Vsechny feedy case, newest first. Q4 vraci jen Type=TextPost (operatorske posty),
+        # navic explicitne vyloucime systemove zaznamy "Case status updated"/"Case Created"
+        # (Josef 2026-06-17) a feedy bez tela.
+        cf_all = sorted(feeds_by_case.get(cid, []), key=lambda x: x.get("CreatedDate") or "", reverse=True)
+        cf = [f for f in cf_all if f.get("Body") and not RE_SYSTEM_FEED.search(f["Body"])]
+        nf = [f for f in cf if NEDOV_RE.search(f["Body"])]
+        # Legacy kategorizovane feedy (4-kat) — drzime kvuli nCnt a zpetne kompatibilite
         cat_feeds = []
         for f in cf:
             cat = categorize(f.get("Body"))
             if cat:
                 cat_feeds.append((cat, f))
+        # b9 "kontakt" = feed, ze ktereho plyne pokus o kontakt = jakakoli z 6 kategorii
+        # KROME 'ostatni' (interni @mention, FC objednani, dokumenty nejsou kontakt).
+        contact_feeds = [f for f in cf if categorize_full(f.get("Body")) != "ostatni"]
         is_n = len(nf) > 0
         if is_n:
             nedov_count += 1
         ccd = parse_dt(c.get("CA_Car_Check_Date__c"))
         age_h = round((now_utc - ccd).total_seconds() / 3600) if ccd else None
-        age_w = working_hours_between(ccd, now_utc) if ccd else None
+        # b5 Prac. hod. — POUZE Po-Pa 08-17 (lokalne pro tuto tabulku; Josef 2026-06-17)
+        age_w = working_hours_mf(ccd, now_utc) if ccd else None
         case_incs_raw = sorted(incs_by_case.get(cid, []), key=lambda x: x.get("CreatedDate") or "", reverse=True)
         case_incs = [
             {
@@ -438,42 +482,28 @@ def main():
             }
             for i in case_incs_raw
         ]
-        # potClose: 2+ contacts of ANY type, span >= 1.5h, age_w >= 4h
+        # b9 "Na uzavreni" (Josef 2026-06-17): VSECHNY podminky soucasne ->
+        #   1) >= 3 kontaktni feedy (pokus o kontakt)
+        #   2) mezi prvnim a poslednim kontaktem >= 2 prac. hodiny (Po-Pa 08-17)
+        #   3) ZADNY blokacni incident u case
+        pot_contacts = len(contact_feeds)
         pot_close = False
         pot_span_h = None
-        if age_w is not None and age_w >= 4 and len(cat_feeds) >= 2:
-            ts = sorted(parse_dt(f["CreatedDate"]).timestamp() for _, f in cat_feeds)
-            pot_span_h = round((ts[-1] - ts[0]) / 3600, 2)
-            if pot_span_h >= 1.5:
+        if pot_contacts >= 3 and not case_incs:
+            cts = sorted(parse_dt(f["CreatedDate"]) for f in contact_feeds)
+            pot_span_h = working_hours_mf(cts[0], cts[-1])
+            if pot_span_h >= 2:
                 pot_close = True
-        # Last contact info — STRICT: only operators who logged a categorized feed
-        # (Nedovoláno/Zavolá zpět/Email-SMS) OR created an incident. Uncategorized feed
-        # noise (vendor info dumps, etc.) is ignored.
-        last_type = cat_feeds[0][0] if cat_feeds else None
+        # b6 Posledni pokus + b7 Operator (Josef 2026-06-17): posledni REALNY feed post
+        # (jakykoli typ, krome systemovych Case status updated/Created) a jeho autor.
+        last_type = cat_feeds[0][0] if cat_feeds else None  # ponechano pro zpetnou kompat.
         last_d = None
         last_by = None
-        if cat_feeds:
-            last_feed = cat_feeds[0][1]
-            last_d = last_feed["CreatedDate"]
-            last_by = (last_feed.get("CreatedBy") or {}).get("Name")
-        elif case_incs:
-            # No categorized feed — fall back to incident creator
-            last_d = case_incs[0].get("createdDate")
-            last_by = case_incs[0].get("createdBy")
-        # Incident-based rezervace override: if any blocking incident subject matches
-        # and no feed already flagged rezervace, override lastType
-        if last_type != "rezervace" and case_incs:
-            for inc in case_incs:
-                if RE_REZERVACE.search(inc.get("subject", "") or ""):
-                    last_type = "rezervace"
-                    if not last_d:
-                        last_d = inc.get("createdDate")
-                        last_by = inc.get("createdBy")
-                    break
-        # 6-category lastCategory — z POSLEDNÍHO feedu (cf[0]), bez ohledu na categorize() — pro hover badge v Car Check tabulce
-        last_category = "ostatni"
-        if cf and cf[0].get("Body"):
-            last_category = categorize_full(cf[0]["Body"])
+        if cf:
+            last_d = cf[0]["CreatedDate"]
+            last_by = (cf[0].get("CreatedBy") or {}).get("Name")
+        # b7 Typ kontaktu — 6-kat label z POSLEDNIHO feedu (cf[0]); zadny feed -> None ("—")
+        last_category = categorize_full(cf[0]["Body"]) if cf else None
         nedov_data.append({
             "id": cid,
             "cn": c["CaseNumber"],
@@ -484,6 +514,7 @@ def main():
             "isN": is_n,
             "nCnt": len(nf),
             "ctCnt": len(cat_feeds),
+            "potContacts": pot_contacts,
             "lastType": last_type,
             "lastCategory": last_category,
             "lastD": last_d,
