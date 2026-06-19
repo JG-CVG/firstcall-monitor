@@ -617,6 +617,20 @@ def main():
         matrix[idx][hr] = cnt
         hm_total += cnt
 
+    # ---- Heatmap: CarAudit -> Audit Result (rolling 30 days) — optional (work-window only) ----
+    matrix_result = None
+    hm_result_total = 0
+    try:
+        with open(os.path.join(TMP, "sf_heatmap_result.json"), "r", encoding="utf-8") as _fhr:
+            _hr_recs = json.load(_fhr).get("records", [])
+        matrix_result = [[0] * 24 for _ in range(7)]
+        for _r in _hr_recs:
+            _idx = (int(_r["dow"]) + 5) % 7
+            matrix_result[_idx][int(_r["hr"])] = int(_r["cnt"])
+            hm_result_total += int(_r["cnt"])
+    except FileNotFoundError:
+        matrix_result = None
+
     # ---- Buffer hourly (Q9/Q10/Q11) — optional ----
     def _load_hourly(name):
         try:
@@ -1173,6 +1187,14 @@ def main():
             "end_date": today_pg.strftime("%Y-%m-%d"),
         },
     }
+    if matrix_result is not None:
+        output["heatmap_result"] = {
+            "matrix": matrix_result,
+            "days_per_dow": days_per_dow,
+            "total_cases": hm_result_total,
+            "start_date": start_pg.strftime("%Y-%m-%d"),
+            "end_date": today_pg.strftime("%Y-%m-%d"),
+        }
     if buffer_hourly is not None:
         output["buffer_hourly"] = buffer_hourly
     if capacity_reco is not None:
