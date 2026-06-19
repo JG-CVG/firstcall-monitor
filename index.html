@@ -317,8 +317,6 @@ tr:hover td { background:#f9fafb; }
   <div class="card card-hm"><div class="card-title">&#9201; CarAudit New &mdash; Heatmap (pracovni okno, Po-Pa 8-17, So 8-13)</div><div id="heatmapWorkWrap"></div></div>
   <div id="phase2Tables"></div>
   <div id="auditOrderTimeline"></div>
-  <div class="card card-hm"><div class="card-title">&#128203; CarAudit &rarr; Audit Result &mdash; Heatmap (prumer / den x hodina, plovouci 30 dni)</div><div id="heatmapResultWrap"></div></div>
-  <div class="card card-hm"><div class="card-title">&#9201; CarAudit &rarr; Audit Result &mdash; Heatmap (pracovni okno, Po-Pa 8-17, So 8-13)</div><div id="heatmapResultWorkWrap"></div></div>
   <div id="cebiaAuditOrderTimeline"></div>
   <div id="prepToDoneHeatmap"></div>
   <div id="backlogEstimate"></div>
@@ -444,7 +442,6 @@ function render() {
   renderAuditOrderTimeline(d.audit_order_expected, { badgeText: "CARVAGO CARAUDIT", badgeColor: "carvago", title: "Audit Order — Očekávané dodání", subtitle: "Status = Audit Order · Record Type = CarAudit · bez Instamotion · bez XK/AL" });
   renderAuditOrderTimeline(d.cebia_audit_order_expected, { containerId: "cebiaAuditOrderTimeline", badgeText: "CEBIA CARAUDIT", badgeColor: "teal", title: "Audit Order — Očekávané dodání", subtitle: "Status = Audit Order · Record Type = Cebia CarAudit · bez Instamotion · bez XK/AL" });
   renderPrepToDoneHeatmap(d.prep_to_done_daily);
-  renderHeatmapResult(d.heatmap_result); renderHeatmapResultWork(d.heatmap_result);
   updateTimestamp(d);
 }
 
@@ -1662,136 +1659,6 @@ function renderHeatmapWork(hm) {
 
   wrap.innerHTML = h;
 }
-
-function hmBucketCoral(v) {
-  if (v === 0) return { bg:'#F1EFE8', fg:'#888780', border:'0.5px solid var(--border)' };
-  if (v <= 1)  return { bg:'#FAECE7', fg:'#4A1B0C', border:'none' };
-  if (v <= 3)  return { bg:'#F5C4B3', fg:'#4A1B0C', border:'none' };
-  if (v <= 6)  return { bg:'#F0997B', fg:'#4A1B0C', border:'none' };
-  if (v <= 10) return { bg:'#D85A30', fg:'#ffffff', border:'none' };
-  if (v <= 15) return { bg:'#993C1D', fg:'#ffffff', border:'none' };
-  return { bg:'#4A1B0C', fg:'#ffffff', border:'none' };
-}
-
-function renderHeatmapResult(hm) {
-  const wrap = document.getElementById('heatmapResultWrap');
-  if (!hm || !hm.matrix) { wrap.innerHTML='<span style="color:var(--muted)">No data</span>'; return; }
-  const matrix = hm.matrix, daysPerDow = hm.days_per_dow;
-  const totalsPerDow = matrix.map(row => row.reduce((s,x)=>s+x,0));
-  const totalsPerHour = Array(24).fill(0);
-  matrix.forEach(row => row.forEach((v,h) => totalsPerHour[h] += v));
-  const total = hm.total_cases;
-  const totalDays = daysPerDow.reduce((s,x)=>s+x,0);
-
-  let peakD=0, peakH=0, peakAvg=0;
-  for (let d=0; d<7; d++) { if(!daysPerDow[d]) continue; for (let h=0; h<24; h++) { const a=Math.ceil(matrix[d][h]/daysPerDow[d]); if (a>peakAvg){peakAvg=a;peakD=d;peakH=h;} } }
-  let pdIdx=0, pdAvg=0;
-  for (let d=0; d<7; d++) { if(!daysPerDow[d]) continue; const a=Math.ceil(totalsPerDow[d]/daysPerDow[d]); if(a>pdAvg){pdAvg=a;pdIdx=d;} }
-  let phIdx=0, phAvg=0;
-  for (let h=0; h<24; h++) { const a=Math.ceil(totalsPerHour[h]/totalDays); if(a>phAvg){phAvg=a;phIdx=h;} }
-  const dayAvg = Math.ceil(total/totalDays);
-
-  let h = '<div class="hm-cards">';
-  h += '<div class="hm-card"><div class="l">Celkem ('+totalDays+' dni)</div><div class="v">'+total.toLocaleString('cs-CZ')+'</div><div class="s">&#8776; '+dayAvg+' / den</div></div>';
-  h += '<div class="hm-card"><div class="l">Spicka dne (avg)</div><div class="v">'+HM_DOWS[pdIdx]+'</div><div class="s">'+pdAvg+' / den</div></div>';
-  h += '<div class="hm-card"><div class="l">Spicka hodiny (avg)</div><div class="v">'+padH(phIdx)+':00</div><div class="s">'+phAvg+' / den-hod</div></div>';
-  h += '<div class="hm-card"><div class="l">Top bunka</div><div class="v">'+HM_DOWS[peakD]+' &middot; '+padH(peakH)+'h</div><div class="s">'+peakAvg+' / '+HM_DOWS[peakD]+' '+padH(peakH)+'h</div></div></div>';
-
-  h += '<div class="hm-sub">Prumer cases na 1 den daneho tydne x hodinu (Europe/Prague), zaokrouhleno nahoru</div><div class="hm-grid">';
-  h += '<div></div>';
-  for (let hh=0; hh<24; hh++) h += '<div class="hm-hour">'+padH(hh)+'</div>';
-  h += '<div class="hm-totlbl">avg/den</div>';
-
-  for (let d=0; d<7; d++) {
-    h += '<div class="hm-rowlbl">'+HM_DOWS[d]+'</div>';
-    for (let hh=0; hh<24; hh++) {
-      const t=matrix[d][hh], avg=daysPerDow[d]?t/daysPerDow[d]:0, cAvg=Math.ceil(avg);
-      const b=hmBucketCoral(cAvg), txt=t===0?'&middot;':cAvg;
-      const tip=HM_DOWS[d]+' '+padH(hh)+':00 - avg '+cAvg+' / '+HM_DOWS[d]+' (presne '+(Math.round(avg*100)/100)+' = '+t+'/'+daysPerDow[d]+')';
-      h += '<div class="hm-cell" title="'+escapeHtml(tip)+'" style="background:'+b.bg+';color:'+b.fg+';border:'+b.border+'">'+txt+'</div>';
-    }
-    const da = daysPerDow[d] ? Math.ceil(totalsPerDow[d]/daysPerDow[d]) : 0;
-    h += '<div class="hm-rowtot">'+da+'</div>';
-  }
-  h += '<div class="hm-totlbl" style="padding-top:5px">avg/h</div>';
-  for (let hh=0; hh<24; hh++) { const a=totalDays?Math.ceil(totalsPerHour[hh]/totalDays):0; h += '<div class="hm-coltot">'+a+'</div>'; }
-  h += '<div class="hm-rowtot" style="padding-top:5px">'+dayAvg+'</div></div>';
-
-  h += '<div class="hm-legend"><span>Sytost = prumer / den</span>';
-  ['F1EFE8','FAECE7','F5C4B3','F0997B','D85A30','993C1D','4A1B0C'].forEach((c,i)=>{
-    const lbl=['0','1','2-3','4-6','7-10','11-15','16+'][i];
-    h += '<span><span class="hm-leg-sq" style="background:#'+c+(i===0?';border:0.5px solid var(--border)':'')+'"></span>'+lbl+'</span>';
-  });
-  h += '</div>';
-  h += '<div class="hm-note">Obdobi: '+hm.start_date+' &ndash; '+hm.end_date+' ('+daysPerDow.map((c,i)=>c+' '+HM_DOWS[i]).join(', ')+'). Filtr: RecordType=CarAudit, bez Instamotion, bez Is TEST Case, Country_Origin &ne; XK, AL.</div>';
-
-  wrap.innerHTML = h;
-}
-
-
-function renderHeatmapResultWork(hm) {
-  const wrap = document.getElementById('heatmapResultWorkWrap');
-  if (!hm || !hm.matrix) { wrap.innerHTML='<span style="color:var(--muted)">No data</span>'; return; }
-  const matrix = hm.matrix, daysPerDow = hm.days_per_dow;
-  const work = Array.from({length:6}, () => Array(9).fill(0));
-  let totalWork = 0;
-  for (let d=0; d<7; d++) {
-    for (let hh=0; hh<24; hh++) {
-      const v = matrix[d][hh]; if (!v) continue;
-      const t = pushToWorking(d, hh);
-      const col = t.h - 8;
-      if (t.d < 6 && col >= 0 && col < 9) { work[t.d][col] += v; totalWork += v; }
-    }
-  }
-  const rowTotals = work.map(r => r.reduce((s,x)=>s+x,0));
-  const colTotals = Array(9).fill(0);
-  work.forEach(r => r.forEach((v,c) => colTotals[c] += v));
-  const totalWorkDays = daysPerDow.slice(0,6).reduce((s,x)=>s+x,0);
-
-  let peakD=0, peakC=0, peakAvg=0;
-  for (let d=0; d<6; d++) { if(!daysPerDow[d]) continue; for (let c=0; c<9; c++) { if (d===5 && c>4) continue; const a=Math.ceil(work[d][c]/daysPerDow[d]); if(a>peakAvg){peakAvg=a;peakD=d;peakC=c;} } }
-  let pdIdx=0, pdAvg=0;
-  for (let d=0; d<6; d++) { if(!daysPerDow[d]) continue; const a=Math.ceil(rowTotals[d]/daysPerDow[d]); if(a>pdAvg){pdAvg=a;pdIdx=d;} }
-  let phIdx=8, phAvg=0;
-  for (let c=0; c<9; c++) { const a=totalWorkDays?Math.ceil(colTotals[c]/totalWorkDays):0; if(a>phAvg){phAvg=a;phIdx=c+8;} }
-  const dayAvg = totalWorkDays ? Math.ceil(totalWork/totalWorkDays) : 0;
-
-  let h = '<div class="hm-cards">';
-  h += '<div class="hm-card"><div class="l">Prerozdeleno ('+totalWorkDays+' prac. dni)</div><div class="v">'+totalWork.toLocaleString('cs-CZ')+'</div><div class="s">&#8776; '+dayAvg+' / prac. den</div></div>';
-  h += '<div class="hm-card"><div class="l">Spicka dne (avg)</div><div class="v">'+HM_DOWS[pdIdx]+'</div><div class="s">'+pdAvg+' / den</div></div>';
-  h += '<div class="hm-card"><div class="l">Spicka hodiny (avg)</div><div class="v">'+padH(phIdx)+':00</div><div class="s">'+phAvg+' / prac. den-hod</div></div>';
-  h += '<div class="hm-card"><div class="l">Top bunka</div><div class="v">'+HM_DOWS[peakD]+' &middot; '+padH(peakC+8)+'h</div><div class="s">'+peakAvg+'</div></div></div>';
-
-  h += '<div class="hm-sub">Cases mimo prac. okno presunuty na nejbližší prac. hodinu &mdash; pondelni rano absorbuje vikendovy backlog</div><div class="hm-work-grid">';
-  h += '<div></div>';
-  for (let c=0; c<9; c++) h += '<div class="hm-hour">'+padH(c+8)+'</div>';
-  h += '<div class="hm-totlbl">avg/den</div>';
-  for (let d=0; d<6; d++) {
-    h += '<div class="hm-rowlbl">'+HM_DOWS[d]+'</div>';
-    for (let c=0; c<9; c++) {
-      if (d===5 && c>4) { h += '<div class="hm-cell hm-na" title="Mimo prac. dobu">&times;</div>'; continue; }
-      const v = work[d][c], avg = daysPerDow[d]?v/daysPerDow[d]:0, cAvg = Math.ceil(avg);
-      const b = hmBucketCoral(cAvg), txt = v===0?'&middot;':cAvg;
-      const tip = HM_DOWS[d]+' '+padH(c+8)+':00 - avg '+cAvg+' (presne '+(Math.round(avg*100)/100)+')';
-      h += '<div class="hm-cell" title="'+escapeHtml(tip)+'" style="background:'+b.bg+';color:'+b.fg+';border:'+b.border+'">'+txt+'</div>';
-    }
-    h += '<div class="hm-rowtot">'+(daysPerDow[d]?Math.ceil(rowTotals[d]/daysPerDow[d]):0)+'</div>';
-  }
-  h += '<div class="hm-totlbl" style="padding-top:5px">avg/h</div>';
-  for (let c=0; c<9; c++) { const a = totalWorkDays?Math.ceil(colTotals[c]/totalWorkDays):0; h += '<div class="hm-coltot">'+a+'</div>'; }
-  h += '<div class="hm-rowtot" style="padding-top:5px">'+dayAvg+'</div></div>';
-
-  h += '<div class="hm-legend"><span>Sytost = prumer / den</span>';
-  ['F1EFE8','FAECE7','F5C4B3','F0997B','D85A30','993C1D','4A1B0C'].forEach((c,i)=>{
-    const lbl=['0','1','2-3','4-6','7-10','11-15','16+'][i];
-    h += '<span><span class="hm-leg-sq" style="background:#'+c+(i===0?';border:0.5px solid var(--border)':'')+'"></span>'+lbl+'</span>';
-  });
-  h += '<span><span class="hm-leg-sq" style="background:#f3f4f6;border:0.5px solid var(--border)"></span>Mimo prac. dobu</span></div>';
-  h += '<div class="hm-note">Pravidla presunu: Po-Ct po 17h &rarr; dalsi den 8h. Pa po 17h &rarr; So 8h. So po 13h &rarr; Po 8h. Ne &rarr; Po 8h. Pred 8h &rarr; ten samy den 8h.</div>';
-
-  wrap.innerHTML = h;
-}
-
 
 const REFRESH_MS = 5 * 60 * 1000;
 
