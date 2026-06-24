@@ -1030,7 +1030,8 @@ def main():
 
     ptd_recs = _load_ptd()
     prep_to_done_daily = None
-    # Akumulátor pattern — historická data se nikdy nepřepisují, dnešek vždy.
+    # Akumulátor pattern — dny v okně posledního Q16 fetche (~7 dní) se přepisují per-op MAXem
+    # (oprava neúplných same-day běhů), dny mimo okno zůstávají immutable. Display window 44 prac. dnů.
     # Display window: 44 pracovních dnů (~2 měsíce zpět).
     # History file `data/prep_to_done_history.json` se commituje vedle data.json.
     HISTORY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "prep_to_done_history.json")
@@ -1069,13 +1070,23 @@ def main():
             day_key = cd_local.date().isoformat()
             day_map = fresh[sec].setdefault(day_key, {})
             day_map[name] = day_map.get(name, 0) + 1
-        # Merge into history: dnešek vždy přepiš, starší dny jen pokud chybí
+        # Merge into history (oprava 2026-06-24 — viz "stale 23.6" bug):
+        #  - dnešek (today_key): vždy přepiš živou (kumulativní) hodnotou
+        #  - ostatní dny přítomné v aktuálním Q16 fetch (okno LAST_N_DAYS:7): per-operátor MAX.
+        #    Tím se den OPRAVÍ na svůj konečný počet i když poslední same-day běh proběhl
+        #    jen v půlce dne (počty během dne jen rostou). MAX zároveň nikdy nesníží už
+        #    zaznamenaný počet kvůli transient under-fetch / SF LIMIT truncaci.
+        #  - dny mimo fetch okno (8-44 dní zpět): nejsou ve `fresh`, zůstávají immutable.
         for sec in ("carvago", "cebia"):
             for day_key, by_user in fresh[sec].items():
                 if day_key == today_key:
                     history[sec][day_key] = by_user
-                elif day_key not in history[sec]:
-                    history[sec][day_key] = by_user
+                else:
+                    merged = dict(history[sec].get(day_key, {}))
+                    for name, cnt in by_user.items():
+                        if cnt > merged.get(name, 0):
+                            merged[name] = cnt
+                    history[sec][day_key] = merged
         # Save updated history back to file (will be commited alongside data.json)
         os.makedirs(os.path.dirname(HISTORY_PATH), exist_ok=True)
         with open(HISTORY_PATH, "w", encoding="utf-8") as fh:
