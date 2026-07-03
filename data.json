@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-07-03T05:32:46.597931+00:00",
-  "generated_at_local": "2026-07-03T07:32:46.597931+02:00",
+  "generated_at_utc": "2026-07-03T05:45:18.831528+00:00",
+  "generated_at_local": "2026-07-03T07:45:18.831528+02:00",
   "sf_base_url": "https://carvago.lightning.force.com",
   "month_label": "July 2026",
   "tier1": {
@@ -93,7 +93,7 @@
       "cn": "00190638",
       "country": "KR",
       "agent": null,
-      "ageH": 159,
+      "ageH": 160,
       "ageW": 36.95,
       "isN": false,
       "nCnt": 0,
@@ -133,7 +133,7 @@
       "cn": "00191220",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 69,
+      "ageH": 70,
       "ageW": 24.93,
       "isN": true,
       "nCnt": 1,
@@ -267,7 +267,7 @@
       "cn": "00191492",
       "country": "PL",
       "agent": null,
-      "ageH": 42,
+      "ageH": 43,
       "ageW": 12.95,
       "isN": false,
       "nCnt": 0,
@@ -287,7 +287,7 @@
       "cn": "00191520",
       "country": "DE",
       "agent": "Agent2",
-      "ageH": 41,
+      "ageH": 42,
       "ageW": 11.93,
       "isN": true,
       "nCnt": 6,
@@ -387,7 +387,7 @@
       "cn": "00191693",
       "country": "DE",
       "agent": "Agent7",
-      "ageH": 20,
+      "ageH": 21,
       "ageW": 5.94,
       "isN": false,
       "nCnt": 0,
@@ -454,7 +454,7 @@
       "cn": "00191735",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 17,
+      "ageH": 18,
       "ageW": 2.94,
       "isN": true,
       "nCnt": 2,
@@ -2793,84 +2793,25 @@
       {
         "aws": [
           {
-            "cn": "00191219",
-            "id": "500MI00000phwOMYAY",
-            "wd": 2.4
-          }
-        ],
-        "others": [
-          {
-            "cn": "00191220",
-            "id": "500MI00000phwONYAY",
-            "status": "Car check",
-            "order": "ord-first-call",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00191477",
-            "id": "500MI00000pmKToYAM",
-            "wd": 1.7
-          }
-        ],
-        "others": [
-          {
-            "cn": "00191478",
-            "id": "500MI00000pmKTpYAM",
-            "status": "Awaiting Selection",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00191513",
-            "id": "500MI00000pmvxyYAA",
-            "wd": 1.2
-          },
-          {
-            "cn": "00191514",
-            "id": "500MI00000pmvxzYAA",
-            "wd": 1.0
-          }
-        ],
-        "others": [
-          {
-            "cn": "00191393",
-            "id": "500MI00000pkK9hYAE",
-            "status": "Car check",
-            "order": "ord-first-call",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00191737",
-            "id": "500MI00000pqbKiYAI",
+            "cn": "00191757",
+            "id": "500MI00000pr3qRYAQ",
             "wd": 0.1
           }
         ],
         "others": [
           {
-            "cn": "00191738",
-            "id": "500MI00000pqR3lYAE",
+            "cn": "00191756",
+            "id": "500MI00000pr3qQYAQ",
             "status": "VIN Check",
             "order": "ord-first-call",
             "kind": "inprog"
           },
           {
-            "cn": "00191680",
-            "id": "500MI00000ppusQYAQ",
-            "status": "Car check",
-            "order": "ord-first-call",
-            "kind": "inprog"
+            "cn": "00101749",
+            "id": "500MI00000RkcqjYAB",
+            "status": "CarAudit Done",
+            "order": "ord-canceled-with-alternative",
+            "kind": "wait"
           }
         ]
       },
@@ -2936,25 +2877,54 @@
       {
         "aws": [
           {
-            "cn": "00191757",
-            "id": "500MI00000pr3qRYAQ",
+            "cn": "00191219",
+            "id": "500MI00000phwOMYAY",
+            "wd": 2.4
+          }
+        ],
+        "others": [
+          {
+            "cn": "00191220",
+            "id": "500MI00000phwONYAY",
+            "status": "Car check",
+            "order": "ord-first-call",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00191663",
+            "id": "500MI00000ppjc4YAA",
+            "wd": 0.9
+          }
+        ],
+        "others": [
+          {
+            "cn": "00191664",
+            "id": "500MI00000ppjc5YAA",
+            "status": "Awaiting Selection",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00190909",
+            "id": "500MI00000pc256YAA",
             "wd": 0.1
           }
         ],
         "others": [
           {
-            "cn": "00191756",
-            "id": "500MI00000pr3qQYAQ",
-            "status": "VIN Check",
+            "cn": "00190638",
+            "id": "500MI00000pX4qoYAC",
+            "status": "Car check",
             "order": "ord-first-call",
             "kind": "inprog"
-          },
-          {
-            "cn": "00101749",
-            "id": "500MI00000RkcqjYAB",
-            "status": "CarAudit Done",
-            "order": "ord-canceled-with-alternative",
-            "kind": "wait"
           }
         ]
       },
@@ -2970,6 +2940,31 @@
           {
             "cn": "00191551",
             "id": "500MI00000pnLcDYAU",
+            "status": "Car check",
+            "order": "ord-first-call",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00191737",
+            "id": "500MI00000pqbKiYAI",
+            "wd": 0.1
+          }
+        ],
+        "others": [
+          {
+            "cn": "00191738",
+            "id": "500MI00000pqR3lYAE",
+            "status": "VIN Check",
+            "order": "ord-first-call",
+            "kind": "inprog"
+          },
+          {
+            "cn": "00191680",
+            "id": "500MI00000ppusQYAQ",
             "status": "Car check",
             "order": "ord-first-call",
             "kind": "inprog"
@@ -3004,17 +2999,17 @@
       {
         "aws": [
           {
-            "cn": "00190909",
-            "id": "500MI00000pc256YAA",
-            "wd": 0.1
+            "cn": "00191477",
+            "id": "500MI00000pmKToYAM",
+            "wd": 1.7
           }
         ],
         "others": [
           {
-            "cn": "00190638",
-            "id": "500MI00000pX4qoYAC",
-            "status": "Car check",
-            "order": "ord-first-call",
+            "cn": "00191478",
+            "id": "500MI00000pmKTpYAM",
+            "status": "Awaiting Selection",
+            "order": "ord-physical-check",
             "kind": "inprog"
           }
         ]
@@ -3022,17 +3017,22 @@
       {
         "aws": [
           {
-            "cn": "00191663",
-            "id": "500MI00000ppjc4YAA",
-            "wd": 0.9
+            "cn": "00191513",
+            "id": "500MI00000pmvxyYAA",
+            "wd": 1.2
+          },
+          {
+            "cn": "00191514",
+            "id": "500MI00000pmvxzYAA",
+            "wd": 1.0
           }
         ],
         "others": [
           {
-            "cn": "00191664",
-            "id": "500MI00000ppjc5YAA",
-            "status": "Awaiting Selection",
-            "order": "ord-physical-check",
+            "cn": "00191393",
+            "id": "500MI00000pkK9hYAE",
+            "status": "Car check",
+            "order": "ord-first-call",
             "kind": "inprog"
           }
         ]
@@ -3088,24 +3088,6 @@
       {
         "aws": [
           {
-            "cn": "00191750",
-            "id": "500MI00000pqsyIYAQ",
-            "wd": 0.1
-          }
-        ],
-        "others": [
-          {
-            "cn": "00190199",
-            "id": "500MI00000pPjW3YAK",
-            "status": "CarAudit Done",
-            "order": "ord-caraudit-delivered",
-            "kind": "wait"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
             "cn": "00191235",
             "id": "500MI00000phjpPYAQ",
             "wd": 2.6
@@ -3115,24 +3097,6 @@
           {
             "cn": "00191236",
             "id": "500MI00000phjpQYAQ",
-            "status": "CarAudit Done",
-            "order": "ord-caraudit-delivered",
-            "kind": "wait"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00190531",
-            "id": "500MI00000pVl2AYAS",
-            "wd": 5.3
-          }
-        ],
-        "others": [
-          {
-            "cn": "00189919",
-            "id": "500MI00000pLm9BYAS",
             "status": "CarAudit Done",
             "order": "ord-caraudit-delivered",
             "kind": "wait"
@@ -3169,6 +3133,42 @@
           {
             "cn": "00188492",
             "id": "500MI00000p1OxQYAU",
+            "status": "CarAudit Done",
+            "order": "ord-caraudit-delivered",
+            "kind": "wait"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00190531",
+            "id": "500MI00000pVl2AYAS",
+            "wd": 5.3
+          }
+        ],
+        "others": [
+          {
+            "cn": "00189919",
+            "id": "500MI00000pLm9BYAS",
+            "status": "CarAudit Done",
+            "order": "ord-caraudit-delivered",
+            "kind": "wait"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00191750",
+            "id": "500MI00000pqsyIYAQ",
+            "wd": 0.1
+          }
+        ],
+        "others": [
+          {
+            "cn": "00190199",
+            "id": "500MI00000pPjW3YAK",
             "status": "CarAudit Done",
             "order": "ord-caraudit-delivered",
             "kind": "wait"
@@ -4730,7 +4730,7 @@
           "total": 8
         },
         {
-          "name": "Lenka Venerová",
+          "name": "Leoš Kocman",
           "by_date": {
             "2026-07-03": 0,
             "2026-07-02": 0,
@@ -4754,57 +4754,7 @@
             "2026-06-08": 0,
             "2026-06-05": 0,
             "2026-06-04": 0,
-            "2026-06-03": 0,
-            "2026-06-02": 0,
-            "2026-06-01": 0,
-            "2026-05-29": 0,
-            "2026-05-28": 0,
-            "2026-05-27": 0,
-            "2026-05-26": 0,
-            "2026-05-25": 0,
-            "2026-05-22": 0,
-            "2026-05-21": 0,
-            "2026-05-20": 0,
-            "2026-05-19": 0,
-            "2026-05-18": 0,
-            "2026-05-15": 0,
-            "2026-05-14": 0,
-            "2026-05-13": 0,
-            "2026-05-12": 0,
-            "2026-05-11": 0,
-            "2026-05-08": 0,
-            "2026-05-07": 1,
-            "2026-05-06": 0,
-            "2026-05-05": 0
-          },
-          "total": 1
-        },
-        {
-          "name": "Dardan Nimani",
-          "by_date": {
-            "2026-07-03": 0,
-            "2026-07-02": 0,
-            "2026-07-01": 0,
-            "2026-06-30": 0,
-            "2026-06-29": 0,
-            "2026-06-26": 0,
-            "2026-06-25": 0,
-            "2026-06-24": 0,
-            "2026-06-23": 0,
-            "2026-06-22": 0,
-            "2026-06-19": 0,
-            "2026-06-18": 0,
-            "2026-06-17": 0,
-            "2026-06-16": 0,
-            "2026-06-15": 0,
-            "2026-06-12": 0,
-            "2026-06-11": 0,
-            "2026-06-10": 1,
-            "2026-06-09": 0,
-            "2026-06-08": 0,
-            "2026-06-05": 0,
-            "2026-06-04": 0,
-            "2026-06-03": 0,
+            "2026-06-03": 1,
             "2026-06-02": 0,
             "2026-06-01": 0,
             "2026-05-29": 0,
@@ -4880,7 +4830,7 @@
           "total": 1
         },
         {
-          "name": "Leoš Kocman",
+          "name": "Lenka Venerová",
           "by_date": {
             "2026-07-03": 0,
             "2026-07-02": 0,
@@ -4904,7 +4854,57 @@
             "2026-06-08": 0,
             "2026-06-05": 0,
             "2026-06-04": 0,
-            "2026-06-03": 1,
+            "2026-06-03": 0,
+            "2026-06-02": 0,
+            "2026-06-01": 0,
+            "2026-05-29": 0,
+            "2026-05-28": 0,
+            "2026-05-27": 0,
+            "2026-05-26": 0,
+            "2026-05-25": 0,
+            "2026-05-22": 0,
+            "2026-05-21": 0,
+            "2026-05-20": 0,
+            "2026-05-19": 0,
+            "2026-05-18": 0,
+            "2026-05-15": 0,
+            "2026-05-14": 0,
+            "2026-05-13": 0,
+            "2026-05-12": 0,
+            "2026-05-11": 0,
+            "2026-05-08": 0,
+            "2026-05-07": 1,
+            "2026-05-06": 0,
+            "2026-05-05": 0
+          },
+          "total": 1
+        },
+        {
+          "name": "Dardan Nimani",
+          "by_date": {
+            "2026-07-03": 0,
+            "2026-07-02": 0,
+            "2026-07-01": 0,
+            "2026-06-30": 0,
+            "2026-06-29": 0,
+            "2026-06-26": 0,
+            "2026-06-25": 0,
+            "2026-06-24": 0,
+            "2026-06-23": 0,
+            "2026-06-22": 0,
+            "2026-06-19": 0,
+            "2026-06-18": 0,
+            "2026-06-17": 0,
+            "2026-06-16": 0,
+            "2026-06-15": 0,
+            "2026-06-12": 0,
+            "2026-06-11": 0,
+            "2026-06-10": 1,
+            "2026-06-09": 0,
+            "2026-06-08": 0,
+            "2026-06-05": 0,
+            "2026-06-04": 0,
+            "2026-06-03": 0,
             "2026-06-02": 0,
             "2026-06-01": 0,
             "2026-05-29": 0,
