@@ -1,45 +1,45 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-07-08T13:31:36.027011+00:00",
-  "generated_at_local": "2026-07-08T15:31:36.027011+02:00",
+  "generated_at_utc": "2026-07-08T14:19:56.725818+00:00",
+  "generated_at_local": "2026-07-08T16:19:56.725818+02:00",
   "sf_base_url": "https://carvago.lightning.force.com",
   "month_label": "July 2026",
   "tier1": {
-    "total": 377,
-    "closed": 178,
-    "phase2": 152,
-    "ip_total": 47
+    "total": 387,
+    "closed": 184,
+    "phase2": 157,
+    "ip_total": 46
   },
   "status_breakdown": {
-    "Auditor selection": 17,
-    "VIN Check": 13,
-    "Audit result": 3,
-    "Awaiting Selection": 110,
-    "New CA": 12,
+    "Auditor selection": 16,
+    "VIN Check": 10,
+    "Audit result": 8,
+    "Awaiting Selection": 109,
+    "New CA": 21,
     "Data validation and completion": 13,
-    "CarAudit preparation": 5,
-    "Car check": 26,
-    "Audit order": 27
+    "CarAudit preparation": 4,
+    "Car check": 19,
+    "Audit order": 26
   },
   "closed_reasons": {
-    "REJECT New CA": 8,
+    "REJECT New CA": 9,
     "REJECT Data Validation": 3,
-    "REJECT Car Check": 117,
+    "REJECT Car Check": 120,
     "REJECT VIN Check": 27,
-    "REJECT Awaiting Selection": 8
+    "REJECT Awaiting Selection": 10
   },
   "country_breakdown": {
     "DE": {
-      "ip": 32,
+      "ip": 35,
       "cl": 0,
-      "cc": 14,
-      "vin": 11,
-      "newca": 7
+      "cc": 11,
+      "vin": 10,
+      "newca": 14
     },
     "IT": {
-      "ip": 5,
+      "ip": 3,
       "cl": 0,
-      "cc": 4,
+      "cc": 2,
       "vin": 0,
       "newca": 1
     },
@@ -58,9 +58,23 @@
       "newca": 1
     },
     "PL": {
-      "ip": 2,
+      "ip": 1,
       "cl": 0,
-      "cc": 1,
+      "cc": 0,
+      "vin": 0,
+      "newca": 1
+    },
+    "SE": {
+      "ip": 1,
+      "cl": 0,
+      "cc": 0,
+      "vin": 0,
+      "newca": 1
+    },
+    "BE": {
+      "ip": 1,
+      "cl": 0,
+      "cc": 0,
       "vin": 0,
       "newca": 1
     },
@@ -85,26 +99,18 @@
       "vin": 0,
       "newca": 0
     },
-    "BE": {
+    "NL": {
       "ip": 1,
       "cl": 0,
       "cc": 1,
       "vin": 0,
       "newca": 0
-    },
-    "NL": {
-      "ip": 3,
-      "cl": 0,
-      "cc": 1,
-      "vin": 2,
-      "newca": 0
     }
   },
   "agent_breakdown": {
-    "Agent1": 8,
+    "Agent1": 7,
     "Agent2": 1,
-    "Neprideleno": 10,
-    "Agent7": 2,
+    "Neprideleno": 6,
     "Agent5": 5
   },
   "nedovolano": [
@@ -113,8 +119,8 @@
       "cn": "00190638",
       "country": "KR",
       "agent": null,
-      "ageH": 287,
-      "ageW": 71.48,
+      "ageH": 288,
+      "ageW": 72.29,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -133,8 +139,8 @@
       "cn": "00191163",
       "country": "KR",
       "agent": null,
-      "ageH": 201,
-      "ageW": 61.53,
+      "ageH": 202,
+      "ageW": 62.33,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -153,8 +159,8 @@
       "cn": "00191787",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 142,
-      "ageW": 34.53,
+      "ageH": 143,
+      "ageW": 35.33,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -169,32 +175,12 @@
       "pref": false
     },
     {
-      "id": "500MI00000pvrDcYAI",
-      "cn": "00191998",
-      "country": "DE",
-      "agent": "Agent7",
-      "ageH": 117,
-      "ageW": 25.53,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 0,
-      "potContacts": 0,
-      "lastType": null,
-      "lastCategory": "ostatni",
-      "lastD": "2026-07-07T11:49:14.000+0000",
-      "lastBy": "Jan Kern",
-      "incs": [],
-      "potClose": false,
-      "potSpanH": null,
-      "pref": true
-    },
-    {
       "id": "500MI00000pxPl8YAE",
       "cn": "00192101",
       "country": "IT",
       "agent": null,
-      "ageH": 96,
-      "ageW": 25.53,
+      "ageH": 97,
+      "ageW": 26.33,
       "isN": true,
       "nCnt": 7,
       "ctCnt": 7,
@@ -203,9 +189,16 @@
       "lastCategory": "nedovolano",
       "lastD": "2026-07-08T12:15:10.000+0000",
       "lastBy": "Filip Rella",
-      "incs": [],
-      "potClose": true,
-      "potSpanH": 12.87,
+      "incs": [
+        {
+          "subject": "CA - car condition consultation with sales",
+          "eta": "2026-07-09",
+          "createdDate": "2026-07-08T13:51:51.000+0000",
+          "createdBy": "Filip Rella"
+        }
+      ],
+      "potClose": false,
+      "potSpanH": null,
       "pref": true
     },
     {
@@ -213,8 +206,8 @@
       "cn": "00192122",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 93,
-      "ageW": 25.53,
+      "ageH": 94,
+      "ageW": 26.33,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 1,
@@ -233,8 +226,8 @@
       "cn": "00192160",
       "country": "KR",
       "agent": null,
-      "ageH": 57,
-      "ageW": 25.53,
+      "ageH": 58,
+      "ageW": 26.33,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -249,32 +242,12 @@
       "pref": true
     },
     {
-      "id": "500MI00000q0gatYAA",
-      "cn": "00192301",
-      "country": "IT",
-      "agent": null,
-      "ageH": 52,
-      "ageW": 22.46,
-      "isN": true,
-      "nCnt": 8,
-      "ctCnt": 8,
-      "potContacts": 8,
-      "lastType": "nedov",
-      "lastCategory": "nedovolano",
-      "lastD": "2026-07-08T12:32:01.000+0000",
-      "lastBy": "Filip Rella",
-      "incs": [],
-      "potClose": true,
-      "potSpanH": 13.01,
-      "pref": true
-    },
-    {
       "id": "500MI00000q1vrBYAQ",
       "cn": "00192378",
       "country": "DE",
       "agent": "Agent5",
-      "ageH": 48,
-      "ageW": 17.99,
+      "ageH": 49,
+      "ageW": 18.8,
       "isN": true,
       "nCnt": 2,
       "ctCnt": 3,
@@ -293,8 +266,8 @@
       "cn": "00192450",
       "country": "AT",
       "agent": "Agent5",
-      "ageH": 33,
-      "ageW": 16.53,
+      "ageH": 34,
+      "ageW": 17.33,
       "isN": true,
       "nCnt": 2,
       "ctCnt": 2,
@@ -313,8 +286,8 @@
       "cn": "00192586",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 25,
-      "ageW": 9.99,
+      "ageH": 26,
+      "ageW": 10.79,
       "isN": true,
       "nCnt": 1,
       "ctCnt": 2,
@@ -340,8 +313,8 @@
       "cn": "00192588",
       "country": "CZ",
       "agent": "Agent2",
-      "ageH": 25,
-      "ageW": 9.99,
+      "ageH": 26,
+      "ageW": 10.79,
       "isN": true,
       "nCnt": 3,
       "ctCnt": 3,
@@ -356,39 +329,19 @@
       "pref": true
     },
     {
-      "id": "500MI00000q5aUuYAI",
-      "cn": "00192598",
-      "country": "BE",
-      "agent": null,
-      "ageH": 24,
-      "ageW": 8.99,
-      "isN": true,
-      "nCnt": 4,
-      "ctCnt": 4,
-      "potContacts": 4,
-      "lastType": "nedov",
-      "lastCategory": "nedovolano",
-      "lastD": "2026-07-08T11:54:01.000+0000",
-      "lastBy": "Tiekouta Sissoko",
-      "incs": [],
-      "potClose": true,
-      "potSpanH": 6.81,
-      "pref": false
-    },
-    {
       "id": "500MI00000q5sGVYAY",
       "cn": "00192609",
       "country": "DE",
       "agent": "Agent5",
-      "ageH": 23,
-      "ageW": 8.25,
+      "ageH": 24,
+      "ageW": 9.06,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
       "potContacts": 0,
       "lastType": null,
       "lastCategory": "ostatni",
-      "lastD": "2026-07-08T07:18:31.000+0000",
+      "lastD": "2026-07-08T13:20:07.000+0000",
       "lastBy": "Sofie Bauer",
       "incs": [],
       "potClose": false,
@@ -400,8 +353,8 @@
       "cn": "00192589",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 25,
-      "ageW": 9.99,
+      "ageH": 26,
+      "ageW": 10.79,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 1,
@@ -416,32 +369,12 @@
       "pref": false
     },
     {
-      "id": "500MI00000q7LkvYAE",
-      "cn": "00192660",
-      "country": "DE",
-      "agent": "Agent7",
-      "ageH": 9,
-      "ageW": 7.53,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 0,
-      "potContacts": 0,
-      "lastType": null,
-      "lastCategory": "ostatni",
-      "lastD": "2026-07-08T08:58:24.000+0000",
-      "lastBy": "Jan Kern",
-      "incs": [],
-      "potClose": false,
-      "potSpanH": null,
-      "pref": true
-    },
-    {
       "id": "500MI00000q8QHTYA2",
       "cn": "00192712",
       "country": "DE",
       "agent": "Agent5",
-      "ageH": 6,
-      "ageW": 5.75,
+      "ageH": 7,
+      "ageW": 6.55,
       "isN": true,
       "nCnt": 1,
       "ctCnt": 1,
@@ -456,63 +389,23 @@
       "pref": true
     },
     {
-      "id": "500MI00000q8VteYAE",
-      "cn": "00192708",
-      "country": "PL",
-      "agent": null,
-      "ageH": 6,
-      "ageW": 5.74,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 0,
-      "potContacts": 0,
-      "lastType": null,
-      "lastCategory": null,
-      "lastD": null,
-      "lastBy": null,
-      "incs": [],
-      "potClose": false,
-      "potSpanH": null,
-      "pref": true
-    },
-    {
       "id": "500MI00000q8YbPYAU",
       "cn": "00192709",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 6,
-      "ageW": 5.75,
+      "ageH": 7,
+      "ageW": 6.55,
       "isN": true,
-      "nCnt": 3,
-      "ctCnt": 3,
-      "potContacts": 3,
+      "nCnt": 5,
+      "ctCnt": 5,
+      "potContacts": 5,
       "lastType": "nedov",
       "lastCategory": "nedovolano",
-      "lastD": "2026-07-08T12:41:49.000+0000",
+      "lastD": "2026-07-08T14:00:14.000+0000",
       "lastBy": "Call Center Conectart1",
       "incs": [],
-      "potClose": false,
-      "potSpanH": 1.92,
-      "pref": true
-    },
-    {
-      "id": "500MI00000q93S9YAI",
-      "cn": "00192728",
-      "country": "DE",
-      "agent": "Agent1",
-      "ageH": 4,
-      "ageW": 4.46,
-      "isN": true,
-      "nCnt": 4,
-      "ctCnt": 4,
-      "potContacts": 4,
-      "lastType": "messaging",
-      "lastCategory": "zavolejte_jindy",
-      "lastD": "2026-07-08T12:35:10.000+0000",
-      "lastBy": "Call Center Conectart1",
-      "incs": [],
-      "potClose": false,
-      "potSpanH": 1.86,
+      "potClose": true,
+      "potSpanH": 3.23,
       "pref": true
     },
     {
@@ -520,36 +413,16 @@
       "cn": "00192754",
       "country": "IT",
       "agent": null,
-      "ageH": 3,
-      "ageW": 2.99,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 0,
-      "potContacts": 0,
-      "lastType": null,
-      "lastCategory": null,
-      "lastD": null,
-      "lastBy": null,
-      "incs": [],
-      "potClose": false,
-      "potSpanH": null,
-      "pref": true
-    },
-    {
-      "id": "500MI00000q9BDTYA2",
-      "cn": "00192781",
-      "country": "IT",
-      "agent": null,
-      "ageH": 2,
-      "ageW": 1.99,
-      "isN": false,
-      "nCnt": 0,
-      "ctCnt": 0,
-      "potContacts": 0,
-      "lastType": null,
-      "lastCategory": null,
-      "lastD": null,
-      "lastBy": null,
+      "ageH": 4,
+      "ageW": 3.8,
+      "isN": true,
+      "nCnt": 2,
+      "ctCnt": 2,
+      "potContacts": 2,
+      "lastType": "nedov",
+      "lastCategory": "nedovolano",
+      "lastD": "2026-07-08T14:00:42.000+0000",
+      "lastBy": "Filip Rella",
       "incs": [],
       "potClose": false,
       "potSpanH": null,
@@ -560,8 +433,8 @@
       "cn": "00192740",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 4,
-      "ageW": 3.99,
+      "ageH": 5,
+      "ageW": 4.8,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 1,
@@ -580,8 +453,8 @@
       "cn": "00192742",
       "country": "DE",
       "agent": "Agent1",
-      "ageH": 4,
-      "ageW": 3.75,
+      "ageH": 5,
+      "ageW": 4.55,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 1,
@@ -607,8 +480,8 @@
       "cn": "00192744",
       "country": "NL",
       "agent": null,
-      "ageH": 3,
-      "ageW": 3.47,
+      "ageH": 4,
+      "ageW": 4.27,
       "isN": false,
       "nCnt": 0,
       "ctCnt": 0,
@@ -627,8 +500,8 @@
       "cn": "00192759",
       "country": "DE",
       "agent": "Agent5",
-      "ageH": 3,
-      "ageW": 2.75,
+      "ageH": 4,
+      "ageW": 3.56,
       "isN": true,
       "nCnt": 1,
       "ctCnt": 1,
@@ -643,7 +516,7 @@
       "pref": true
     }
   ],
-  "nedov_count": 11,
+  "nedov_count": 9,
   "heatmap": {
     "matrix": [
       [
@@ -714,8 +587,8 @@
         30,
         31,
         42,
-        21,
-        16,
+        27,
+        20,
         10,
         10,
         4,
@@ -838,17 +711,17 @@
       4,
       4
     ],
-    "total_cases": 1700,
+    "total_cases": 1710,
     "start_date": "2026-06-08",
     "end_date": "2026-07-08"
   },
   "buffer_hourly": {
     "start_buffer": 51,
-    "start_new_ca": 16,
-    "start_car_check": 35,
-    "current_buffer": 38,
-    "current_new_ca": 12,
-    "current_car_check": 26,
+    "start_new_ca": 27,
+    "start_car_check": 24,
+    "current_buffer": 40,
+    "current_new_ca": 21,
+    "current_car_check": 19,
     "hours": [
       {
         "h": 8,
@@ -901,17 +774,17 @@
       },
       {
         "h": 15,
-        "in": 0,
-        "vin": 0,
-        "rej": 0,
-        "buffer_end": 38
+        "in": 6,
+        "vin": 4,
+        "rej": 3,
+        "buffer_end": 37
       },
       {
         "h": 16,
-        "in": null,
-        "vin": null,
-        "rej": null,
-        "buffer_end": null
+        "in": 4,
+        "vin": 0,
+        "rej": 1,
+        "buffer_end": 40
       },
       {
         "h": 17,
@@ -922,9 +795,9 @@
       }
     ],
     "projection_18": {
-      "buffer": 35,
-      "rate_per_h": -1.62,
-      "delta_vs_now": -3
+      "buffer": 39,
+      "rate_per_h": -1.22,
+      "delta_vs_now": -1
     }
   },
   "aws_split": {
@@ -935,12 +808,12 @@
   },
   "aws_age": {
     "buckets": [
-      15,
-      15,
-      25,
+      16,
+      14,
+      24,
       55
     ],
-    "total": 110,
+    "total": 109,
     "cases": [
       {
         "id": "500MI00000ZkY0vYAF",
@@ -948,7 +821,7 @@
         "country": "DE",
         "pref": false,
         "since": "2025-07-24T08:47:50.000+0000",
-        "wd": 312.0
+        "wd": 312.1
       },
       {
         "id": "500MI00000lF9xsYAC",
@@ -956,7 +829,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-03-27T12:33:06.000+0000",
-        "wd": 91.7
+        "wd": 91.8
       },
       {
         "id": "500MI00000lFWHdYAO",
@@ -964,7 +837,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-03-27T12:34:07.000+0000",
-        "wd": 91.7
+        "wd": 91.8
       },
       {
         "id": "500MI00000mNOpDYAW",
@@ -972,7 +845,7 @@
         "country": "CZ",
         "pref": false,
         "since": "2026-04-27T07:49:10.000+0000",
-        "wd": 65.5
+        "wd": 65.6
       },
       {
         "id": "500MI00000nZr0TYAS",
@@ -980,7 +853,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-05-20T09:01:10.000+0000",
-        "wd": 44.3
+        "wd": 44.4
       },
       {
         "id": "500MI00000nrGP4YAM",
@@ -988,7 +861,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-05-26T08:23:59.000+0000",
-        "wd": 39.3
+        "wd": 39.4
       },
       {
         "id": "500MI00000nrGPHYA2",
@@ -996,7 +869,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-05-26T07:44:34.000+0000",
-        "wd": 39.3
+        "wd": 39.4
       },
       {
         "id": "500MI00000ntb1JYAQ",
@@ -1004,7 +877,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-05-27T06:24:12.000+0000",
-        "wd": 38.4
+        "wd": 38.5
       },
       {
         "id": "500MI00000nuORsYAM",
@@ -1012,7 +885,7 @@
         "country": "SK",
         "pref": false,
         "since": "2026-05-27T07:30:51.000+0000",
-        "wd": 38.3
+        "wd": 38.4
       },
       {
         "id": "500MI00000nxP3AYAU",
@@ -1020,7 +893,7 @@
         "country": "NL",
         "pref": false,
         "since": "2026-05-27T10:30:02.000+0000",
-        "wd": 37.9
+        "wd": 38.0
       },
       {
         "id": "500MI00000nuORtYAM",
@@ -1028,7 +901,7 @@
         "country": "SE",
         "pref": false,
         "since": "2026-05-27T12:11:01.000+0000",
-        "wd": 37.7
+        "wd": 37.8
       },
       {
         "id": "500MI00000o5bYSYAY",
@@ -1036,7 +909,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-01T11:59:10.000+0000",
-        "wd": 33.7
+        "wd": 33.8
       },
       {
         "id": "500MI00000oAZapYAG",
@@ -1044,7 +917,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-01T14:05:16.000+0000",
-        "wd": 33.4
+        "wd": 33.5
       },
       {
         "id": "500MI00000oEHsMYAW",
@@ -1052,7 +925,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-02T13:02:26.000+0000",
-        "wd": 32.4
+        "wd": 32.5
       },
       {
         "id": "500MI00000oQdAjYAK",
@@ -1060,7 +933,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-05T11:12:39.000+0000",
-        "wd": 29.3
+        "wd": 29.4
       },
       {
         "id": "500MI00000oMtarYAC",
@@ -1068,7 +941,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-05T13:00:13.000+0000",
-        "wd": 29.1
+        "wd": 29.2
       },
       {
         "id": "500MI00000oXh9XYAS",
@@ -1076,7 +949,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-09T06:43:00.000+0000",
-        "wd": 27.0
+        "wd": 27.1
       },
       {
         "id": "500MI00000oXSOxYAO",
@@ -1084,7 +957,7 @@
         "country": "SE",
         "pref": false,
         "since": "2026-06-09T08:52:46.000+0000",
-        "wd": 26.7
+        "wd": 26.8
       },
       {
         "id": "500MI00000ol09VYAQ",
@@ -1092,7 +965,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-12T09:25:30.000+0000",
-        "wd": 23.3
+        "wd": 23.4
       },
       {
         "id": "500MI00000orPhzYAE",
@@ -1100,7 +973,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-15T12:34:49.000+0000",
-        "wd": 21.1
+        "wd": 21.2
       },
       {
         "id": "500MI00000otKXZYA2",
@@ -1108,7 +981,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-15T14:07:46.000+0000",
-        "wd": 20.9
+        "wd": 21.0
       },
       {
         "id": "500MI00000osrdeYAA",
@@ -1116,7 +989,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-16T06:30:19.000+0000",
-        "wd": 20.8
+        "wd": 20.9
       },
       {
         "id": "500MI00000oldPTYAY",
@@ -1124,7 +997,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-16T07:46:52.000+0000",
-        "wd": 20.6
+        "wd": 20.7
       },
       {
         "id": "500MI00000p0wJgYAI",
@@ -1132,7 +1005,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-16T10:25:15.000+0000",
-        "wd": 20.3
+        "wd": 20.4
       },
       {
         "id": "500MI00000osrddYAA",
@@ -1140,7 +1013,7 @@
         "country": "SK",
         "pref": false,
         "since": "2026-06-16T10:52:58.000+0000",
-        "wd": 20.2
+        "wd": 20.3
       },
       {
         "id": "500MI00000otKXaYAM",
@@ -1148,7 +1021,7 @@
         "country": "SK",
         "pref": false,
         "since": "2026-06-16T11:09:21.000+0000",
-        "wd": 20.2
+        "wd": 20.3
       },
       {
         "id": "500MI00000p1El9YAE",
@@ -1156,7 +1029,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-16T11:40:44.000+0000",
-        "wd": 20.1
+        "wd": 20.2
       },
       {
         "id": "500MI00000p1TVjYAM",
@@ -1164,7 +1037,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-16T12:48:55.000+0000",
-        "wd": 20.0
+        "wd": 20.1
       },
       {
         "id": "500MI00000p15upYAA",
@@ -1172,7 +1045,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-17T06:09:45.000+0000",
-        "wd": 19.7
+        "wd": 19.8
       },
       {
         "id": "500MI00000p15uqYAA",
@@ -1180,7 +1053,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-16T14:53:07.000+0000",
-        "wd": 19.7
+        "wd": 19.8
       },
       {
         "id": "500MI00000p1Is5YAE",
@@ -1188,7 +1061,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-17T06:18:26.000+0000",
-        "wd": 19.7
+        "wd": 19.8
       },
       {
         "id": "500MI00000p1Is4YAE",
@@ -1196,7 +1069,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-17T09:17:44.000+0000",
-        "wd": 19.3
+        "wd": 19.4
       },
       {
         "id": "500MI00000p4UGgYAM",
@@ -1204,7 +1077,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-17T10:34:16.000+0000",
-        "wd": 19.1
+        "wd": 19.2
       },
       {
         "id": "500MI00000p1bt0YAA",
@@ -1212,7 +1085,7 @@
         "country": "BE",
         "pref": true,
         "since": "2026-06-17T12:48:52.000+0000",
-        "wd": 18.8
+        "wd": 18.9
       },
       {
         "id": "500MI00000p3xvzYAA",
@@ -1220,7 +1093,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-17T13:06:12.000+0000",
-        "wd": 18.8
+        "wd": 18.9
       },
       {
         "id": "500MI00000p4DqyYAE",
@@ -1228,7 +1101,7 @@
         "country": "BE",
         "pref": false,
         "since": "2026-06-17T13:03:42.000+0000",
-        "wd": 18.8
+        "wd": 18.9
       },
       {
         "id": "500MI00000p4LzwYAE",
@@ -1236,7 +1109,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-17T13:11:02.000+0000",
-        "wd": 18.8
+        "wd": 18.9
       },
       {
         "id": "500MI00000p4ki9YAA",
@@ -1244,7 +1117,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-17T13:26:33.000+0000",
-        "wd": 18.8
+        "wd": 18.9
       },
       {
         "id": "500MI00000p4kiAYAQ",
@@ -1252,7 +1125,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-17T13:25:44.000+0000",
-        "wd": 18.8
+        "wd": 18.9
       },
       {
         "id": "500MI00000p4rbVYAQ",
@@ -1260,7 +1133,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-17T13:37:12.000+0000",
-        "wd": 18.7
+        "wd": 18.8
       },
       {
         "id": "500MI00000p4rbUYAQ",
@@ -1268,7 +1141,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-18T06:10:59.000+0000",
-        "wd": 18.5
+        "wd": 18.6
       },
       {
         "id": "500MI00000p84kMYAQ",
@@ -1276,7 +1149,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-18T12:40:05.000+0000",
-        "wd": 17.7
+        "wd": 17.8
       },
       {
         "id": "500MI00000p84kLYAQ",
@@ -1284,7 +1157,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-18T14:17:48.000+0000",
-        "wd": 17.5
+        "wd": 17.6
       },
       {
         "id": "500MI00000pBjfhYAC",
@@ -1292,7 +1165,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-19T12:58:52.000+0000",
-        "wd": 16.6
+        "wd": 16.7
       },
       {
         "id": "500MI00000pDwSGYA0",
@@ -1300,7 +1173,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-22T08:40:42.000+0000",
-        "wd": 15.4
+        "wd": 15.5
       },
       {
         "id": "500MI00000pHd1OYAS",
@@ -1308,7 +1181,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-22T13:55:57.000+0000",
-        "wd": 14.7
+        "wd": 14.8
       },
       {
         "id": "500MI00000pHd1NYAS",
@@ -1316,7 +1189,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-22T14:41:06.000+0000",
-        "wd": 14.6
+        "wd": 14.7
       },
       {
         "id": "500MI00000pHd1PYAS",
@@ -1324,7 +1197,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-23T06:39:33.000+0000",
-        "wd": 14.5
+        "wd": 14.6
       },
       {
         "id": "500MI00000pHd1KYAS",
@@ -1332,7 +1205,7 @@
         "country": "PL",
         "pref": false,
         "since": "2026-06-24T07:34:21.000+0000",
-        "wd": 13.2
+        "wd": 13.3
       },
       {
         "id": "500MI00000pHd1MYAS",
@@ -1340,7 +1213,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-24T11:16:03.000+0000",
-        "wd": 12.8
+        "wd": 12.9
       },
       {
         "id": "500MI00000pPZjoYAG",
@@ -1348,7 +1221,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-25T10:52:46.000+0000",
-        "wd": 11.7
+        "wd": 11.8
       },
       {
         "id": "500MI00000pRulkYAC",
@@ -1356,7 +1229,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-25T14:25:48.000+0000",
-        "wd": 11.3
+        "wd": 11.4
       },
       {
         "id": "500MI00000pSfmAYAS",
@@ -1364,7 +1237,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-26T11:28:02.000+0000",
-        "wd": 10.5
+        "wd": 10.6
       },
       {
         "id": "500MI00000pVl2AYAS",
@@ -1372,7 +1245,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-26T13:14:30.000+0000",
-        "wd": 10.3
+        "wd": 10.4
       },
       {
         "id": "500MI00000pWeWYYA0",
@@ -1380,7 +1253,7 @@
         "country": "SK",
         "pref": false,
         "since": "2026-06-26T15:00:57.000+0000",
-        "wd": 10.1
+        "wd": 10.2
       },
       {
         "id": "500MI00000pWeWWYA0",
@@ -1388,7 +1261,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-29T06:08:36.000+0000",
-        "wd": 9.4
+        "wd": 9.5
       },
       {
         "id": "500MI00000pWeWXYA0",
@@ -1396,7 +1269,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-29T06:07:46.000+0000",
-        "wd": 9.4
+        "wd": 9.5
       },
       {
         "id": "500MI00000pWeWZYA0",
@@ -1404,7 +1277,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-29T06:09:32.000+0000",
-        "wd": 9.4
+        "wd": 9.5
       },
       {
         "id": "500MI00000pbuE5YAI",
@@ -1412,7 +1285,7 @@
         "country": "CZ",
         "pref": false,
         "since": "2026-06-29T10:42:00.000+0000",
-        "wd": 8.9
+        "wd": 9.0
       },
       {
         "id": "500MI00000pcp7aYAA",
@@ -1420,7 +1293,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-29T13:06:02.000+0000",
-        "wd": 8.6
+        "wd": 8.7
       },
       {
         "id": "500MI00000pdF8OYAU",
@@ -1428,7 +1301,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-29T13:43:49.000+0000",
-        "wd": 8.5
+        "wd": 8.6
       },
       {
         "id": "500MI00000pdF8PYAU",
@@ -1436,7 +1309,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-29T13:50:02.000+0000",
-        "wd": 8.5
+        "wd": 8.6
       },
       {
         "id": "500MI00000pbuE4YAI",
@@ -1444,7 +1317,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-29T14:29:09.000+0000",
-        "wd": 8.4
+        "wd": 8.5
       },
       {
         "id": "500MI00000pcp7ZYAQ",
@@ -1452,7 +1325,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-30T10:20:21.000+0000",
-        "wd": 7.8
+        "wd": 7.9
       },
       {
         "id": "500MI00000phqJ0YAI",
@@ -1460,7 +1333,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-30T10:21:37.000+0000",
-        "wd": 7.8
+        "wd": 7.9
       },
       {
         "id": "500MI00000piSmXYAU",
@@ -1468,7 +1341,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-30T12:27:48.000+0000",
-        "wd": 7.5
+        "wd": 7.6
       },
       {
         "id": "500MI00000piSmYYAU",
@@ -1476,7 +1349,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-30T12:26:02.000+0000",
-        "wd": 7.5
+        "wd": 7.6
       },
       {
         "id": "500MI00000pdtSQYAY",
@@ -1484,15 +1357,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-30T12:57:46.000+0000",
-        "wd": 7.4
-      },
-      {
-        "id": "500MI00000phqIzYAI",
-        "cn": "00191239",
-        "country": "DE",
-        "pref": false,
-        "since": "2026-06-30T13:59:45.000+0000",
-        "wd": 7.3
+        "wd": 7.5
       },
       {
         "id": "500MI00000phwOMYAY",
@@ -1500,7 +1365,15 @@
         "country": "DE",
         "pref": false,
         "since": "2026-06-30T13:44:02.000+0000",
-        "wd": 7.3
+        "wd": 7.5
+      },
+      {
+        "id": "500MI00000phqIzYAI",
+        "cn": "00191239",
+        "country": "DE",
+        "pref": false,
+        "since": "2026-06-30T13:59:45.000+0000",
+        "wd": 7.4
       },
       {
         "id": "500MI00000pcYGHYA2",
@@ -1508,15 +1381,7 @@
         "country": "NL",
         "pref": false,
         "since": "2026-07-01T09:36:47.000+0000",
-        "wd": 6.7
-      },
-      {
-        "id": "500MI00000pmKToYAM",
-        "cn": "00191477",
-        "country": "DE",
-        "pref": false,
-        "since": "2026-07-01T10:15:00.000+0000",
-        "wd": 6.7
+        "wd": 6.8
       },
       {
         "id": "500MI00000pdtSRYAY",
@@ -1524,7 +1389,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-01T14:34:54.000+0000",
-        "wd": 6.1
+        "wd": 6.2
       },
       {
         "id": "500MI00000pmvxyYAA",
@@ -1532,7 +1397,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-01T14:29:36.000+0000",
-        "wd": 6.1
+        "wd": 6.2
       },
       {
         "id": "500MI00000ppdy1YAA",
@@ -1540,7 +1405,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-02T07:54:43.000+0000",
-        "wd": 5.8
+        "wd": 5.9
       },
       {
         "id": "500MI00000ppdy2YAA",
@@ -1548,7 +1413,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-02T07:51:43.000+0000",
-        "wd": 5.8
+        "wd": 5.9
       },
       {
         "id": "500MI00000ppl4MYAQ",
@@ -1556,7 +1421,7 @@
         "country": "NL",
         "pref": false,
         "since": "2026-07-02T07:58:32.000+0000",
-        "wd": 5.8
+        "wd": 5.9
       },
       {
         "id": "500MI00000pq7koYAA",
@@ -1564,7 +1429,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-02T09:11:08.000+0000",
-        "wd": 5.7
+        "wd": 5.8
       },
       {
         "id": "500MI00000pqGpnYAE",
@@ -1572,7 +1437,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-02T11:42:36.000+0000",
-        "wd": 5.4
+        "wd": 5.5
       },
       {
         "id": "500MI00000pc256YAA",
@@ -1580,7 +1445,7 @@
         "country": "KR",
         "pref": false,
         "since": "2026-07-02T14:24:48.000+0000",
-        "wd": 5.0
+        "wd": 5.1
       },
       {
         "id": "500MI00000puLAtYAM",
@@ -1588,7 +1453,7 @@
         "country": "IT",
         "pref": false,
         "since": "2026-07-03T08:44:44.000+0000",
-        "wd": 4.6
+        "wd": 4.7
       },
       {
         "id": "500MI00000puBMrYAM",
@@ -1596,7 +1461,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-03T11:17:08.000+0000",
-        "wd": 4.3
+        "wd": 4.4
       },
       {
         "id": "500MI00000puLAsYAM",
@@ -1604,7 +1469,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-03T12:23:23.000+0000",
-        "wd": 4.1
+        "wd": 4.2
       },
       {
         "id": "500MI00000pv1qCYAQ",
@@ -1612,7 +1477,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-03T12:24:09.000+0000",
-        "wd": 4.1
+        "wd": 4.2
       },
       {
         "id": "500MI00000pv1qBYAQ",
@@ -1620,7 +1485,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-06T06:30:19.000+0000",
-        "wd": 3.1
+        "wd": 3.2
       },
       {
         "id": "500MI00000pvYVqYAM",
@@ -1628,7 +1493,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-06T06:30:58.000+0000",
-        "wd": 3.1
+        "wd": 3.2
       },
       {
         "id": "500MI00000pupsAYAQ",
@@ -1636,7 +1501,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-06T11:22:37.000+0000",
-        "wd": 2.5
+        "wd": 2.6
       },
       {
         "id": "500MI00000pxMgoYAE",
@@ -1644,7 +1509,7 @@
         "country": "DE",
         "pref": true,
         "since": "2026-07-06T12:03:55.000+0000",
-        "wd": 2.4
+        "wd": 2.5
       },
       {
         "id": "500MI00000q0tbQYAQ",
@@ -1652,7 +1517,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-06T12:02:48.000+0000",
-        "wd": 2.4
+        "wd": 2.5
       },
       {
         "id": "500MI00000q1Nr5YAE",
@@ -1660,15 +1525,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-06T12:06:08.000+0000",
-        "wd": 2.4
-      },
-      {
-        "id": "500MI00000q1RGTYA2",
-        "cn": "00192346",
-        "country": "DE",
-        "pref": false,
-        "since": "2026-07-06T12:35:38.000+0000",
-        "wd": 2.4
+        "wd": 2.5
       },
       {
         "id": "500MI00000q1RGdYAM",
@@ -1676,7 +1533,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-06T12:40:00.000+0000",
-        "wd": 2.4
+        "wd": 2.5
       },
       {
         "id": "500MI00000q1Yg6YAE",
@@ -1684,7 +1541,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-06T12:03:22.000+0000",
-        "wd": 2.4
+        "wd": 2.5
       },
       {
         "id": "500MI00000q1RGXYA2",
@@ -1692,7 +1549,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-06T14:08:57.000+0000",
-        "wd": 2.2
+        "wd": 2.3
       },
       {
         "id": "500MI00000q1RGUYA2",
@@ -1700,7 +1557,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-07T05:52:30.000+0000",
-        "wd": 2.1
+        "wd": 2.2
       },
       {
         "id": "500MI00000q1Yg5YAE",
@@ -1708,7 +1565,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-07T08:04:26.000+0000",
-        "wd": 1.8
+        "wd": 1.9
       },
       {
         "id": "500MI00000q4p61YAA",
@@ -1716,7 +1573,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-07T08:14:34.000+0000",
-        "wd": 1.8
+        "wd": 1.9
       },
       {
         "id": "500MI00000pxMaIYAU",
@@ -1724,7 +1581,7 @@
         "country": "CZ",
         "pref": false,
         "since": "2026-07-07T09:31:11.000+0000",
-        "wd": 1.6
+        "wd": 1.7
       },
       {
         "id": "500MI00000q0ge2YAA",
@@ -1732,7 +1589,7 @@
         "country": "NL",
         "pref": false,
         "since": "2026-07-07T09:21:39.000+0000",
-        "wd": 1.6
+        "wd": 1.7
       },
       {
         "id": "500MI00000q2x9MYAQ",
@@ -1740,7 +1597,7 @@
         "country": "DE",
         "pref": true,
         "since": "2026-07-07T10:37:18.000+0000",
-        "wd": 1.5
+        "wd": 1.6
       },
       {
         "id": "500MI00000pv1q7YAA",
@@ -1748,7 +1605,7 @@
         "country": "PL",
         "pref": false,
         "since": "2026-07-07T11:24:55.000+0000",
-        "wd": 1.4
+        "wd": 1.5
       },
       {
         "id": "500MI00000q5SlhYAE",
@@ -1756,7 +1613,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-07T11:36:31.000+0000",
-        "wd": 1.4
+        "wd": 1.5
       },
       {
         "id": "500MI00000px6KAYAY",
@@ -1764,7 +1621,7 @@
         "country": "IT",
         "pref": false,
         "since": "2026-07-07T13:23:51.000+0000",
-        "wd": 1.1
+        "wd": 1.2
       },
       {
         "id": "500MI00000q1RGfYAM",
@@ -1772,15 +1629,7 @@
         "country": "SK",
         "pref": false,
         "since": "2026-07-07T14:14:13.000+0000",
-        "wd": 1.0
-      },
-      {
-        "id": "500MI00000q5aUvYAI",
-        "cn": "00192599",
-        "country": "DE",
-        "pref": false,
-        "since": "2026-07-07T14:26:25.000+0000",
-        "wd": 1.0
+        "wd": 1.1
       },
       {
         "id": "500MI00000q5iCHYAY",
@@ -1788,7 +1637,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-08T08:09:12.000+0000",
-        "wd": 0.7
+        "wd": 0.8
       },
       {
         "id": "500MI00000q8b2wYAA",
@@ -1796,15 +1645,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-08T08:07:29.000+0000",
-        "wd": 0.7
-      },
-      {
-        "id": "500MI00000q0kUsYAI",
-        "cn": "00192291",
-        "country": "DE",
-        "pref": false,
-        "since": "2026-07-08T12:04:52.000+0000",
-        "wd": 0.2
+        "wd": 0.8
       },
       {
         "id": "500MI00000q980bYAA",
@@ -1812,7 +1653,7 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-08T12:03:00.000+0000",
-        "wd": 0.2
+        "wd": 0.3
       },
       {
         "id": "500MI00000q9NPMYA2",
@@ -1820,7 +1661,31 @@
         "country": "DE",
         "pref": false,
         "since": "2026-07-08T11:33:03.000+0000",
-        "wd": 0.2
+        "wd": 0.3
+      },
+      {
+        "id": "500MI00000q4psbYAA",
+        "cn": "00192504",
+        "country": "NL",
+        "pref": false,
+        "since": "2026-07-08T13:41:09.000+0000",
+        "wd": 0.1
+      },
+      {
+        "id": "500MI00000q4pscYAA",
+        "cn": "00192505",
+        "country": "NL",
+        "pref": false,
+        "since": "2026-07-08T13:40:31.000+0000",
+        "wd": 0.1
+      },
+      {
+        "id": "500MI00000q8ErEYAU",
+        "cn": "00192710",
+        "country": "DE",
+        "pref": false,
+        "since": "2026-07-08T13:53:13.000+0000",
+        "wd": 0.1
       }
     ]
   },
@@ -1830,7 +1695,7 @@
     "inactive": 3,
     "have_order": true,
     "f_available": true,
-    "f_customers_total": 88,
+    "f_customers_total": 87,
     "buckets": {
       "le2": {
         "active": [
@@ -1839,7 +1704,7 @@
             "cn": "00191942",
             "country": "PL",
             "pref": false,
-            "wd": 1.4,
+            "wd": 1.5,
             "order": "ord-first-call"
           },
           {
@@ -1847,7 +1712,7 @@
             "cn": "00192042",
             "country": "IT",
             "pref": false,
-            "wd": 1.1,
+            "wd": 1.2,
             "order": "ord-first-call"
           },
           {
@@ -1855,7 +1720,7 @@
             "cn": "00192074",
             "country": "CZ",
             "pref": false,
-            "wd": 1.6,
+            "wd": 1.7,
             "order": "ord-first-call"
           },
           {
@@ -1863,15 +1728,7 @@
             "cn": "00192282",
             "country": "NL",
             "pref": false,
-            "wd": 1.6,
-            "order": "ord-first-call"
-          },
-          {
-            "id": "500MI00000q0kUsYAI",
-            "cn": "00192291",
-            "country": "DE",
-            "pref": false,
-            "wd": 0.2,
+            "wd": 1.7,
             "order": "ord-first-call"
           },
           {
@@ -1879,7 +1736,7 @@
             "cn": "00192358",
             "country": "SK",
             "pref": false,
-            "wd": 1.0,
+            "wd": 1.1,
             "order": "ord-first-call"
           },
           {
@@ -1887,7 +1744,7 @@
             "cn": "00192344",
             "country": "DE",
             "pref": false,
-            "wd": 1.8,
+            "wd": 1.9,
             "order": "ord-first-call"
           },
           {
@@ -1895,7 +1752,7 @@
             "cn": "00192435",
             "country": "DE",
             "pref": true,
-            "wd": 1.5,
+            "wd": 1.6,
             "order": "ord-first-call"
           },
           {
@@ -1903,7 +1760,23 @@
             "cn": "00192494",
             "country": "DE",
             "pref": false,
-            "wd": 1.8,
+            "wd": 1.9,
+            "order": "ord-first-call"
+          },
+          {
+            "id": "500MI00000q4psbYAA",
+            "cn": "00192504",
+            "country": "NL",
+            "pref": false,
+            "wd": 0.1,
+            "order": "ord-first-call"
+          },
+          {
+            "id": "500MI00000q4pscYAA",
+            "cn": "00192505",
+            "country": "NL",
+            "pref": false,
+            "wd": 0.1,
             "order": "ord-first-call"
           },
           {
@@ -1911,15 +1784,7 @@
             "cn": "00192539",
             "country": "DE",
             "pref": false,
-            "wd": 1.4,
-            "order": "ord-first-call"
-          },
-          {
-            "id": "500MI00000q5aUvYAI",
-            "cn": "00192599",
-            "country": "DE",
-            "pref": false,
-            "wd": 1.0,
+            "wd": 1.5,
             "order": "ord-first-call"
           },
           {
@@ -1927,7 +1792,15 @@
             "cn": "00192595",
             "country": "DE",
             "pref": false,
-            "wd": 0.7,
+            "wd": 0.8,
+            "order": "ord-first-call"
+          },
+          {
+            "id": "500MI00000q8ErEYAU",
+            "cn": "00192710",
+            "country": "DE",
+            "pref": false,
+            "wd": 0.1,
             "order": "ord-first-call"
           },
           {
@@ -1935,7 +1808,7 @@
             "cn": "00192698",
             "country": "DE",
             "pref": false,
-            "wd": 0.7,
+            "wd": 0.8,
             "order": "ord-first-call"
           },
           {
@@ -1943,7 +1816,7 @@
             "cn": "00192780",
             "country": "DE",
             "pref": false,
-            "wd": 0.2,
+            "wd": 0.3,
             "order": "ord-first-call"
           },
           {
@@ -1951,7 +1824,7 @@
             "cn": "00192778",
             "country": "DE",
             "pref": false,
-            "wd": 0.2,
+            "wd": 0.3,
             "order": "ord-first-call"
           }
         ],
@@ -1964,7 +1837,7 @@
             "cn": "00191869",
             "country": "DE",
             "pref": false,
-            "wd": 4.3,
+            "wd": 4.4,
             "order": "ord-first-call"
           },
           {
@@ -1972,7 +1845,7 @@
             "cn": "00191876",
             "country": "DE",
             "pref": false,
-            "wd": 4.1,
+            "wd": 4.2,
             "order": "ord-first-call"
           },
           {
@@ -1980,7 +1853,7 @@
             "cn": "00191877",
             "country": "IT",
             "pref": false,
-            "wd": 4.6,
+            "wd": 4.7,
             "order": "ord-first-call"
           },
           {
@@ -1988,7 +1861,7 @@
             "cn": "00191924",
             "country": "DE",
             "pref": false,
-            "wd": 2.5,
+            "wd": 2.6,
             "order": "ord-first-call"
           },
           {
@@ -1996,7 +1869,7 @@
             "cn": "00191946",
             "country": "DE",
             "pref": false,
-            "wd": 3.1,
+            "wd": 3.2,
             "order": "ord-first-call"
           },
           {
@@ -2004,7 +1877,7 @@
             "cn": "00191947",
             "country": "DE",
             "pref": false,
-            "wd": 4.1,
+            "wd": 4.2,
             "order": "ord-first-call"
           },
           {
@@ -2012,7 +1885,7 @@
             "cn": "00191968",
             "country": "DE",
             "pref": false,
-            "wd": 3.1,
+            "wd": 3.2,
             "order": "ord-first-call"
           },
           {
@@ -2020,7 +1893,7 @@
             "cn": "00192109",
             "country": "DE",
             "pref": true,
-            "wd": 2.4,
+            "wd": 2.5,
             "order": "ord-first-call"
           },
           {
@@ -2028,7 +1901,7 @@
             "cn": "00192314",
             "country": "DE",
             "pref": false,
-            "wd": 2.4,
+            "wd": 2.5,
             "order": "ord-first-call"
           },
           {
@@ -2036,7 +1909,7 @@
             "cn": "00192331",
             "country": "DE",
             "pref": false,
-            "wd": 2.4,
+            "wd": 2.5,
             "order": "ord-first-call"
           },
           {
@@ -2044,7 +1917,7 @@
             "cn": "00192347",
             "country": "DE",
             "pref": false,
-            "wd": 2.1,
+            "wd": 2.2,
             "order": "ord-first-call"
           },
           {
@@ -2052,7 +1925,7 @@
             "cn": "00192350",
             "country": "DE",
             "pref": false,
-            "wd": 2.2,
+            "wd": 2.3,
             "order": "ord-first-call"
           },
           {
@@ -2060,7 +1933,7 @@
             "cn": "00192356",
             "country": "DE",
             "pref": false,
-            "wd": 2.4,
+            "wd": 2.5,
             "order": "ord-first-call"
           },
           {
@@ -2068,7 +1941,7 @@
             "cn": "00192345",
             "country": "DE",
             "pref": false,
-            "wd": 2.4,
+            "wd": 2.5,
             "order": "ord-first-call"
           }
         ],
@@ -2081,7 +1954,7 @@
             "cn": "00190607",
             "country": "DE",
             "pref": false,
-            "wd": 9.4,
+            "wd": 9.5,
             "order": "ord-first-call"
           },
           {
@@ -2089,7 +1962,7 @@
             "cn": "00190608",
             "country": "DE",
             "pref": false,
-            "wd": 9.4,
+            "wd": 9.5,
             "order": "ord-first-call"
           },
           {
@@ -2097,7 +1970,7 @@
             "cn": "00190610",
             "country": "DE",
             "pref": false,
-            "wd": 9.4,
+            "wd": 9.5,
             "order": "ord-first-call"
           },
           {
@@ -2105,7 +1978,7 @@
             "cn": "00190923",
             "country": "DE",
             "pref": false,
-            "wd": 8.4,
+            "wd": 8.5,
             "order": "ord-first-call"
           },
           {
@@ -2113,7 +1986,7 @@
             "cn": "00190924",
             "country": "CZ",
             "pref": false,
-            "wd": 8.9,
+            "wd": 9.0,
             "order": "ord-first-call"
           },
           {
@@ -2121,7 +1994,7 @@
             "cn": "00190909",
             "country": "KR",
             "pref": false,
-            "wd": 5.0,
+            "wd": 5.1,
             "order": "ord-first-call"
           },
           {
@@ -2129,7 +2002,7 @@
             "cn": "00190973",
             "country": "NL",
             "pref": false,
-            "wd": 6.7,
+            "wd": 6.8,
             "order": "ord-first-call"
           },
           {
@@ -2137,7 +2010,7 @@
             "cn": "00191031",
             "country": "DE",
             "pref": false,
-            "wd": 7.8,
+            "wd": 7.9,
             "order": "ord-first-call"
           },
           {
@@ -2145,7 +2018,7 @@
             "cn": "00191032",
             "country": "DE",
             "pref": false,
-            "wd": 8.6,
+            "wd": 8.7,
             "order": "ord-first-call"
           },
           {
@@ -2153,7 +2026,7 @@
             "cn": "00191050",
             "country": "DE",
             "pref": false,
-            "wd": 8.5,
+            "wd": 8.6,
             "order": "ord-first-call"
           },
           {
@@ -2161,7 +2034,7 @@
             "cn": "00191051",
             "country": "DE",
             "pref": false,
-            "wd": 8.5,
+            "wd": 8.6,
             "order": "ord-first-call"
           },
           {
@@ -2169,7 +2042,7 @@
             "cn": "00191119",
             "country": "DE",
             "pref": false,
-            "wd": 7.4,
+            "wd": 7.5,
             "order": "ord-first-call"
           },
           {
@@ -2177,7 +2050,7 @@
             "cn": "00191120",
             "country": "DE",
             "pref": false,
-            "wd": 6.1,
+            "wd": 6.2,
             "order": "ord-first-call"
           },
           {
@@ -2185,7 +2058,7 @@
             "cn": "00191239",
             "country": "DE",
             "pref": false,
-            "wd": 7.3,
+            "wd": 7.4,
             "order": "ord-first-call"
           },
           {
@@ -2193,7 +2066,7 @@
             "cn": "00191240",
             "country": "DE",
             "pref": false,
-            "wd": 7.8,
+            "wd": 7.9,
             "order": "ord-first-call"
           },
           {
@@ -2201,7 +2074,7 @@
             "cn": "00191219",
             "country": "DE",
             "pref": false,
-            "wd": 7.3,
+            "wd": 7.5,
             "order": "ord-first-call"
           },
           {
@@ -2209,7 +2082,7 @@
             "cn": "00191281",
             "country": "DE",
             "pref": false,
-            "wd": 7.5,
+            "wd": 7.6,
             "order": "ord-first-call"
           },
           {
@@ -2217,15 +2090,7 @@
             "cn": "00191282",
             "country": "DE",
             "pref": false,
-            "wd": 7.5,
-            "order": "ord-first-call"
-          },
-          {
-            "id": "500MI00000pmKToYAM",
-            "cn": "00191477",
-            "country": "DE",
-            "pref": false,
-            "wd": 6.7,
+            "wd": 7.6,
             "order": "ord-first-call"
           },
           {
@@ -2233,7 +2098,7 @@
             "cn": "00191513",
             "country": "DE",
             "pref": false,
-            "wd": 6.1,
+            "wd": 6.2,
             "order": "ord-first-call"
           },
           {
@@ -2241,7 +2106,7 @@
             "cn": "00191660",
             "country": "DE",
             "pref": false,
-            "wd": 5.8,
+            "wd": 5.9,
             "order": "ord-first-call"
           },
           {
@@ -2249,7 +2114,7 @@
             "cn": "00191661",
             "country": "DE",
             "pref": false,
-            "wd": 5.8,
+            "wd": 5.9,
             "order": "ord-first-call"
           },
           {
@@ -2257,7 +2122,7 @@
             "cn": "00191665",
             "country": "NL",
             "pref": false,
-            "wd": 5.8,
+            "wd": 5.9,
             "order": "ord-first-call"
           },
           {
@@ -2265,7 +2130,7 @@
             "cn": "00191691",
             "country": "DE",
             "pref": false,
-            "wd": 5.7,
+            "wd": 5.8,
             "order": "ord-first-call"
           },
           {
@@ -2273,7 +2138,7 @@
             "cn": "00191724",
             "country": "DE",
             "pref": false,
-            "wd": 5.4,
+            "wd": 5.5,
             "order": "ord-first-call"
           }
         ],
@@ -2286,7 +2151,7 @@
             "cn": "00176020",
             "country": "CZ",
             "pref": false,
-            "wd": 65.5,
+            "wd": 65.6,
             "order": "ord-first-call"
           },
           {
@@ -2294,7 +2159,7 @@
             "cn": "00181945",
             "country": "DE",
             "pref": false,
-            "wd": 44.3,
+            "wd": 44.4,
             "order": "ord-first-call"
           },
           {
@@ -2302,7 +2167,7 @@
             "cn": "00183385",
             "country": "DE",
             "pref": false,
-            "wd": 39.3,
+            "wd": 39.4,
             "order": "ord-first-call"
           },
           {
@@ -2310,7 +2175,7 @@
             "cn": "00183398",
             "country": "DE",
             "pref": false,
-            "wd": 39.3,
+            "wd": 39.4,
             "order": "ord-first-call"
           },
           {
@@ -2318,7 +2183,7 @@
             "cn": "00183619",
             "country": "DE",
             "pref": false,
-            "wd": 38.4,
+            "wd": 38.5,
             "order": "ord-first-call"
           },
           {
@@ -2326,7 +2191,7 @@
             "cn": "00183724",
             "country": "SK",
             "pref": false,
-            "wd": 38.3,
+            "wd": 38.4,
             "order": "ord-first-call"
           },
           {
@@ -2334,7 +2199,7 @@
             "cn": "00183725",
             "country": "SE",
             "pref": false,
-            "wd": 37.7,
+            "wd": 37.8,
             "order": "ord-first-call"
           },
           {
@@ -2342,7 +2207,7 @@
             "cn": "00183968",
             "country": "NL",
             "pref": false,
-            "wd": 37.9,
+            "wd": 38.0,
             "order": "ord-first-call"
           },
           {
@@ -2350,7 +2215,7 @@
             "cn": "00184681",
             "country": "DE",
             "pref": false,
-            "wd": 33.7,
+            "wd": 33.8,
             "order": "ord-first-call"
           },
           {
@@ -2358,7 +2223,7 @@
             "cn": "00184993",
             "country": "DE",
             "pref": false,
-            "wd": 33.4,
+            "wd": 33.5,
             "order": "ord-first-call"
           },
           {
@@ -2366,7 +2231,7 @@
             "cn": "00185329",
             "country": "DE",
             "pref": false,
-            "wd": 32.4,
+            "wd": 32.5,
             "order": "ord-first-call"
           },
           {
@@ -2374,7 +2239,7 @@
             "cn": "00186003",
             "country": "DE",
             "pref": false,
-            "wd": 29.1,
+            "wd": 29.2,
             "order": "ord-first-call"
           },
           {
@@ -2382,7 +2247,7 @@
             "cn": "00186198",
             "country": "DE",
             "pref": false,
-            "wd": 29.3,
+            "wd": 29.4,
             "order": "ord-first-call"
           },
           {
@@ -2390,7 +2255,7 @@
             "cn": "00186716",
             "country": "SE",
             "pref": false,
-            "wd": 26.7,
+            "wd": 26.8,
             "order": "ord-first-call"
           },
           {
@@ -2398,7 +2263,7 @@
             "cn": "00186748",
             "country": "DE",
             "pref": false,
-            "wd": 27.0,
+            "wd": 27.1,
             "order": "ord-first-call"
           },
           {
@@ -2406,7 +2271,7 @@
             "cn": "00187640",
             "country": "DE",
             "pref": false,
-            "wd": 23.3,
+            "wd": 23.4,
             "order": "ord-first-call"
           },
           {
@@ -2414,7 +2279,7 @@
             "cn": "00187727",
             "country": "DE",
             "pref": false,
-            "wd": 20.6,
+            "wd": 20.7,
             "order": "ord-first-call"
           },
           {
@@ -2422,7 +2287,7 @@
             "cn": "00188144",
             "country": "DE",
             "pref": false,
-            "wd": 21.1,
+            "wd": 21.2,
             "order": "ord-first-call"
           },
           {
@@ -2430,7 +2295,7 @@
             "cn": "00188190",
             "country": "SK",
             "pref": false,
-            "wd": 20.2,
+            "wd": 20.3,
             "order": "ord-first-call"
           },
           {
@@ -2438,7 +2303,7 @@
             "cn": "00188191",
             "country": "DE",
             "pref": false,
-            "wd": 20.8,
+            "wd": 20.9,
             "order": "ord-first-call"
           },
           {
@@ -2446,7 +2311,7 @@
             "cn": "00188209",
             "country": "DE",
             "pref": false,
-            "wd": 20.9,
+            "wd": 21.0,
             "order": "ord-first-call"
           },
           {
@@ -2454,7 +2319,7 @@
             "cn": "00188210",
             "country": "SK",
             "pref": false,
-            "wd": 20.2,
+            "wd": 20.3,
             "order": "ord-first-call"
           },
           {
@@ -2462,7 +2327,7 @@
             "cn": "00188422",
             "country": "DE",
             "pref": false,
-            "wd": 20.3,
+            "wd": 20.4,
             "order": "ord-first-call"
           },
           {
@@ -2470,7 +2335,7 @@
             "cn": "00188510",
             "country": "DE",
             "pref": false,
-            "wd": 19.7,
+            "wd": 19.8,
             "order": "ord-first-call"
           },
           {
@@ -2478,7 +2343,7 @@
             "cn": "00188511",
             "country": "DE",
             "pref": false,
-            "wd": 19.7,
+            "wd": 19.8,
             "order": "ord-first-call"
           },
           {
@@ -2486,7 +2351,7 @@
             "cn": "00188439",
             "country": "DE",
             "pref": false,
-            "wd": 20.1,
+            "wd": 20.2,
             "order": "ord-first-call"
           },
           {
@@ -2494,7 +2359,7 @@
             "cn": "00188490",
             "country": "DE",
             "pref": false,
-            "wd": 19.3,
+            "wd": 19.4,
             "order": "ord-first-call"
           },
           {
@@ -2502,7 +2367,7 @@
             "cn": "00188491",
             "country": "DE",
             "pref": false,
-            "wd": 19.7,
+            "wd": 19.8,
             "order": "ord-first-call"
           },
           {
@@ -2510,7 +2375,7 @@
             "cn": "00188484",
             "country": "DE",
             "pref": false,
-            "wd": 20.0,
+            "wd": 20.1,
             "order": "ord-first-call"
           },
           {
@@ -2518,7 +2383,7 @@
             "cn": "00188505",
             "country": "BE",
             "pref": true,
-            "wd": 18.8,
+            "wd": 18.9,
             "order": "ord-first-call"
           },
           {
@@ -2526,7 +2391,7 @@
             "cn": "00188681",
             "country": "DE",
             "pref": false,
-            "wd": 18.8,
+            "wd": 18.9,
             "order": "ord-first-call"
           },
           {
@@ -2534,7 +2399,7 @@
             "cn": "00188669",
             "country": "BE",
             "pref": false,
-            "wd": 18.8,
+            "wd": 18.9,
             "order": "ord-first-call"
           },
           {
@@ -2542,7 +2407,7 @@
             "cn": "00188721",
             "country": "DE",
             "pref": false,
-            "wd": 18.8,
+            "wd": 18.9,
             "order": "ord-first-call"
           },
           {
@@ -2550,7 +2415,7 @@
             "cn": "00188698",
             "country": "DE",
             "pref": false,
-            "wd": 19.1,
+            "wd": 19.2,
             "order": "ord-first-call"
           },
           {
@@ -2558,7 +2423,7 @@
             "cn": "00188736",
             "country": "DE",
             "pref": false,
-            "wd": 18.8,
+            "wd": 18.9,
             "order": "ord-first-call"
           },
           {
@@ -2566,7 +2431,7 @@
             "cn": "00188737",
             "country": "DE",
             "pref": false,
-            "wd": 18.8,
+            "wd": 18.9,
             "order": "ord-first-call"
           },
           {
@@ -2574,7 +2439,7 @@
             "cn": "00188753",
             "country": "DE",
             "pref": false,
-            "wd": 18.5,
+            "wd": 18.6,
             "order": "ord-first-call"
           },
           {
@@ -2582,7 +2447,7 @@
             "cn": "00188754",
             "country": "DE",
             "pref": false,
-            "wd": 18.7,
+            "wd": 18.8,
             "order": "ord-first-call"
           },
           {
@@ -2590,7 +2455,7 @@
             "cn": "00188934",
             "country": "DE",
             "pref": false,
-            "wd": 17.5,
+            "wd": 17.6,
             "order": "ord-first-call"
           },
           {
@@ -2598,7 +2463,7 @@
             "cn": "00188935",
             "country": "DE",
             "pref": false,
-            "wd": 17.7,
+            "wd": 17.8,
             "order": "ord-first-call"
           },
           {
@@ -2606,7 +2471,7 @@
             "cn": "00189168",
             "country": "DE",
             "pref": false,
-            "wd": 16.6,
+            "wd": 16.7,
             "order": "ord-first-call"
           },
           {
@@ -2614,7 +2479,7 @@
             "cn": "00189332",
             "country": "DE",
             "pref": false,
-            "wd": 15.4,
+            "wd": 15.5,
             "order": "ord-first-call"
           },
           {
@@ -2622,7 +2487,7 @@
             "cn": "00189640",
             "country": "PL",
             "pref": false,
-            "wd": 13.2,
+            "wd": 13.3,
             "order": "ord-first-call"
           },
           {
@@ -2630,7 +2495,7 @@
             "cn": "00189642",
             "country": "DE",
             "pref": false,
-            "wd": 12.8,
+            "wd": 12.9,
             "order": "ord-first-call"
           },
           {
@@ -2638,7 +2503,7 @@
             "cn": "00189643",
             "country": "DE",
             "pref": false,
-            "wd": 14.6,
+            "wd": 14.7,
             "order": "ord-first-call"
           },
           {
@@ -2646,7 +2511,7 @@
             "cn": "00189644",
             "country": "DE",
             "pref": false,
-            "wd": 14.7,
+            "wd": 14.8,
             "order": "ord-first-call"
           },
           {
@@ -2654,7 +2519,7 @@
             "cn": "00189645",
             "country": "DE",
             "pref": false,
-            "wd": 14.5,
+            "wd": 14.6,
             "order": "ord-first-call"
           },
           {
@@ -2662,7 +2527,7 @@
             "cn": "00190214",
             "country": "DE",
             "pref": false,
-            "wd": 11.7,
+            "wd": 11.8,
             "order": "ord-first-call"
           },
           {
@@ -2670,7 +2535,7 @@
             "cn": "00190289",
             "country": "DE",
             "pref": false,
-            "wd": 11.3,
+            "wd": 11.4,
             "order": "ord-first-call"
           },
           {
@@ -2678,7 +2543,7 @@
             "cn": "00190360",
             "country": "DE",
             "pref": false,
-            "wd": 10.5,
+            "wd": 10.6,
             "order": "ord-first-call"
           },
           {
@@ -2686,7 +2551,7 @@
             "cn": "00190531",
             "country": "DE",
             "pref": false,
-            "wd": 10.3,
+            "wd": 10.4,
             "order": "ord-first-call"
           },
           {
@@ -2694,7 +2559,7 @@
             "cn": "00190609",
             "country": "SK",
             "pref": false,
-            "wd": 10.1,
+            "wd": 10.2,
             "order": "ord-first-call"
           }
         ],
@@ -2704,7 +2569,7 @@
             "cn": "00127260",
             "country": "DE",
             "pref": false,
-            "wd": 312.0,
+            "wd": 312.1,
             "order": "ord-completed"
           },
           {
@@ -2712,7 +2577,7 @@
             "cn": "00170100",
             "country": "DE",
             "pref": false,
-            "wd": 91.7,
+            "wd": 91.8,
             "order": "ord-lost"
           },
           {
@@ -2720,7 +2585,7 @@
             "cn": "00170126",
             "country": "DE",
             "pref": false,
-            "wd": 91.7,
+            "wd": 91.8,
             "order": "ord-lost"
           }
         ]
@@ -2730,9 +2595,81 @@
       {
         "aws": [
           {
+            "cn": "00191513",
+            "id": "500MI00000pmvxyYAA",
+            "wd": 6.2
+          }
+        ],
+        "others": [
+          {
+            "cn": "00191514",
+            "id": "500MI00000pmvxzYAA",
+            "status": "Audit order",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00192358",
+            "id": "500MI00000q1RGfYAM",
+            "wd": 1.1
+          }
+        ],
+        "others": [
+          {
+            "cn": "00192357",
+            "id": "500MI00000q1RGeYAM",
+            "status": "Audit order",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00192595",
+            "id": "500MI00000q5iCHYAY",
+            "wd": 0.8
+          }
+        ],
+        "others": [
+          {
+            "cn": "00192594",
+            "id": "500MI00000q5iCGYAY",
+            "status": "Audit order",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00191219",
+            "id": "500MI00000phwOMYAY",
+            "wd": 7.5
+          }
+        ],
+        "others": [
+          {
+            "cn": "00191220",
+            "id": "500MI00000phwONYAY",
+            "status": "VIN Check",
+            "order": "ord-first-call",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
             "cn": "00190909",
             "id": "500MI00000pc256YAA",
-            "wd": 5.0
+            "wd": 5.1
           }
         ],
         "others": [
@@ -2748,9 +2685,104 @@
       {
         "aws": [
           {
+            "cn": "00192042",
+            "id": "500MI00000px6KAYAY",
+            "wd": 1.2
+          }
+        ],
+        "others": [
+          {
+            "cn": "00191927",
+            "id": "500MI00000putxTYAQ",
+            "status": "Auditor selection",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00191724",
+            "id": "500MI00000pqGpnYAE",
+            "wd": 5.5
+          }
+        ],
+        "others": [
+          {
+            "cn": "00191551",
+            "id": "500MI00000pnLcDYAU",
+            "status": "Audit result",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00191946",
+            "id": "500MI00000pv1qBYAQ",
+            "wd": 3.2
+          },
+          {
+            "cn": "00191947",
+            "id": "500MI00000pv1qCYAQ",
+            "wd": 4.2
+          }
+        ],
+        "others": [
+          {
+            "cn": "00191822",
+            "id": "500MI00000prraQYAQ",
+            "status": "Audit order",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00192282",
+            "id": "500MI00000q0ge2YAA",
+            "wd": 1.7
+          }
+        ],
+        "others": [
+          {
+            "cn": "00192283",
+            "id": "500MI00000q0ge3YAA",
+            "status": "Audit order",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00192350",
+            "id": "500MI00000q1RGXYA2",
+            "wd": 2.3
+          }
+        ],
+        "others": [
+          {
+            "cn": "00192175",
+            "id": "500MI00000pywS2YAI",
+            "status": "Audit order",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
             "cn": "00192780",
             "id": "500MI00000q980bYAA",
-            "wd": 0.2
+            "wd": 0.3
           }
         ],
         "others": [
@@ -2766,9 +2798,68 @@
       {
         "aws": [
           {
+            "cn": "00192539",
+            "id": "500MI00000q5SlhYAE",
+            "wd": 1.5
+          }
+        ],
+        "others": [
+          {
+            "cn": "00192378",
+            "id": "500MI00000q1vrBYAQ",
+            "status": "Car check",
+            "order": "ord-first-call",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00192347",
+            "id": "500MI00000q1RGUYA2",
+            "wd": 2.2
+          }
+        ],
+        "others": [
+          {
+            "cn": "00192346",
+            "id": "500MI00000q1RGTYA2",
+            "status": "Audit order",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00192344",
+            "id": "500MI00000q1Yg5YAE",
+            "wd": 1.9
+          },
+          {
+            "cn": "00192345",
+            "id": "500MI00000q1Yg6YAE",
+            "wd": 2.5
+          }
+        ],
+        "others": [
+          {
+            "cn": "00192072",
+            "id": "500MI00000pxM0qYAE",
+            "status": "Auditor selection",
+            "order": "ord-physical-check",
+            "kind": "inprog"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
             "cn": "00192314",
             "id": "500MI00000q0tbQYAQ",
-            "wd": 2.4
+            "wd": 2.5
           }
         ],
         "others": [
@@ -2787,265 +2878,21 @@
             "kind": "wait"
           }
         ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00191946",
-            "id": "500MI00000pv1qBYAQ",
-            "wd": 3.1
-          },
-          {
-            "cn": "00191947",
-            "id": "500MI00000pv1qCYAQ",
-            "wd": 4.1
-          }
-        ],
-        "others": [
-          {
-            "cn": "00191822",
-            "id": "500MI00000prraQYAQ",
-            "status": "Audit order",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00192539",
-            "id": "500MI00000q5SlhYAE",
-            "wd": 1.4
-          }
-        ],
-        "others": [
-          {
-            "cn": "00192378",
-            "id": "500MI00000q1vrBYAQ",
-            "status": "Car check",
-            "order": "ord-first-call",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00192042",
-            "id": "500MI00000px6KAYAY",
-            "wd": 1.1
-          }
-        ],
-        "others": [
-          {
-            "cn": "00191927",
-            "id": "500MI00000putxTYAQ",
-            "status": "Auditor selection",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00192358",
-            "id": "500MI00000q1RGfYAM",
-            "wd": 1.0
-          }
-        ],
-        "others": [
-          {
-            "cn": "00192357",
-            "id": "500MI00000q1RGeYAM",
-            "status": "Audit order",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00192599",
-            "id": "500MI00000q5aUvYAI",
-            "wd": 1.0
-          }
-        ],
-        "others": [
-          {
-            "cn": "00192598",
-            "id": "500MI00000q5aUuYAI",
-            "status": "Car check",
-            "order": "ord-first-call",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00192350",
-            "id": "500MI00000q1RGXYA2",
-            "wd": 2.2
-          }
-        ],
-        "others": [
-          {
-            "cn": "00192175",
-            "id": "500MI00000pywS2YAI",
-            "status": "Audit order",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00192344",
-            "id": "500MI00000q1Yg5YAE",
-            "wd": 1.8
-          },
-          {
-            "cn": "00192345",
-            "id": "500MI00000q1Yg6YAE",
-            "wd": 2.4
-          }
-        ],
-        "others": [
-          {
-            "cn": "00192072",
-            "id": "500MI00000pxM0qYAE",
-            "status": "Auditor selection",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00191219",
-            "id": "500MI00000phwOMYAY",
-            "wd": 7.3
-          }
-        ],
-        "others": [
-          {
-            "cn": "00191220",
-            "id": "500MI00000phwONYAY",
-            "status": "VIN Check",
-            "order": "ord-first-call",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00191513",
-            "id": "500MI00000pmvxyYAA",
-            "wd": 6.1
-          }
-        ],
-        "others": [
-          {
-            "cn": "00191514",
-            "id": "500MI00000pmvxzYAA",
-            "status": "Audit order",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00192282",
-            "id": "500MI00000q0ge2YAA",
-            "wd": 1.6
-          }
-        ],
-        "others": [
-          {
-            "cn": "00192283",
-            "id": "500MI00000q0ge3YAA",
-            "status": "Auditor selection",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00192595",
-            "id": "500MI00000q5iCHYAY",
-            "wd": 0.7
-          }
-        ],
-        "others": [
-          {
-            "cn": "00192594",
-            "id": "500MI00000q5iCGYAY",
-            "status": "Audit order",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00192347",
-            "id": "500MI00000q1RGUYA2",
-            "wd": 2.1
-          }
-        ],
-        "others": [
-          {
-            "cn": "00192346",
-            "id": "500MI00000q1RGTYA2",
-            "status": "Awaiting Selection",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
-            "cn": "00191724",
-            "id": "500MI00000pqGpnYAE",
-            "wd": 5.4
-          }
-        ],
-        "others": [
-          {
-            "cn": "00191551",
-            "id": "500MI00000pnLcDYAU",
-            "status": "Audit order",
-            "order": "ord-physical-check",
-            "kind": "inprog"
-          }
-        ]
       }
     ],
     "f_wait": [
       {
         "aws": [
           {
-            "cn": "00189332",
-            "id": "500MI00000pDwSGYA0",
-            "wd": 15.4
+            "cn": "00190531",
+            "id": "500MI00000pVl2AYAS",
+            "wd": 10.4
           }
         ],
         "others": [
           {
-            "cn": "00189217",
-            "id": "500MI00000pCHz9YAG",
+            "cn": "00189919",
+            "id": "500MI00000pLm9BYAS",
             "status": "CarAudit Done",
             "order": "ord-caraudit-delivered",
             "kind": "wait"
@@ -3057,12 +2904,12 @@
           {
             "cn": "00191660",
             "id": "500MI00000ppdy1YAA",
-            "wd": 5.8
+            "wd": 5.9
           },
           {
             "cn": "00191661",
             "id": "500MI00000ppdy2YAA",
-            "wd": 5.8
+            "wd": 5.9
           }
         ],
         "others": [
@@ -3078,27 +2925,9 @@
       {
         "aws": [
           {
-            "cn": "00192356",
-            "id": "500MI00000q1RGdYAM",
-            "wd": 2.4
-          }
-        ],
-        "others": [
-          {
-            "cn": "00192172",
-            "id": "500MI00000pyuDKYAY",
-            "status": "CarAudit Done",
-            "order": "ord-physical-check",
-            "kind": "wait"
-          }
-        ]
-      },
-      {
-        "aws": [
-          {
             "cn": "00191968",
             "id": "500MI00000pvYVqYAM",
-            "wd": 3.1
+            "wd": 3.2
           }
         ],
         "others": [
@@ -3114,15 +2943,33 @@
       {
         "aws": [
           {
-            "cn": "00190531",
-            "id": "500MI00000pVl2AYAS",
-            "wd": 10.3
+            "cn": "00192356",
+            "id": "500MI00000q1RGdYAM",
+            "wd": 2.5
           }
         ],
         "others": [
           {
-            "cn": "00189919",
-            "id": "500MI00000pLm9BYAS",
+            "cn": "00192172",
+            "id": "500MI00000pyuDKYAY",
+            "status": "CarAudit Done",
+            "order": "ord-physical-check",
+            "kind": "wait"
+          }
+        ]
+      },
+      {
+        "aws": [
+          {
+            "cn": "00189332",
+            "id": "500MI00000pDwSGYA0",
+            "wd": 15.5
+          }
+        ],
+        "others": [
+          {
+            "cn": "00189217",
+            "id": "500MI00000pCHz9YAG",
             "status": "CarAudit Done",
             "order": "ord-caraudit-delivered",
             "kind": "wait"
@@ -3141,26 +2988,26 @@
     "preferred": {
       "Auditor selection": {
         "pref": 14,
-        "nopref": 3
+        "nopref": 1
       },
       "Audit order": {
-        "pref": 21,
-        "nopref": 4
+        "pref": 19,
+        "nopref": 8
       },
       "Audit result": {
-        "pref": 4,
+        "pref": 7,
         "nopref": 1
       },
       "CarAudit preparation": {
         "pref": 4,
-        "nopref": 1
+        "nopref": 0
       }
     },
     "age": {
       "Auditor selection": {
         "lt2": {
           "pref": 12,
-          "nopref": 3
+          "nopref": 1
         },
         "b23": {
           "pref": 2,
@@ -3181,19 +3028,19 @@
       },
       "Audit order": {
         "lt2": {
-          "pref": 12,
-          "nopref": 2
+          "pref": 14,
+          "nopref": 6
         },
         "b23": {
-          "pref": 3,
+          "pref": 2,
           "nopref": 1
         },
         "b35": {
-          "pref": 3,
+          "pref": 2,
           "nopref": 1
         },
         "b57": {
-          "pref": 2,
+          "pref": 0,
           "nopref": 0
         },
         "gt7": {
@@ -3203,30 +3050,30 @@
       },
       "Audit result": {
         "lt2": {
-          "pref": 2,
+          "pref": 3,
           "nopref": 0
         },
         "b23": {
-          "pref": 1,
+          "pref": 2,
           "nopref": 1
         },
         "b35": {
-          "pref": 0,
+          "pref": 1,
           "nopref": 0
         },
         "b57": {
-          "pref": 0,
+          "pref": 1,
           "nopref": 0
         },
         "gt7": {
-          "pref": 1,
+          "pref": 0,
           "nopref": 0
         }
       },
       "CarAudit preparation": {
         "lt2": {
-          "pref": 2,
-          "nopref": 1
+          "pref": 1,
+          "nopref": 0
         },
         "b23": {
           "pref": 0,
@@ -3241,7 +3088,7 @@
           "nopref": 0
         },
         "gt7": {
-          "pref": 1,
+          "pref": 2,
           "nopref": 0
         }
       }
@@ -3265,7 +3112,7 @@
     "today_iso": "2026-07-08",
     "days_back": 5,
     "days_fwd": 7,
-    "max_count": 9,
+    "max_count": 10,
     "days": [
       {
         "date": "2026-07-03",
@@ -3309,22 +3156,16 @@
         "dow": "po",
         "offset": -2,
         "status": "overdue",
-        "pref": 2,
+        "pref": 1,
         "nopref": 0,
-        "total": 2,
+        "total": 1,
         "countries": {
-          "DE": 2
+          "DE": 1
         },
         "cases": [
           {
             "id": "500MI00000q09giYAA",
             "cn": "00192276",
-            "country": "DE",
-            "pref": true
-          },
-          {
-            "id": "500MI00000pmdZiYAI",
-            "cn": "00191499",
             "country": "DE",
             "pref": true
           }
@@ -3351,16 +3192,16 @@
             "pref": true
           },
           {
-            "id": "500MI00000ppgEXYAY",
-            "cn": "00191688",
-            "country": "IT",
-            "pref": false
-          },
-          {
             "id": "500MI00000pebptYAA",
             "cn": "00191138",
             "country": "IT",
             "pref": true
+          },
+          {
+            "id": "500MI00000ppgEXYAY",
+            "cn": "00191688",
+            "country": "IT",
+            "pref": false
           }
         ]
       },
@@ -3370,31 +3211,13 @@
         "dow": "st",
         "offset": 0,
         "status": "today",
-        "pref": 8,
+        "pref": 4,
         "nopref": 1,
-        "total": 9,
+        "total": 5,
         "countries": {
-          "DE": 9
+          "DE": 5
         },
         "cases": [
-          {
-            "id": "500MI00000puThyYAE",
-            "cn": "00191894",
-            "country": "DE",
-            "pref": true
-          },
-          {
-            "id": "500MI00000pmZKvYAM",
-            "cn": "00191506",
-            "country": "DE",
-            "pref": true
-          },
-          {
-            "id": "500MI00000pnLcDYAU",
-            "cn": "00191551",
-            "country": "DE",
-            "pref": true
-          },
           {
             "id": "500MI00000prInuYAE",
             "cn": "00191794",
@@ -3402,14 +3225,8 @@
             "pref": true
           },
           {
-            "id": "500MI00000puQc8YAE",
-            "cn": "00191899",
-            "country": "DE",
-            "pref": true
-          },
-          {
-            "id": "500MI00000pywF5YAI",
-            "cn": "00192177",
+            "id": "500MI00000q67fEYAQ",
+            "cn": "00192608",
             "country": "DE",
             "pref": true
           },
@@ -3420,8 +3237,8 @@
             "pref": true
           },
           {
-            "id": "500MI00000q67fEYAQ",
-            "cn": "00192608",
+            "id": "500MI00000puQc8YAE",
+            "cn": "00191899",
             "country": "DE",
             "pref": true
           },
@@ -3439,17 +3256,53 @@
         "dow": "čt",
         "offset": 1,
         "status": "future",
-        "pref": 5,
-        "nopref": 1,
-        "total": 6,
+        "pref": 6,
+        "nopref": 4,
+        "total": 10,
         "countries": {
-          "DE": 5,
+          "DE": 9,
           "NL": 1
         },
         "cases": [
           {
+            "id": "500MI00000q71CtYAI",
+            "cn": "00192652",
+            "country": "DE",
+            "pref": true
+          },
+          {
+            "id": "500MI00000q0ge3YAA",
+            "cn": "00192283",
+            "country": "DE",
+            "pref": false
+          },
+          {
+            "id": "500MI00000q1RGbYAM",
+            "cn": "00192354",
+            "country": "DE",
+            "pref": false
+          },
+          {
+            "id": "500MI00000q1RGeYAM",
+            "cn": "00192357",
+            "country": "DE",
+            "pref": false
+          },
+          {
+            "id": "500MI00000q5aUvYAI",
+            "cn": "00192599",
+            "country": "DE",
+            "pref": false
+          },
+          {
             "id": "500MI00000prraQYAQ",
             "cn": "00191822",
+            "country": "DE",
+            "pref": true
+          },
+          {
+            "id": "500MI00000pxTaEYAU",
+            "cn": "00192095",
             "country": "DE",
             "pref": true
           },
@@ -3466,18 +3319,6 @@
             "pref": true
           },
           {
-            "id": "500MI00000pip3IYAQ",
-            "cn": "00191317",
-            "country": "DE",
-            "pref": true
-          },
-          {
-            "id": "500MI00000q1RGbYAM",
-            "cn": "00192354",
-            "country": "DE",
-            "pref": false
-          },
-          {
             "id": "500MI00000q2u0FYAQ",
             "cn": "00192446",
             "country": "NL",
@@ -3491,17 +3332,23 @@
         "dow": "pá",
         "offset": 2,
         "status": "future",
-        "pref": 3,
-        "nopref": 0,
-        "total": 3,
+        "pref": 4,
+        "nopref": 1,
+        "total": 5,
         "countries": {
-          "DE": 2,
+          "DE": 4,
           "PL": 1
         },
         "cases": [
           {
-            "id": "500MI00000pxn11YAA",
-            "cn": "00192125",
+            "id": "500MI00000q1RGTYA2",
+            "cn": "00192346",
+            "country": "DE",
+            "pref": false
+          },
+          {
+            "id": "500MI00000q5PBEYA2",
+            "cn": "00192554",
             "country": "DE",
             "pref": true
           },
@@ -3514,6 +3361,12 @@
           {
             "id": "500MI00000q6QjVYAU",
             "cn": "00192631",
+            "country": "DE",
+            "pref": true
+          },
+          {
+            "id": "500MI00000pxn11YAA",
+            "cn": "00192125",
             "country": "DE",
             "pref": true
           }
@@ -3549,13 +3402,19 @@
         "dow": "po",
         "offset": 5,
         "status": "future",
-        "pref": 1,
+        "pref": 2,
         "nopref": 1,
-        "total": 2,
+        "total": 3,
         "countries": {
-          "DE": 2
+          "DE": 3
         },
         "cases": [
+          {
+            "id": "500MI00000pip3IYAQ",
+            "cn": "00191317",
+            "country": "DE",
+            "pref": true
+          },
           {
             "id": "500MI00000q5255YAA",
             "cn": "00192518",
@@ -3604,23 +3463,23 @@
       "nopref": 0
     },
     "totals": {
-      "overdue": 5,
-      "overdue_pref": 4,
+      "overdue": 4,
+      "overdue_pref": 3,
       "overdue_days_count": 2,
       "max_overdue_days_back": 2,
-      "today": 9,
-      "today_pref": 8,
-      "tomorrow": 6,
-      "tomorrow_pref": 5,
-      "week": 20,
-      "total": 25
+      "today": 5,
+      "today_pref": 4,
+      "tomorrow": 10,
+      "tomorrow_pref": 6,
+      "week": 23,
+      "total": 27
     }
   },
   "cebia_audit_order_expected": {
     "today_iso": "2026-07-08",
     "days_back": 5,
     "days_fwd": 7,
-    "max_count": 5,
+    "max_count": 6,
     "days": [
       {
         "date": "2026-07-03",
@@ -3701,10 +3560,10 @@
         "offset": 1,
         "status": "future",
         "pref": 0,
-        "nopref": 5,
-        "total": 5,
+        "nopref": 6,
+        "total": 6,
         "countries": {
-          "CZ": 5
+          "CZ": 6
         },
         "cases": [
           {
@@ -3714,8 +3573,8 @@
             "pref": false
           },
           {
-            "id": "500MI00000q64KoYAI",
-            "cn": "00192620",
+            "id": "500MI00000q6aj4YAA",
+            "cn": "00192640",
             "country": "CZ",
             "pref": false
           },
@@ -3734,6 +3593,12 @@
           {
             "id": "500MI00000q1XteYAE",
             "cn": "00192340",
+            "country": "CZ",
+            "pref": false
+          },
+          {
+            "id": "500MI00000q64KoYAI",
+            "cn": "00192620",
             "country": "CZ",
             "pref": false
           }
@@ -3849,10 +3714,10 @@
       "max_overdue_days_back": 0,
       "today": 0,
       "today_pref": 0,
-      "tomorrow": 5,
+      "tomorrow": 6,
       "tomorrow_pref": 0,
-      "week": 8,
-      "total": 8
+      "week": 9,
+      "total": 9
     }
   },
   "prep_to_done_daily": {
@@ -4084,7 +3949,7 @@
         {
           "name": "Daniel Forman",
           "by_date": {
-            "2026-07-08": 4,
+            "2026-07-08": 6,
             "2026-07-07": 9,
             "2026-07-06": 6,
             "2026-07-03": 6,
@@ -4129,7 +3994,7 @@
             "2026-05-11": 6,
             "2026-05-08": 5
           },
-          "total": 323
+          "total": 325
         },
         {
           "name": "Marek Moťovský",
@@ -4184,7 +4049,7 @@
         {
           "name": "Daniel Noga",
           "by_date": {
-            "2026-07-08": 3,
+            "2026-07-08": 5,
             "2026-07-07": 8,
             "2026-07-06": 7,
             "2026-07-03": 0,
@@ -4229,12 +4094,12 @@
             "2026-05-11": 7,
             "2026-05-08": 7
           },
-          "total": 184
+          "total": 186
         },
         {
           "name": "Martin Linhart",
           "by_date": {
-            "2026-07-08": 4,
+            "2026-07-08": 5,
             "2026-07-07": 5,
             "2026-07-06": 0,
             "2026-07-03": 7,
@@ -4279,7 +4144,7 @@
             "2026-05-11": 0,
             "2026-05-08": 0
           },
-          "total": 88
+          "total": 89
         },
         {
           "name": "Martin Farkas",
@@ -4582,7 +4447,7 @@
           "total": 12
         },
         {
-          "name": "Jan Kern",
+          "name": "Monika Selmová",
           "by_date": {
             "2026-07-08": 0,
             "2026-07-07": 1,
@@ -4605,56 +4470,6 @@
             "2026-06-12": 0,
             "2026-06-11": 0,
             "2026-06-10": 0,
-            "2026-06-09": 0,
-            "2026-06-08": 0,
-            "2026-06-05": 0,
-            "2026-06-04": 0,
-            "2026-06-03": 0,
-            "2026-06-02": 0,
-            "2026-06-01": 0,
-            "2026-05-29": 0,
-            "2026-05-28": 0,
-            "2026-05-27": 0,
-            "2026-05-26": 0,
-            "2026-05-25": 0,
-            "2026-05-22": 0,
-            "2026-05-21": 0,
-            "2026-05-20": 0,
-            "2026-05-19": 0,
-            "2026-05-18": 0,
-            "2026-05-15": 0,
-            "2026-05-14": 0,
-            "2026-05-13": 0,
-            "2026-05-12": 0,
-            "2026-05-11": 0,
-            "2026-05-08": 0
-          },
-          "total": 1
-        },
-        {
-          "name": "Dardan Nimani",
-          "by_date": {
-            "2026-07-08": 0,
-            "2026-07-07": 0,
-            "2026-07-06": 0,
-            "2026-07-03": 0,
-            "2026-07-02": 0,
-            "2026-07-01": 0,
-            "2026-06-30": 0,
-            "2026-06-29": 0,
-            "2026-06-26": 0,
-            "2026-06-25": 0,
-            "2026-06-24": 0,
-            "2026-06-23": 0,
-            "2026-06-22": 0,
-            "2026-06-19": 0,
-            "2026-06-18": 0,
-            "2026-06-17": 0,
-            "2026-06-16": 0,
-            "2026-06-15": 0,
-            "2026-06-12": 0,
-            "2026-06-11": 0,
-            "2026-06-10": 1,
             "2026-06-09": 0,
             "2026-06-08": 0,
             "2026-06-05": 0,
@@ -4732,56 +4547,6 @@
           "total": 1
         },
         {
-          "name": "Monika Selmová",
-          "by_date": {
-            "2026-07-08": 0,
-            "2026-07-07": 1,
-            "2026-07-06": 0,
-            "2026-07-03": 0,
-            "2026-07-02": 0,
-            "2026-07-01": 0,
-            "2026-06-30": 0,
-            "2026-06-29": 0,
-            "2026-06-26": 0,
-            "2026-06-25": 0,
-            "2026-06-24": 0,
-            "2026-06-23": 0,
-            "2026-06-22": 0,
-            "2026-06-19": 0,
-            "2026-06-18": 0,
-            "2026-06-17": 0,
-            "2026-06-16": 0,
-            "2026-06-15": 0,
-            "2026-06-12": 0,
-            "2026-06-11": 0,
-            "2026-06-10": 0,
-            "2026-06-09": 0,
-            "2026-06-08": 0,
-            "2026-06-05": 0,
-            "2026-06-04": 0,
-            "2026-06-03": 0,
-            "2026-06-02": 0,
-            "2026-06-01": 0,
-            "2026-05-29": 0,
-            "2026-05-28": 0,
-            "2026-05-27": 0,
-            "2026-05-26": 0,
-            "2026-05-25": 0,
-            "2026-05-22": 0,
-            "2026-05-21": 0,
-            "2026-05-20": 0,
-            "2026-05-19": 0,
-            "2026-05-18": 0,
-            "2026-05-15": 0,
-            "2026-05-14": 0,
-            "2026-05-13": 0,
-            "2026-05-12": 0,
-            "2026-05-11": 0,
-            "2026-05-08": 0
-          },
-          "total": 1
-        },
-        {
           "name": "Michael Hladík",
           "by_date": {
             "2026-07-08": 0,
@@ -4830,10 +4595,110 @@
             "2026-05-08": 0
           },
           "total": 1
+        },
+        {
+          "name": "Dardan Nimani",
+          "by_date": {
+            "2026-07-08": 0,
+            "2026-07-07": 0,
+            "2026-07-06": 0,
+            "2026-07-03": 0,
+            "2026-07-02": 0,
+            "2026-07-01": 0,
+            "2026-06-30": 0,
+            "2026-06-29": 0,
+            "2026-06-26": 0,
+            "2026-06-25": 0,
+            "2026-06-24": 0,
+            "2026-06-23": 0,
+            "2026-06-22": 0,
+            "2026-06-19": 0,
+            "2026-06-18": 0,
+            "2026-06-17": 0,
+            "2026-06-16": 0,
+            "2026-06-15": 0,
+            "2026-06-12": 0,
+            "2026-06-11": 0,
+            "2026-06-10": 1,
+            "2026-06-09": 0,
+            "2026-06-08": 0,
+            "2026-06-05": 0,
+            "2026-06-04": 0,
+            "2026-06-03": 0,
+            "2026-06-02": 0,
+            "2026-06-01": 0,
+            "2026-05-29": 0,
+            "2026-05-28": 0,
+            "2026-05-27": 0,
+            "2026-05-26": 0,
+            "2026-05-25": 0,
+            "2026-05-22": 0,
+            "2026-05-21": 0,
+            "2026-05-20": 0,
+            "2026-05-19": 0,
+            "2026-05-18": 0,
+            "2026-05-15": 0,
+            "2026-05-14": 0,
+            "2026-05-13": 0,
+            "2026-05-12": 0,
+            "2026-05-11": 0,
+            "2026-05-08": 0
+          },
+          "total": 1
+        },
+        {
+          "name": "Jan Kern",
+          "by_date": {
+            "2026-07-08": 0,
+            "2026-07-07": 1,
+            "2026-07-06": 0,
+            "2026-07-03": 0,
+            "2026-07-02": 0,
+            "2026-07-01": 0,
+            "2026-06-30": 0,
+            "2026-06-29": 0,
+            "2026-06-26": 0,
+            "2026-06-25": 0,
+            "2026-06-24": 0,
+            "2026-06-23": 0,
+            "2026-06-22": 0,
+            "2026-06-19": 0,
+            "2026-06-18": 0,
+            "2026-06-17": 0,
+            "2026-06-16": 0,
+            "2026-06-15": 0,
+            "2026-06-12": 0,
+            "2026-06-11": 0,
+            "2026-06-10": 0,
+            "2026-06-09": 0,
+            "2026-06-08": 0,
+            "2026-06-05": 0,
+            "2026-06-04": 0,
+            "2026-06-03": 0,
+            "2026-06-02": 0,
+            "2026-06-01": 0,
+            "2026-05-29": 0,
+            "2026-05-28": 0,
+            "2026-05-27": 0,
+            "2026-05-26": 0,
+            "2026-05-25": 0,
+            "2026-05-22": 0,
+            "2026-05-21": 0,
+            "2026-05-20": 0,
+            "2026-05-19": 0,
+            "2026-05-18": 0,
+            "2026-05-15": 0,
+            "2026-05-14": 0,
+            "2026-05-13": 0,
+            "2026-05-12": 0,
+            "2026-05-11": 0,
+            "2026-05-08": 0
+          },
+          "total": 1
         }
       ],
       "day_totals": [
-        16,
+        21,
         37,
         24,
         17,
@@ -5134,7 +4999,7 @@
   },
   "agent_activity": {
     "today_iso": "2026-07-08",
-    "current_hour": 15,
+    "current_hour": 16,
     "hours": [
       7,
       8,
@@ -5159,11 +5024,12 @@
           "11": 7,
           "9": 10,
           "10": 7,
-          "15": 3
+          "16": 9,
+          "15": 12
         },
-        "total": 61,
+        "total": 79,
         "move": 13,
-        "feed": 48
+        "feed": 66
       },
       {
         "agent": "Agent5",
@@ -5173,32 +5039,35 @@
           "9": 8,
           "11": 3,
           "8": 3,
-          "14": 1
+          "14": 1,
+          "16": 3,
+          "15": 4
         },
-        "total": 29,
+        "total": 36,
         "move": 7,
-        "feed": 22
+        "feed": 29
       },
       {
         "agent": "Agent7",
         "by_hour": {
           "10": 2,
+          "15": 2,
           "9": 6,
           "13": 10,
           "12": 2,
           "11": 1
         },
-        "total": 21,
-        "move": 4,
+        "total": 23,
+        "move": 6,
         "feed": 17
       },
       {
         "agent": "Agent6",
         "by_hour": {
           "12": 2,
-          "14": 1,
           "11": 1,
-          "10": 1
+          "10": 1,
+          "14": 1
         },
         "total": 5,
         "move": 1,
@@ -5218,16 +5087,18 @@
         "agent": "Neprideleno",
         "by_hour": {
           "10": 8,
+          "15": 6,
           "9": 7,
           "11": 2,
           "14": 6,
           "12": 2,
-          "13": 1,
-          "8": 3
+          "8": 3,
+          "16": 3,
+          "13": 1
         },
-        "total": 29,
-        "move": 6,
-        "feed": 23
+        "total": 38,
+        "move": 8,
+        "feed": 30
       }
     ],
     "col_totals": {
@@ -5239,13 +5110,13 @@
       "12": 21,
       "13": 24,
       "14": 23,
-      "15": 4,
-      "16": 0,
+      "15": 25,
+      "16": 15,
       "17": 0,
       "18": 0
     },
-    "grand_total": 147,
-    "src_move_total": 32,
-    "src_feed_total": 115
+    "grand_total": 183,
+    "src_move_total": 36,
+    "src_feed_total": 147
   }
 }
